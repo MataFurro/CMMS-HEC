@@ -1,8 +1,19 @@
 <?php
 // pages/new_asset.php
 
+// Verificar permisos - Solo Ingeniero/Admin puede crear activos
+if (!canModify()) {
+    header('Location: ?page=inventory');
+    exit;
+}
+
 // Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Doble verificación de permisos en backend
+    if (!canModify()) {
+        die('Acceso denegado. Solo Ingeniero/Admin puede crear activos.');
+    }
+
     // In a real app, sanitize and save to DB
     // $data = $_POST;
     // saveAsset($data);

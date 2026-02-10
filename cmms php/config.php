@@ -16,6 +16,7 @@ define('SIDEBAR_DASHBOARD', 'Dashboard');
 define('SIDEBAR_CALENDAR', 'Agenda Técnica');
 define('SIDEBAR_ORDERS', 'Órdenes');
 define('SIDEBAR_INVENTORY', 'Inventario');
+define('SIDEBAR_FAMILY_ANALYSIS', 'Análisis por Familia');
 
 define('BTN_NEW_ASSET', 'Nuevo Activo');
 define('BTN_UPLOAD_EXCEL', 'Cargar Excel');
@@ -26,6 +27,27 @@ define('STATUS_OPERATIVE', 'OPERATIVE');
 define('STATUS_MAINTENANCE', 'MAINTENANCE');
 define('STATUS_OUT_OF_SERVICE', 'OUT_OF_SERVICE');
 define('STATUS_OPERATIVE_WITH_OBS', 'OPERATIVE_WITH_OBS');
+
+// Helper functions para verificación de permisos
+function canModify()
+{
+    return !in_array($_SESSION['user_role'] ?? '', ['Técnico', 'Auditor']);
+}
+
+function canExecuteWorkOrder()
+{
+    return in_array($_SESSION['user_role'] ?? '', ['Técnico', 'Ingeniero', 'Admin']);
+}
+
+function canCompleteWorkOrder()
+{
+    return !in_array($_SESSION['user_role'] ?? '', ['Técnico', 'Auditor']);
+}
+
+function isReadOnly()
+{
+    return ($_SESSION['user_role'] ?? '') === 'Auditor';
+}
 
 // Error Reporting (Enable for Dev)
 error_reporting(E_ALL);

@@ -113,14 +113,16 @@ $filteredAssets = array_filter($assets, function ($asset) use ($searchTerm, $sta
             <p class="text-slate-400 mt-2 text-lg">Gestión centralizada de equipamiento clínico y soporte de vida.</p>
         </div>
         <div class="flex items-center gap-4">
-            <!-- Export - Visible to All -->
-            <button class="h-11 flex items-center gap-3 px-6 bg-slate-700 text-white rounded-2xl hover:bg-slate-600 transition-all font-bold shadow-xl shadow-slate-700/20 active:scale-95">
-                <span class="material-symbols-outlined text-xl">download</span>
-                <span><?= BTN_DOWNLOAD_EXCEL ?></span>
-            </button>
+            <?php if (canModify()): ?>
+                <!-- Export - Hidden for Técnico and Auditor -->
+                <button class="h-11 flex items-center gap-3 px-6 bg-slate-700 text-white rounded-2xl hover:bg-slate-600 transition-all font-bold shadow-xl shadow-slate-700/20 active:scale-95">
+                    <span class="material-symbols-outlined text-xl">download</span>
+                    <span><?= BTN_DOWNLOAD_EXCEL ?></span>
+                </button>
+            <?php endif; ?>
 
-            <?php if ($_SESSION['user_role'] !== 'Auditor'): ?>
-                <!-- Import/Create - Hidden for Auditor -->
+            <?php if (canModify()): ?>
+                <!-- Import/Create - Hidden for Técnico and Auditor -->
                 <form method="POST" enctype="multipart/form-data" class="flex items-center gap-2">
                     <input type="file" name="excel_file" id="excel_input" class="hidden" accept=".xlsx, .xls, .csv" onchange="this.form.submit()">
                     <button type="button" onclick="document.getElementById('excel_input').click()" class="h-11 flex items-center gap-3 px-6 bg-excel-green text-white rounded-2xl hover:bg-excel-green/90 transition-all font-bold shadow-xl shadow-excel-green/20 active:scale-95">

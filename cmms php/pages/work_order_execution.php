@@ -95,7 +95,7 @@ $checks = ['Seguridad Eléctrica (Fugas)', 'Inspección Visual Chasis', 'Prueba 
                             <p class="text-xs text-slate-500 uppercase font-bold tracking-widest mt-0.5">Protocolos firmados y capturas de pantalla</p>
                         </div>
                     </div>
-                    <?php if (!$isCompleted): ?>
+                    <?php if (!$isCompleted && canExecuteWorkOrder()): ?>
                         <button class="flex items-center gap-2 text-[10px] font-black text-medical-blue uppercase tracking-widest hover:bg-medical-blue/10 px-4 py-2 rounded-xl border border-medical-blue/30 transition-all">
                             <span class="material-symbols-outlined text-sm">cloud_upload</span>
                             Cargar Evidencia
@@ -125,7 +125,7 @@ $checks = ['Seguridad Eléctrica (Fugas)', 'Inspección Visual Chasis', 'Prueba 
                         </div>
                     <?php endforeach; ?>
 
-                    <?php if (!$isCompleted): ?>
+                    <?php if (!$isCompleted && canExecuteWorkOrder()): ?>
                         <div class="p-8 border-2 border-dashed border-slate-700/50 rounded-2xl flex flex-col items-center justify-center text-slate-600 gap-2 hover:border-medical-blue/50 hover:text-medical-blue transition-all cursor-pointer">
                             <span class="material-symbols-outlined text-3xl">upload_file</span>
                             <p class="text-[10px] font-black uppercase tracking-widest">Arrastra evidencia técnica aquí</p>
@@ -150,7 +150,8 @@ $checks = ['Seguridad Eléctrica (Fugas)', 'Inspección Visual Chasis', 'Prueba 
                 <?php else: ?>
                     <textarea
                         class="w-full bg-slate-900 border border-slate-700/50 rounded-2xl p-6 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all min-h-[180px] text-slate-300 placeholder:text-slate-700 font-medium"
-                        placeholder="Describa el trabajo realizado, hallazgos técnicos, repuestos reemplazados y observaciones finales..."></textarea>
+                        placeholder="Describa el trabajo realizado, hallazgos técnicos, repuestos reemplazados y observaciones finales..."
+                        <?= isReadOnly() ? 'readonly' : '' ?>></textarea>
                 <?php endif; ?>
             </div>
         </div>
@@ -200,14 +201,18 @@ $checks = ['Seguridad Eléctrica (Fugas)', 'Inspección Visual Chasis', 'Prueba 
                         </div>
                     <?php else: ?>
                         <div class="space-y-4">
-                            <button onclick="window.location.href='?page=work_orders'" class="w-full py-4 bg-emerald-500 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 hover:bg-emerald-500/90 transition-all flex items-center justify-center gap-3 text-xs">
-                                <span class="material-symbols-outlined text-xl">verified</span>
-                                <span>Finalizar e Informar</span>
-                            </button>
-                            <button class="w-full py-4 bg-white/5 border border-slate-700/50 text-slate-300 font-black uppercase tracking-widest rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-3 text-xs">
-                                <span class="material-symbols-outlined text-xl">save</span>
-                                <span>Guardar Borrador</span>
-                            </button>
+                            <?php if (canCompleteWorkOrder()): ?>
+                                <button onclick="window.location.href='?page=work_orders'" class="w-full py-4 bg-emerald-500 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 hover:bg-emerald-500/90 transition-all flex items-center justify-center gap-3 text-xs">
+                                    <span class="material-symbols-outlined text-xl">verified</span>
+                                    <span>Finalizar e Informar</span>
+                                </button>
+                            <?php endif; ?>
+                            <?php if (canExecuteWorkOrder()): ?>
+                                <button class="w-full py-4 bg-white/5 border border-slate-700/50 text-slate-300 font-black uppercase tracking-widest rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-3 text-xs">
+                                    <span class="material-symbols-outlined text-xl">save</span>
+                                    <span>Guardar Borrador</span>
+                                </button>
+                            <?php endif; ?>
                         </div>
                     <?php endif; ?>
                 </div>

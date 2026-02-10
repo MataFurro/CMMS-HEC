@@ -40,7 +40,7 @@ $orders = [
             <p class="text-slate-400 text-sm mt-1">Gestión y seguimiento de mantenimientos.</p>
         </div>
     </div>
-    <?php if ($_SESSION['user_role'] !== 'Auditor'): ?>
+    <?php if (canModify()): ?>
         <a href="?page=work_order_opening" class="h-10 px-6 bg-medical-blue text-white rounded-xl font-bold hover:bg-medical-blue/90 flex items-center gap-2 transition-all shadow-lg shadow-medical-blue/20">
             <span class="material-symbols-outlined text-lg">add</span>
             Nueva Orden
@@ -129,7 +129,7 @@ $orders = [
                         <a href="?page=work_order_execution&id=<?= $ot['id'] ?>" class="text-slate-400 hover:text-white transition-colors">
                             <span class="material-symbols-outlined text-lg">visibility</span>
                         </a>
-                        <?php if ($ot['status'] === 'En Proceso' && $_SESSION['user_role'] !== 'Auditor'): ?>
+                        <?php if ($ot['status'] !== 'Terminada' && canExecuteWorkOrder()): ?>
                             <a href="?page=work_order_execution&id=<?= $ot['id'] ?>&action=complete" class="ml-2 px-4 py-2 bg-emerald-500 text-white rounded-lg text-xs font-black uppercase hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20" title="Completar Orden">
                                 COMPLETAR
                             </a>

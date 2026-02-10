@@ -1,8 +1,19 @@
 <?php
 // pages/work_order_opening.php
 
+// Verificar permisos - Solo Ingeniero/Admin puede crear órdenes
+if (!canModify()) {
+    header('Location: ?page=work_orders');
+    exit;
+}
+
 // Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Doble verificación de permisos en backend
+    if (!canModify()) {
+        die('Acceso denegado. Solo Ingeniero/Admin puede crear órdenes.');
+    }
+
     // In a real app, save to DB
     // $data = $_POST;
     // createWorkOrder($data);

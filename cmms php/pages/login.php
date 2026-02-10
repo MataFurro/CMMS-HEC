@@ -18,19 +18,19 @@ $roles = [
     ],
     'chief' => [
         'name' => 'Ing. Roberto Jefe',
-        'role' => 'Ingeniero Jefe',
+        'role' => 'Ingeniero',
         'avatar' => 'https://i.pravatar.cc/150?u=chief',
         'desc' => 'Gestión y Reportes'
     ],
     'engineer' => [
         'name' => 'Ing. Laura',
-        'role' => 'Ingeniero Biomédico',
+        'role' => 'Ingeniero',
         'avatar' => 'https://i.pravatar.cc/150?u=eng',
         'desc' => 'Supervisión Técnica'
     ],
     'tech' => [
         'name' => 'Téc. Mario',
-        'role' => 'Técnico Especialista',
+        'role' => 'Técnico',
         'avatar' => 'https://i.pravatar.cc/150?u=tech',
         'desc' => 'Ejecución de OTs'
     ],
