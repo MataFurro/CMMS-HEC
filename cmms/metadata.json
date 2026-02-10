@@ -1,0 +1,7 @@
+{
+  "name": "BioCMMS v4.2 Pro",
+  "description": "Professional Biomedical CMMS for medical asset management, preventive maintenance, and regulatory compliance (MINSAL/ISO 13485 standards).",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
