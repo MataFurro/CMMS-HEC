@@ -15,49 +15,114 @@ $assets = [
         'ownership' => 'Propio',
         'criticality' => 'CRITICAL',
         'status' => 'OPERATIVE',
+        'riesgoGE' => 'Life Support',
+        'codigoUMDNS' => '17-429',
+        'fechaInstalacion' => '2018-05-10',
+        'purchasedYear' => 2018,
+        'acquisitionCost' => 45000,
+        'vencimientoVidaUtil' => '2028-05-10',
+        'totalUsefulLife' => 10,
         'usefulLife' => 75,
         'yearsRemaining' => 6,
         'warrantyUntil' => '2024-12-15',
         'warrantyExpiration' => '2024-12-15',
+        'lastMaintenance' => '2023-11-20',
+        'nextMaintenance' => '2024-05-20',
         'underMaintenancePlan' => true,
+        'enUso' => true,
+        'recalls' => [],
         'imageUrl' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuArjc0RB-oPKqM3OEkdyKO5qx0pqx3tnnDtgQIHmBy0OPhWndzJRDGmHAcSYe5KMj0OjejmEqQHwFvzj3j49_uv32qOSGRi45_B0VwA769XNTkLdWndUI_FM0j2hmcjFtaudmO_Y7PVvrQYFCicy5r0hOsgef2wmHu8tH4m42rvSfGyQ0ijsJnKLkakgcGce8Iu_LCpMrDOwXVMHGj1pEW6dn2BZOSGHAPH7GUrrvLeB-Sphiq9IgFn8INtJB9-UCwIwvp96rzTMKE'
     ],
     [
-        'id' => 'AL-8015-994',
-        'serialNumber' => 'AL-8015-994',
+        'id' => 'AL-500-00441',
+        'serialNumber' => 'SN-882211-X',
         'name' => 'Bomba de Infusión',
         'brand' => 'Alaris',
-        'model' => '8015',
-        'location' => 'Quirófano 1',
-        'subLocation' => 'Pabellón Central',
-        'vendor' => 'CareFusion',
-        'ownership' => 'Arriendo',
+        'model' => 'GH Plus',
+        'location' => 'Urgencias - Sala 01',
+        'subLocation' => 'Box 1',
+        'vendor' => 'Becton Dickinson',
+        'ownership' => 'Comodato',
         'criticality' => 'RELEVANT',
         'status' => 'MAINTENANCE',
-        'usefulLife' => 40,
-        'yearsRemaining' => 3,
-        'warrantyUntil' => '2025-02-10',
-        'warrantyExpiration' => '2025-02-10',
+        'riesgoGE' => 'High Risk',
+        'codigoUMDNS' => '13-215',
+        'fechaInstalacion' => '2021-02-15',
+        'purchasedYear' => 2021,
+        'acquisitionCost' => 8500,
+        'vencimientoVidaUtil' => '2031-02-15',
+        'totalUsefulLife' => 10,
+        'usefulLife' => 85,
+        'yearsRemaining' => 7,
+        'warrantyUntil' => '2026-02-15',
+        'warrantyExpiration' => '2026-02-15',
+        'lastMaintenance' => '2024-02-10',
+        'nextMaintenance' => '2024-08-10',
         'underMaintenancePlan' => true,
-        'imageUrl' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuCqTY2B_WeZ_djLO8S6euAFUJ1WzmzbMSUGYduj9g59ioholcDXR6um3kCeWy8poItGYaqCnDdViYv97BGdYNx8ucDtglCYRM8Bn0aWVmXsngWQharhj4mTBqGiH58Vdm_g9T9eTm72oulsEa28E5vrELOutWmLu_-yqJAEsNzS1XHxFT7w4-ZP_s112NWvyWajE_qYtSotNUDX_RmK9BRoKh5E1SLr0eiG4u1f8btf5ya4Q9ay-aLE9NzkgsKJHPSZonQn9m3BQ4o'
+        'enUso' => false,
+        'recalls' => [
+            ['id' => 'AV-2024-01', 'agency' => 'ISP', 'priority' => 'Alta', 'description' => 'Falla en software de goteo']
+        ],
+        'imageUrl' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuCqTY2B_WeZ_djLO8S6euAFUJ1WzmzbMSUGYduj9g59ioholcDXR6um3kCeWy8poItGYaqCnDdViYv97BGdYNx8ucDtglCYRM8Bn0aWVnXsngWQharhj4mTBqGiH58Vdm_g9T9eTm72oulsEa28E5vrELOutWmLu_-yqJAEsNzS1XHxFT7w4-ZP_s112NWvyWajE_qYtSotNUDX_RmK9BRoKh5E1SLr0eiG4u1f8btf5ya4Q9ay-aLE9NzkgsKJHPSZonQn9m3BQ4o'
     ],
     [
-        'id' => 'ZL-X-44211',
-        'serialNumber' => 'ZL-X-44211',
-        'name' => 'Desfibrilador',
-        'brand' => 'Zoll',
-        'model' => 'Series X',
-        'location' => 'Urgencias - Carro Rojo',
-        'subLocation' => 'Reanimación 1',
-        'vendor' => 'Zoll Medical',
-        'ownership' => 'Comodato',
+        'id' => 'MM-X3-00922',
+        'serialNumber' => 'SN-773344-Y',
+        'name' => 'Monitor Multiparamétrico',
+        'brand' => 'Mindray',
+        'model' => 'BeneVision X3',
+        'location' => 'Pabellón 03',
+        'subLocation' => 'Mesa Anestesia',
+        'vendor' => 'Mindray Chile',
+        'ownership' => 'Propio',
         'criticality' => 'CRITICAL',
-        'status' => 'OPERATIVE',
+        'status' => 'OPERATIVE_WITH_OBS',
+        'riesgoGE' => 'High Risk',
+        'codigoUMDNS' => '12-630',
+        'fechaInstalacion' => '2022-08-20',
+        'purchasedYear' => 2022,
+        'acquisitionCost' => 12000,
+        'vencimientoVidaUtil' => '2032-08-20',
+        'totalUsefulLife' => 10,
         'usefulLife' => 90,
         'yearsRemaining' => 8,
-        'warrantyUntil' => '2026-05-20',
-        'warrantyExpiration' => '2026-05-20',
+        'warrantyUntil' => '2025-08-20',
+        'warrantyExpiration' => '2025-08-20',
+        'lastMaintenance' => '2024-01-15',
+        'nextMaintenance' => '2024-07-15',
         'underMaintenancePlan' => true,
+        'enUso' => true,
+        'recalls' => [],
+        'imageUrl' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuCuTnaOyhDigSEJ_ZeiC5vlm5VEN4TICv5-Uk95l4oLSa4UlVPj36whZ9nAbcywMbM2UJsZSQQ-ZzoERBXbiyPkVhNiEq5VFx609iR72MDSNS9M15h6Xw71p6PKvEmyUBH3-ICY4Q8NsO7WSOPEdLVGp347QdiBje3dZ088nhjDZqFJQV6q_PMoECxkS3wI4nNpI5j-nZ5BgVzOhP7Uu3mulfvz2PZpBfaq6vbjJh9zaqLzkw9c3G4TgLFD4g_QY0tXEmNI-8-100s'
+    ],
+    [
+        'id' => 'DF-CU-00210',
+        'serialNumber' => 'SN-554433-Z',
+        'name' => 'Desfibrilador',
+        'brand' => 'Zoll',
+        'model' => 'R Series',
+        'location' => 'Piso 3 - Torre A',
+        'subLocation' => 'Carro de Paro',
+        'vendor' => 'Medtronic',
+        'ownership' => 'Propio',
+        'criticality' => 'CRITICAL',
+        'status' => 'NO_OPERATIVE',
+        'riesgoGE' => 'Life Support',
+        'codigoUMDNS' => '11-129',
+        'fechaInstalacion' => '2020-03-30',
+        'purchasedYear' => 2020,
+        'acquisitionCost' => 15000,
+        'vencimientoVidaUtil' => '2030-03-30',
+        'totalUsefulLife' => 10,
+        'usefulLife' => 40,
+        'yearsRemaining' => 4,
+        'warrantyUntil' => '2025-03-30',
+        'warrantyExpiration' => '2025-03-30',
+        'lastMaintenance' => '2023-12-01',
+        'nextMaintenance' => '2024-06-01',
+        'underMaintenancePlan' => true,
+        'enUso' => false,
+        'recalls' => [],
         'imageUrl' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuCuTnaOyhDigSEJ_ZeiC5vlm5VEN4TICv5-Uk95l4oLSa4UlVPj36whZ9nAbcywMbM2UJsZSQQ-ZzoERBXbiyPkVhNiEq5VFx609iR72MDSNS9M15h6Xw71p6PKvEmyUBH3-ICY4Q8NsO7WSOPEdLVGp347QdiBje3dZ088nhjDZqFJQV6q_PMoECxkS3wI4nNpI5j-nZ5BgVzOhP7Uu3mulfvz2PZpBfaq6vbjJh9zaqLzkw9c3G4TgLFD4g_QY0tXEmNI-8-100s'
     ],
     [
@@ -73,6 +138,9 @@ $assets = [
         'criticality' => 'RELEVANT',
         'status' => 'OPERATIVE_WITH_OBS',
         'observations' => 'Pantalla con leve parpadeo ocasional.',
+        'purchasedYear' => 2023,
+        'acquisitionCost' => 5500,
+        'totalUsefulLife' => 8,
         'usefulLife' => 60,
         'yearsRemaining' => 4,
         'warrantyUntil' => '2025-01-01',
@@ -185,9 +253,10 @@ $filteredAssets = array_filter($assets, function ($asset) use ($searchTerm, $sta
                         <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">Ubicación / Sub</th>
                         <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">Proveedor / Garantía</th>
                         <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-center">Plan Mant.</th>
-                        <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">Pertenencia</th>
+                        <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-center">Pertenencia</th>
+                        <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-center">Año / Costo</th>
                         <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-center">Estado</th>
-                        <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-center">Vida Útil</th>
+                        <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-center">Vida Útil (Total)</th>
                         <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-right">Acciones</th>
                     </tr>
                 </thead>
@@ -238,8 +307,12 @@ $filteredAssets = array_filter($assets, function ($asset) use ($searchTerm, $sta
                                     <?= $asset['underMaintenancePlan'] ? 'Sí' : 'No' ?>
                                 </span>
                             </td>
-                            <td class="px-6 py-6">
+                            <td class="px-6 py-6 text-center">
                                 <div class="font-bold text-slate-200 text-xs"><?= $asset['ownership'] ?? '-' ?></div>
+                            </td>
+                            <td class="px-6 py-6 text-center">
+                                <div class="font-bold text-white text-xs"><?= $asset['purchasedYear'] ?? '-' ?></div>
+                                <div class="text-[9px] text-medical-blue font-bold mt-0.5">$<?= isset($asset['acquisitionCost']) ? number_format($asset['acquisitionCost']) : '-' ?></div>
                             </td>
                             <td class="px-6 py-6 text-center">
                                 <?php
@@ -247,36 +320,19 @@ $filteredAssets = array_filter($assets, function ($asset) use ($searchTerm, $sta
                                     STATUS_OPERATIVE => 'bg-success/10 text-success border-success/30',
                                     STATUS_MAINTENANCE => 'bg-amber-500/10 text-amber-500 border-amber-500/30',
                                     STATUS_OPERATIVE_WITH_OBS => 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30',
+                                    STATUS_NO_OPERATIVE => 'bg-red-500/10 text-red-500 border-red-500/30',
                                     default => 'bg-slate-700/10 text-slate-500 border-slate-700/30'
-                                };
-                                $dotClass = match ($asset['status']) {
-                                    STATUS_OPERATIVE => 'bg-success shadow-[0_0_8px_rgba(16,185,129,0.5)]',
-                                    STATUS_MAINTENANCE => 'bg-amber-500',
-                                    STATUS_OPERATIVE_WITH_OBS => 'bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]',
-                                    default => 'bg-slate-500'
-                                };
-                                $statusLabel = match ($asset['status']) {
-                                    STATUS_OPERATIVE => 'Operativo',
-                                    STATUS_MAINTENANCE => 'Mantención',
-                                    STATUS_OPERATIVE_WITH_OBS => 'Operativo con observaciones',
-                                    default => 'Baja'
                                 };
                                 ?>
                                 <span class="px-4 py-1.5 rounded-xl text-xs font-black inline-flex items-center gap-2 uppercase tracking-wide border <?= $statusClass ?>">
-                                    <span class="size-2 rounded-full <?= $dotClass ?>"></span>
-                                    <?= $statusLabel ?>
+                                    <?= $asset['status'] === STATUS_OPERATIVE ? 'Operativo' : $asset['status'] ?>
                                 </span>
-                                <?php if (!empty($asset['observations']) && $asset['status'] === STATUS_OPERATIVE_WITH_OBS): ?>
-                                    <div class="mt-2 text-[10px] text-yellow-500 font-bold bg-yellow-500/5 px-2 py-1 rounded border border-yellow-500/10">
-                                        OBS: <?= htmlspecialchars($asset['observations']) ?>
-                                    </div>
-                                <?php endif; ?>
                             </td>
                             <td class="px-6 py-6">
                                 <div class="w-28 mx-auto">
                                     <div class="flex items-center justify-between mb-2">
                                         <span class="text-[10px] font-black text-slate-500"><?= $asset['usefulLife'] ?>%</span>
-                                        <span class="text-[9px] text-slate-600 font-bold uppercase"><?= $asset['yearsRemaining'] ?> años rest.</span>
+                                        <span class="text-[9px] text-slate-400 font-bold uppercase">(Total: <?= $asset['totalUsefulLife'] ?? '-' ?> a)</span>
                                     </div>
                                     <div class="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
                                         <div class="h-full <?= $asset['usefulLife'] > 50 ? 'bg-success' : 'bg-amber-500' ?>" style="width: <?= $asset['usefulLife'] ?>%"></div>

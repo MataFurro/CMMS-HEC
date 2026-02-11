@@ -7,7 +7,7 @@ require_once 'config.php';
 $page = $_GET['page'] ?? 'dashboard';
 
 // Safe allow-list of pages
-$allowed_pages = ['dashboard', 'inventory', 'calendar', 'work_orders', 'new_asset', 'login', 'asset', 'work_order_execution', 'work_order_opening'];
+$allowed_pages = ['dashboard', 'inventory', 'calendar', 'work_orders', 'new_asset', 'login', 'asset', 'work_order_execution', 'work_order_opening', 'family_analysis', 'financial_analysis'];
 
 if (!in_array($page, $allowed_pages)) {
     $page = 'dashboard';

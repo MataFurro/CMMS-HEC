@@ -27,6 +27,7 @@ define('STATUS_OPERATIVE', 'OPERATIVE');
 define('STATUS_MAINTENANCE', 'MAINTENANCE');
 define('STATUS_OUT_OF_SERVICE', 'OUT_OF_SERVICE');
 define('STATUS_OPERATIVE_WITH_OBS', 'OPERATIVE_WITH_OBS');
+define('STATUS_NO_OPERATIVE', 'NO_OPERATIVE'); // No Operativo
 
 // Helper functions para verificación de permisos
 function canModify()

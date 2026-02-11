@@ -1,9 +1,14 @@
 {
     "mcpServers": {
+        "notebooklm": {
+            "command": "C:\\Users\\star_\\.local\\bin\\notebooklm-mcp.exe",
+            "args": []
+        },
         "stitch": {
-            "serverUrl": "https://stitch.googleapis.com/mcp",
-            "headers": {
-                "X-Goog-Api-Key": "AQ.Ab8RN6KtOmMyw6sMWKvW7xgAUFCsRXtViZcR1u-37vSn_CzFbQ"
+            "command": "C:\\path\\to\\your\\stitch-mcp.exe",
+            "args": [],
+            "env": {
+                "STITCH_API_KEY": "AQ.Ab8RN6KtOmMyw6sMWKvW7xgAUFCsRXtViZcR1u-37vSn_CzFbQ"
             }
         }
     }

@@ -15,10 +15,16 @@ $referenceDocs = [
     ['name' => 'Protocolo_Preventivo_Standard.pdf', 'category' => 'Checklist Guía']
 ];
 
-$checks = ['Seguridad Eléctrica (Fugas)', 'Inspección Visual Chasis', 'Prueba de Batería', 'Calibración Sensores O2'];
+$checks = [
+    'Seguridad Eléctrica (IEC 62353)',
+    'Inspección Visual de Chasis e Integridad',
+    'Prueba de Batería y Autonomía',
+    'Verificación de Calibración Sensores O2',
+    'Validación de Alarmas (ISO 60601-1-8)'
+];
 ?>
 
-<div class="max-w-[1200px] mx-auto space-y-10 animate-in fade-in duration-500">
+<div x-data="executionState" class="max-w-[1200px] mx-auto space-y-10 animate-in fade-in duration-500">
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
             <nav class="flex items-center gap-2 text-[10px] text-slate-500 uppercase tracking-[0.2em] font-black mb-3">
@@ -202,7 +208,7 @@ $checks = ['Seguridad Eléctrica (Fugas)', 'Inspección Visual Chasis', 'Prueba 
                     <?php else: ?>
                         <div class="space-y-4">
                             <?php if (canCompleteWorkOrder()): ?>
-                                <button onclick="window.location.href='?page=work_orders'" class="w-full py-4 bg-emerald-500 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 hover:bg-emerald-500/90 transition-all flex items-center justify-center gap-3 text-xs">
+                                <button @click="showSignatureModal = true" class="w-full py-4 bg-emerald-500 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 hover:bg-emerald-500/90 transition-all flex items-center justify-center gap-3 text-xs">
                                     <span class="material-symbols-outlined text-xl">verified</span>
                                     <span>Finalizar e Informar</span>
                                 </button>
@@ -212,6 +218,13 @@ $checks = ['Seguridad Eléctrica (Fugas)', 'Inspección Visual Chasis', 'Prueba 
                                     <span class="material-symbols-outlined text-xl">save</span>
                                     <span>Guardar Borrador</span>
                                 </button>
+                                <div class="mt-4 p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/20 flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-indigo-400 text-sm">stars</span>
+                                        <span class="text-[9px] font-black text-indigo-400 uppercase tracking-widest">Recompensa Estimada</span>
+                                    </div>
+                                    <span class="text-xs font-black text-white">+350 XP</span>
+                                </div>
                             <?php endif; ?>
                         </div>
                     <?php endif; ?>
@@ -219,4 +232,50 @@ $checks = ['Seguridad Eléctrica (Fugas)', 'Inspección Visual Chasis', 'Prueba 
             </div>
         </aside>
     </div>
+
+    <!-- Modal de Firma Electrónica (Compliance 21 CFR Part 11) -->
+    <template x-if="showSignatureModal">
+        <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-medical-dark/95 backdrop-blur-sm animate-in fade-in duration-300">
+            <div @click.away="showSignatureModal = false" class="max-w-md w-full bg-medical-surface border border-slate-700/50 rounded-3xl p-8 shadow-2xl space-y-8">
+                <div class="text-center">
+                    <div class="size-16 rounded-2xl bg-medical-blue/10 text-medical-blue border border-medical-blue/20 flex items-center justify-center mx-auto mb-6">
+                        <span class="material-symbols-outlined text-3xl">draw</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white tracking-tight">Firma de Conformidad</h2>
+                    <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-2">Cierre de Orden y Certificación Técnica</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="p-4 bg-white/5 rounded-2xl border border-slate-700/50">
+                        <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Declaración de Responsabilidad</p>
+                        <p class="text-[11px] text-slate-400 italic leading-relaxed">
+                            "Certifico que el equipo ha sido intervenido siguiendo los protocolos del fabricante y cumple con los estándares de seguridad vigentes."
+                        </p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Confirmar Identidad (PIN/ID)</label>
+                        <input type="password" placeholder="••••" class="w-full h-14 bg-slate-900 border border-slate-700/50 rounded-2xl px-6 text-xl tracking-[1em] text-center focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all">
+                    </div>
+                </div>
+
+                <div class="flex gap-4 pt-4">
+                    <button @click="showSignatureModal = false" class="flex-1 py-4 border border-slate-700/50 text-slate-500 font-black uppercase tracking-widest rounded-2xl hover:bg-white/5 transition-all text-xs">Cancelar</button>
+                    <button onclick="window.location.href='?page=work_orders'" class="flex-1 py-4 bg-medical-blue text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-medical-blue/20 hover:bg-medical-blue/90 transition-all text-xs">Sellar OT</button>
+                </div>
+
+                <p class="text-[9px] text-slate-600 text-center font-bold uppercase leading-relaxed">
+                    Esta acción genera un registro inalterable en la pista de auditoría (Log #<?= uniqid() ?>) bajo la normativa FDA 21 CFR Part 11.
+                </p>
+            </div>
+        </div>
+    </template>
 </div>
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('executionState', () => ({
+            showSignatureModal: false
+        }))
+    });
+</script>

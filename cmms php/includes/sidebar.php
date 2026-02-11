@@ -6,6 +6,8 @@ $menuItems = [
     ['name' => SIDEBAR_CALENDAR, 'path' => 'calendar', 'icon' => 'calendar_month'],
     ['name' => SIDEBAR_ORDERS, 'path' => 'work_orders', 'icon' => 'assignment'],
     ['name' => SIDEBAR_INVENTORY, 'path' => 'inventory', 'icon' => 'precision_manufacturing'],
+    ['name' => SIDEBAR_FAMILY_ANALYSIS, 'path' => 'family_analysis', 'icon' => 'analytics'],
+    ['name' => 'Análisis Financiero', 'path' => 'financial_analysis', 'icon' => 'payments'],
 ];
 ?>
 <aside class="fixed lg:sticky top-0 left-0 flex flex-col w-20 lg:w-72 bg-medical-surface border-r border-slate-700/50 h-screen shrink-0 z-50 transition-all duration-300">

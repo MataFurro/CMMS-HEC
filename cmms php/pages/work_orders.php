@@ -39,13 +39,53 @@ $orders = [
             <h1 class="text-3xl font-bold text-white tracking-tight">Órdenes de Trabajo</h1>
             <p class="text-slate-400 text-sm mt-1">Gestión y seguimiento de mantenimientos.</p>
         </div>
+        <?php if (canModify()): ?>
+            <a href="?page=work_order_opening" class="h-10 px-6 bg-medical-blue text-white rounded-xl font-bold hover:bg-medical-blue/90 flex items-center gap-2 transition-all shadow-lg shadow-medical-blue/20">
+                <span class="material-symbols-outlined text-lg">add</span>
+                Nueva Orden
+            </a>
+        <?php endif; ?>
     </div>
-    <?php if (canModify()): ?>
-        <a href="?page=work_order_opening" class="h-10 px-6 bg-medical-blue text-white rounded-xl font-bold hover:bg-medical-blue/90 flex items-center gap-2 transition-all shadow-lg shadow-medical-blue/20">
-            <span class="material-symbols-outlined text-lg">add</span>
-            Nueva Orden
-        </a>
-    <?php endif; ?>
+</div>
+
+<!-- Filtros -->
+<div class="card-glass p-4 mb-6 space-y-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Tipo</label>
+            <select id="filter-tipo" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-medical-blue">
+                <option value="">Todos</option>
+                <option value="Preventiva">Preventiva</option>
+                <option value="Correctiva">Correctiva</option>
+                <option value="Calibración">Calibración</option>
+            </select>
+        </div>
+        <div>
+            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Estado</label>
+            <select id="filter-estado" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-medical-blue">
+                <option value="">Todos</option>
+                <option value="En Proceso">En Proceso</option>
+                <option value="Terminada">Terminada</option>
+                <option value="Pendiente">Pendiente</option>
+            </select>
+        </div>
+        <div>
+            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Desde</label>
+            <input type="date" id="filter-desde" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-medical-blue">
+        </div>
+        <div>
+            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Hasta</label>
+            <input type="date" id="filter-hasta" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-medical-blue">
+        </div>
+    </div>
+    <div class="flex gap-2">
+        <button onclick="applyFilters()" class="px-4 py-2 bg-medical-blue text-white rounded-lg font-bold hover:bg-medical-blue/90 transition-all text-sm uppercase tracking-wider">
+            Filtrar
+        </button>
+        <button onclick="clearFilters()" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-lg font-bold hover:bg-slate-600 transition-all text-sm uppercase tracking-wider">
+            Limpiar
+        </button>
+    </div>
 </div>
 
 <!-- Stats Row -->
@@ -79,6 +119,39 @@ $orders = [
     </div>
 </div>
 
+<script>
+    function applyFilters() {
+        const tipo = document.getElementById('filter-tipo').value;
+        const estado = document.getElementById('filter-estado').value;
+        const desde = document.getElementById('filter-desde').value;
+        const hasta = document.getElementById('filter-hasta').value;
+
+        const rows = document.querySelectorAll('.ot-row');
+
+        rows.forEach(row => {
+            let show = true;
+
+            if (tipo && row.dataset.tipo !== tipo) show = false;
+            if (estado && row.dataset.estado !== estado) show = false;
+            if (desde && row.dataset.fecha < desde) show = false;
+            if (hasta && row.dataset.fecha > hasta) show = false;
+
+            row.style.display = show ? '' : 'none';
+        });
+    }
+
+    function clearFilters() {
+        document.getElementById('filter-tipo').value = '';
+        document.getElementById('filter-estado').value = '';
+        document.getElementById('filter-desde').value = '';
+        document.getElementById('filter-hasta').value = '';
+
+        document.querySelectorAll('.ot-row').forEach(row => {
+            row.style.display = '';
+        });
+    }
+</script>
+
 <!-- Table -->
 <div class="card-glass overflow-hidden shadow-xl">
     <table class="w-full text-left border-collapse">
@@ -95,7 +168,10 @@ $orders = [
         </thead>
         <tbody class="divide-y divide-slate-700/50">
             <?php foreach ($orders as $ot): ?>
-                <tr class="hover:bg-white/5 transition-colors">
+                <tr class="ot-row hover:bg-white/5 transition-colors"
+                    data-tipo="<?= $ot['type'] ?>"
+                    data-estado="<?= $ot['status'] ?>"
+                    data-fecha="<?= $ot['date'] ?>">
                     <td class="px-6 py-4 font-mono text-sm text-medical-blue font-bold"><?= $ot['id'] ?></td>
                     <td class="px-6 py-4 text-sm font-bold text-white"><?= $ot['asset'] ?></td>
                     <td class="px-6 py-4 text-xs font-bold text-slate-300 uppercase"><?= $ot['type'] ?></td>
