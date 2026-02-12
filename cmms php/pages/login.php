@@ -8,52 +8,23 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     exit;
 }
 
-// Role Definitions (Simulated from CMMS HEC Notebook context)
-$roles = [
-    'auditor' => [
-        'name' => 'Lic. Auditor',
-        'role' => 'Auditor',
-        'avatar' => 'https://i.pravatar.cc/150?u=auditor',
-        'desc' => 'Solo Observación'
-    ],
-    'chief' => [
-        'name' => 'Ing. Roberto Jefe',
-        'role' => 'Ingeniero',
-        'avatar' => 'https://i.pravatar.cc/150?u=chief',
-        'desc' => 'Gestión y Reportes'
-    ],
-    'engineer' => [
-        'name' => 'Ing. Laura',
-        'role' => 'Ingeniero',
-        'avatar' => 'https://i.pravatar.cc/150?u=eng',
-        'desc' => 'Supervisión Técnica'
-    ],
-    'tech' => [
-        'name' => 'Téc. Mario',
-        'role' => 'Técnico',
-        'avatar' => 'https://i.pravatar.cc/150?u=tech',
-        'desc' => 'Ejecución de OTs'
-    ],
-];
+// ── Backend Provider ──
+require_once __DIR__ . '/../backend/providers/UserProvider.php';
 
 // Handle Login POST
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? '';
+    $user = authenticateUser($email);
 
-    // Determine Role based on Email for Demo
-    $userKey = 'auditor'; // Default
-    if (strpos($email, 'jefe') !== false) $userKey = 'chief';
-    if (strpos($email, 'ing') !== false) $userKey = 'engineer';
-    if (strpos($email, 'tec') !== false) $userKey = 'tech';
-
-    // Mock Validation
-    if (!empty($email)) {
-        $_SESSION['user_id'] = 1;
-        $_SESSION['user_name'] = $roles[$userKey]['name'];
-        $_SESSION['user_role'] = $roles[$userKey]['role'];
-        $_SESSION['user_avatar'] = $roles[$userKey]['avatar'];
-        header('Location: ?page=dashboard');
+    if ($user) {
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['user_name'] = $user['name'];
+        $_SESSION['user_role'] = $user['role'];
+        $_SESSION['user_avatar'] = $user['avatar'];
+        // Técnico no tiene acceso al dashboard
+        $redirect = ($user['role'] === 'Técnico') ? 'work_orders' : 'dashboard';
+        header('Location: ?page=' . $redirect);
         exit;
     } else {
         $error = 'Credenciales inválidas';

@@ -50,6 +50,18 @@ function isReadOnly()
     return ($_SESSION['user_role'] ?? '') === 'Auditor';
 }
 
+function canViewDashboard()
+{
+    // Técnico NO puede ver el dashboard — solo Ingeniero, Admin, Auditor
+    return !in_array($_SESSION['user_role'] ?? '', ['Técnico']);
+}
+
+function canRequestService()
+{
+    // Todos los roles pueden solicitar servicio
+    return !empty($_SESSION['user_role']);
+}
+
 // Error Reporting (Enable for Dev)
 error_reporting(E_ALL);
 ini_set('display_errors', 1);

@@ -1,45 +1,10 @@
 <?php
 // pages/work_orders.php
 
-// Mock Data for Work Orders
-$orders = [
-    [
-        'id' => 'OT-2026-4584',
-        'asset' => 'Monitor Multiparámetro',
-        'type' => 'Calibración',
-        'status' => 'Pendiente',
-        'tech' => 'Ana Muñoz',
-        'date' => '2026-02-11',
-        'priority' => 'Baja'
-    ],
-    [
-        'id' => 'OT-2026-4583',
-        'asset' => 'Bomba de Infusión',
-        'type' => 'Correctiva',
-        'status' => 'En Proceso',
-        'tech' => 'Pablo Rojas',
-        'date' => '2026-02-10',
-        'priority' => 'Media'
-    ],
-    [
-        'id' => 'OT-2025-3210',
-        'asset' => 'Rayos X Portátil',
-        'type' => 'Preventiva',
-        'status' => 'Terminada',
-        'tech' => 'Ana Muñoz',
-        'date' => '2025-11-20',
-        'priority' => 'Baja'
-    ],
-    [
-        'id' => 'OT-2024-1105',
-        'asset' => 'Ventilador Mecánico',
-        'type' => 'Preventiva',
-        'status' => 'Terminada',
-        'tech' => 'Mario Gómez',
-        'date' => '2024-08-15',
-        'priority' => 'Alta'
-    ]
-];
+// ── Backend Provider ──
+require_once __DIR__ . '/../backend/providers/WorkOrderProvider.php';
+
+$orders = getAllWorkOrders();
 ?>
 
 <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">

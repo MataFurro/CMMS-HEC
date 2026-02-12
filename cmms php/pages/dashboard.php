@@ -1,166 +1,58 @@
 <?php
 // pages/dashboard.php
 
+// ── Control de Acceso ──
+if (!canViewDashboard()) {
+    echo "<div class='p-8 text-center'><h1 class='text-2xl font-bold text-red-500'>Acceso Denegado</h1><p class='text-slate-400 mt-2'>Los técnicos no tienen acceso al Dashboard.</p></div>";
+    return;
+}
+
 // Importar funciones de métricas de confiabilidad
 require_once __DIR__ . '/../includes/reliability_metrics.php';
 
-// --- IMPORTAR DATOS DEL INVENTARIO ---
-// En producción, esto vendría de la base de datos
-// Por ahora, replicamos el array de inventory.php
-$assets = [
-    [
-        'id' => 'PB-840-00122',
-        'name' => 'Ventilador Mecánico',
-        'brand' => 'Puritan Bennett',
-        'model' => '840',
-        'criticality' => 'CRITICAL',
-        'status' => 'OPERATIVE',
-        'acquisitionCost' => 45000,
-        'purchaseYear' => 2020,
-        'totalUsefulLife' => 10,
-        'yearsRemaining' => 4,
-        'funcion' => 10,
-        'riesgo' => 5,
-        'mantenimiento' => 4
-    ],
-    [
-        'id' => 'AL-8015-994',
-        'name' => 'Bomba de Infusión',
-        'brand' => 'Alaris',
-        'model' => '8015',
-        'criticality' => 'RELEVANT',
-        'status' => 'MAINTENANCE',
-        'acquisitionCost' => 3500,
-        'purchaseYear' => 2022,
-        'totalUsefulLife' => 7,
-        'yearsRemaining' => 4,
-        'funcion' => 8,
-        'riesgo' => 4,
-        'mantenimiento' => 3
-    ],
-    [
-        'id' => 'ZL-X-44211',
-        'name' => 'Desfibrilador',
-        'brand' => 'Zoll',
-        'model' => 'Series X',
-        'criticality' => 'CRITICAL',
-        'status' => 'OPERATIVE',
-        'acquisitionCost' => 18000,
-        'purchaseYear' => 2024,
-        'totalUsefulLife' => 8,
-        'yearsRemaining' => 7,
-        'funcion' => 10,
-        'riesgo' => 5,
-        'mantenimiento' => 3
-    ],
-    [
-        'id' => 'ECG-2024-001',
-        'name' => 'Electrocardiógrafo',
-        'brand' => 'Philips',
-        'model' => 'PageWriter TC70',
-        'criticality' => 'RELEVANT',
-        'status' => 'OPERATIVE_WITH_OBS',
-        'acquisitionCost' => 12000,
-        'purchaseYear' => 2014,
-        'totalUsefulLife' => 12,
-        'yearsRemaining' => 2,
-        'funcion' => 5,
-        'riesgo' => 2,
-        'mantenimiento' => 3
-    ]
-];
+// ── Backend Providers ──
+require_once __DIR__ . '/../backend/providers/AssetProvider.php';
+require_once __DIR__ . '/../backend/providers/WorkOrderProvider.php';
+require_once __DIR__ . '/../backend/providers/UserProvider.php';
+require_once __DIR__ . '/../backend/providers/EventProvider.php';
 
-// Datos de OT correctivas (en producción vendría de BD)
-$otCorrectivas = [
-    // Ventilador PB-840-00122
-    ['equipo_id' => 'PB-840-00122', 'fecha' => '2025-06-15', 'duracion_horas' => 2.5],
-    ['equipo_id' => 'PB-840-00122', 'fecha' => '2026-01-20', 'duracion_horas' => 3.0],
-
-    // Bomba AL-8015-994
-    ['equipo_id' => 'AL-8015-994', 'fecha' => '2025-08-10', 'duracion_horas' => 1.5],
-    ['equipo_id' => 'AL-8015-994', 'fecha' => '2026-02-05', 'duracion_horas' => 2.0],
-
-    // Desfibrilador ZL-X-44211
-    ['equipo_id' => 'ZL-X-44211', 'fecha' => '2025-05-20', 'duracion_horas' => 4.0],
-    ['equipo_id' => 'ZL-X-44211', 'fecha' => '2026-01-15', 'duracion_horas' => 3.5],
-
-    // ECG
-    ['equipo_id' => 'ECG-2024-001', 'fecha' => '2025-09-10', 'duracion_horas' => 1.0],
-    ['equipo_id' => 'ECG-2024-001', 'fecha' => '2026-02-01', 'duracion_horas' => 1.5]
-];
-
+// --- DATOS DESDE PROVIDERS ---
+$assets = getAllAssets();
+$otCorrectivas = getCorrectiveWorkOrders();
+$technicians = getTechnicianRanking();
+$recentEvents = getRecentEvents();
 
 // --- CÁLCULO DINÁMICO DE MÉTRICAS ---
-
-// Total de equipos
 $totalEquipos = count($assets);
 
-// Equipos por estado (usando array_filter)
-$equiposOperativos = count(array_filter($assets, fn($a) => $a['status'] === STATUS_OPERATIVE));
-$equiposMantenimiento = count(array_filter($assets, fn($a) => $a['status'] === STATUS_MAINTENANCE));
-$equiposNoOperativos = count(array_filter($assets, fn($a) => $a['status'] === STATUS_NO_OPERATIVE));
-$equiposConObservaciones = count(array_filter($assets, fn($a) => $a['status'] === STATUS_OPERATIVE_WITH_OBS));
+// Equipos por estado
+$statusCounts = countAssetsByStatus();
+$equiposOperativos = $statusCounts['operative'];
+$equiposMantenimiento = $statusCounts['maintenance'];
+$equiposNoOperativos = $statusCounts['no_operative'];
+$equiposConObservaciones = $statusCounts['with_obs'];
 
 // Equipos por criticidad
-$equiposCriticos = count(array_filter($assets, fn($a) => $a['criticality'] === 'CRITICAL'));
-$equiposRelevantes = count(array_filter($assets, fn($a) => $a['criticality'] === 'RELEVANT'));
-
-// Técnicos reales del sistema (de login.php)
-$technicians = [
-    [
-        'name' => 'Ana Muñoz',
-        'role' => 'Ingeniero Sr.',
-        'initial' => 'AM',
-        'xp' => 5420,
-        'level' => 18,
-        'badges' => ['military_tech', 'psychology', 'workspace_premium'],
-        'otTerminadas' => 22,
-        'trend' => 'up'
-    ],
-    [
-        'name' => 'Mario Gómez',
-        'role' => 'Especialista',
-        'initial' => 'MG',
-        'xp' => 4150,
-        'level' => 14,
-        'badges' => ['bolt', 'verified'],
-        'otTerminadas' => 12,
-        'trend' => 'up'
-    ],
-    [
-        'name' => 'Pablo Rojas',
-        'role' => 'Técnico de Campo',
-        'initial' => 'PR',
-        'xp' => 2840,
-        'level' => 9,
-        'badges' => ['schedule'],
-        'otTerminadas' => 8,
-        'trend' => 'stable'
-    ]
-];
-
-// Re-ordenar por XP para el ranking de gamificación
-usort($technicians, fn($a, $b) => $b['xp'] - $a['xp']);
+$critCounts = countAssetsByCriticality();
+$equiposCriticos = $critCounts['CRITICAL'];
+$equiposRelevantes = $critCounts['RELEVANT'];
 
 // --- CÁLCULO DE MÉTRICAS CLÍNICAS 2.0 ---
-$totalAcquisitionValue = array_sum(array_column($assets, 'acquisitionCost'));
+$totalAcquisitionValue = getTotalInventoryValue();
 $totalMaintenanceCost = 12500; // Mock de costos de mantenimiento acumulados
 $cosr = $totalAcquisitionValue > 0 ? ($totalMaintenanceCost / $totalAcquisitionValue) * 100 : 0;
 
-// Riesgo de Capital (Equipos a renovar pronto)
-$equiposRiesgoCapital = count(array_filter($assets, fn($a) => ($a['yearsRemaining'] / $a['totalUsefulLife']) < 0.2));
+// Riesgo de Capital
+$equiposRiesgoCapital = getCapitalRiskCount();
 
 // Órdenes de trabajo
-$totalOT = 4;
-$otTerminadas = 3;
-$otEnProceso = 1;
-$otPendientes = 0;
+$woCounts = countWorkOrdersByStatus();
+$totalOT = $woCounts['total'];
+$otTerminadas = $woCounts['Terminada'];
+$otEnProceso = $woCounts['En Proceso'];
+$otPendientes = $woCounts['Pendiente'];
 
-$otPorTipo = [
-    'Preventivo' => 2,
-    'Correctivo' => 1,
-    'Calibración' => 1
-];
+$otPorTipo = countWorkOrdersByType();
 
 // --- CÁLCULO DE MÉTRICAS POR FAMILIA PARA EL GRÁFICO GLOBAL ---
 $familias = [];
@@ -195,19 +87,15 @@ foreach ($familias as $nombre => $datos) {
 }
 
 // --- CÁLCULO DE MÉTRICAS DE CONFIABILIDAD (WEIBULL) ---
-
-// Calcular métricas globales
 $metricasGlobales = calcularMetricasGlobales($assets, $otCorrectivas);
 
 // --- GENERAR DATOS PARA LA CURVA DE PROBABILIDAD DE FALLA ACUMULADA F(t) ---
-// F(t) = 1 - e^-(t/eta)^beta (Distribución Weibull)
 $mtbf_global = $metricasGlobales['mtbf_promedio'] > 0 ? $metricasGlobales['mtbf_promedio'] : 30;
-$beta = 1.45; // Simulación de fase de desgaste inicial
+$beta = 1.45;
 $eta = $mtbf_global / gamma_approx(1 + 1 / $beta);
 
 function gamma_approx($n)
 {
-    // Aproximación de Stirling para la función Gamma en la UI
     return sqrt(2 * M_PI / $n) * pow($n / exp(1), $n);
 }
 
@@ -221,7 +109,7 @@ for ($t = 0; $t <= 90; $t += 5) {
 // Calcular GE para equipos críticos
 $equiposCriticosGE = count(array_filter($assets, fn($a) => calcularGE($a) >= 12));
 
-// KPIs calculados dinámicamente con enfoque Clínico 2.0
+// KPIs calculados dinámicamente
 $kpiCards = [
     [
         'label' => 'Valor Inventario',
@@ -234,7 +122,7 @@ $kpiCards = [
     [
         'label' => 'MTBF (Weibull)',
         'value' => round($mtbf_global, 1) . ' d',
-        'trend' => '$\beta=' . $beta . '$',
+        'trend' => '$\\beta=' . $beta . '$',
         'color' => 'border-l-emerald-500',
         'icon' => 'timeline',
         'sub' => 'Fase de Desgaste'
@@ -273,19 +161,18 @@ $kpiCards = [
     ]
 ];
 
-// Datos para gráfico de estado de equipos (calculados dinámicamente)
+// Datos para gráfico de estado de equipos
 $estadoEquiposData = [
     ['name' => 'Operativos', 'value' => $equiposOperativos, 'color' => '#10b981'],
     ['name' => 'Mantenimiento', 'value' => $equiposMantenimiento, 'color' => '#f59e0b'],
     ['name' => 'Con Observaciones', 'value' => $equiposConObservaciones, 'color' => '#eab308']
 ];
 
-// Solo incluir "No Operativos" si hay alguno
 if ($equiposNoOperativos > 0) {
     $estadoEquiposData[] = ['name' => 'No Operativos', 'value' => $equiposNoOperativos, 'color' => '#ef4444'];
 }
 
-// Datos para gráfico de criticidad (calculados dinámicamente)
+// Datos para gráfico de criticidad
 $criticidadData = [
     ['name' => 'Críticos', 'value' => $equiposCriticos, 'color' => '#ef4444'],
     ['name' => 'Relevantes', 'value' => $equiposRelevantes, 'color' => '#0ea5e9']
@@ -293,53 +180,17 @@ $criticidadData = [
 
 // Datos para gráfico de OT por tipo
 $otPorTipoData = [
-    ['name' => 'Preventivo', 'value' => $otPorTipo['Preventivo']],
-    ['name' => 'Correctivo', 'value' => $otPorTipo['Correctivo']],
-    ['name' => 'Calibración', 'value' => $otPorTipo['Calibración']]
+    ['name' => 'Preventivo', 'value' => $otPorTipo['Preventiva'] ?? 0],
+    ['name' => 'Correctivo', 'value' => $otPorTipo['Correctiva'] ?? 0],
+    ['name' => 'Calibración', 'value' => $otPorTipo['Calibración'] ?? 0]
 ];
 
-// Eventos recientes (basados en OT reales)
-$recentEvents = [
-    [
-        'id' => 'OT-2024-001',
-        'title' => 'OT-2024-001 Finalizada',
-        'subtitle' => 'Ventilador Mecánico PB-840-00122 - Preventivo | Téc. Mario Gómez',
-        'time' => 'Hace 15 días',
-        'type' => 'success',
-        'colorClass' => 'emerald-500'
-    ],
-    [
-        'id' => 'OT-2024-015',
-        'title' => 'OT-2024-015 En Proceso',
-        'subtitle' => 'Ventilador Mecánico PB-840-00122 - Correctivo | Téc. Pablo Rojas',
-        'time' => 'Hace 5 días',
-        'type' => 'warning',
-        'colorClass' => 'amber-500'
-    ],
-    [
-        'id' => 'OT-2023-089',
-        'title' => 'OT-2023-089 Finalizada',
-        'subtitle' => 'Ventilador Mecánico PB-840-00122 - Calibración | Téc. Ana Muñoz',
-        'time' => 'Hace 2 meses',
-        'type' => 'success',
-        'colorClass' => 'emerald-500'
-    ],
-    [
-        'id' => 'OT-2023-045',
-        'title' => 'OT-2023-045 Finalizada',
-        'subtitle' => 'Ventilador Mecánico PB-840-00122 - Preventivo | Téc. Mario Gómez',
-        'time' => 'Hace 5 meses',
-        'type' => 'success',
-        'colorClass' => 'emerald-500'
-    ]
-];
-
-// Calcular datos para gráfico de técnicos (Gamification focus)
+// Datos de técnicos para gráfico
 $techComparisonData = array_map(function ($t) {
     return [
         'name' => explode(' ', $t['name'])[0],
         'terminadas' => $t['otTerminadas'],
-        'xp' => $t['xp'] / 100 // Escalar XP para visualización en barra
+        'xp' => ($t['otTerminadas'] ?? 0) * 100 / 100
     ];
 }, $technicians);
 ?>

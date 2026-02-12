@@ -12,12 +12,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $success = true;
 }
 
-// Sample Assets for Selection
-$assets = [
-    ['id' => 'PB-840-00122', 'name' => 'Ventilador Mecánico PB840', 'location' => 'UCI Piso 3'],
-    ['id' => 'DEF-ZOLL-99', 'name' => 'Desfibrilador ZOLL X', 'location' => 'Pabellón 4'],
-    ['id' => 'MON-B450-44', 'name' => 'Monitor B450', 'location' => 'Urgencias'],
-];
+// ── Backend Provider ──
+require_once __DIR__ . '/../backend/providers/AssetProvider.php';
+
+// Assets for Selection
+$assets = getAssetOptions();
 ?>
 
 <div class="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
