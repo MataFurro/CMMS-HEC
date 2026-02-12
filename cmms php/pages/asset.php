@@ -11,33 +11,20 @@ if (!$asset) {
     return;
 }
 
-// Mock Work Orders for this asset
-$workOrders = [
-    ['id' => 'OT-2026-001', 'type' => 'Preventivo', 'status' => 'Terminada', 'date' => '2026-01-10', 'tech' => 'Mario Gómez', 'desc' => 'Cambio de filtros y batería'],
-    ['id' => 'OT-2026-015', 'type' => 'Correctivo', 'status' => 'En Proceso', 'date' => '2026-02-11', 'tech' => 'Pablo Rojas', 'desc' => 'Falla en sensor de flujo'],
-    ['id' => 'OT-2025-089', 'type' => 'Calibración', 'status' => 'Terminada', 'date' => '2025-12-05', 'tech' => 'Ana Muñoz', 'desc' => 'Calibración anual de sensores'],
-    ['id' => 'OT-2024-045', 'type' => 'Preventivo', 'status' => 'Terminada', 'date' => '2024-08-15', 'tech' => 'Mario Gómez', 'desc' => 'Mantenimiento preventivo anual 2024'],
-];
+// Backend Providers
+require_once __DIR__ . '/../backend/providers/WorkOrderProvider.php';
 
-// Mock Observations
-$observations = [
-    ['date' => '2026-02-11 14:30', 'author' => 'Ing. Laura', 'text' => 'Falla reportada hoy en el sensor. Se inicia diagnóstico inmediato.', 'type' => 'warning'],
-    ['date' => '2026-01-10 09:15', 'author' => 'Téc. Mario Gómez', 'text' => 'Mantenimiento preventivo completado sin novedades.', 'type' => 'normal'],
-    ['date' => '2025-12-05 16:45', 'author' => 'Ing. Roberto Jefe', 'text' => 'Calibración 2025 exitosa.', 'type' => 'normal'],
-    ['date' => '2024-08-20 11:00', 'author' => 'Téc. Pablo Rojas', 'text' => 'HISTÓRICO: Batería reemplazada en agosto 2024.', 'type' => 'normal'],
-];
+// Get all work orders and filter for this asset
+$allWorkOrders = getAllWorkOrders();
+$workOrders = array_filter($allWorkOrders, fn($wo) => ($wo['asset_id'] ?? '') === $id);
+
+// Get dynamic observations and documents
+$observations = getAssetObservations($id);
+$documents = getAssetDocuments($id);
 
 require_once 'config.php';
 require_once 'includes/audit_trail.php';
 
-// Mock Documents
-$documents = [
-    ['name' => 'Manual_' . $asset['model'] . '_ES.pdf', 'type' => 'Manual', 'size' => '2.4 MB', 'date' => '2025-01-15'],
-    ['name' => 'Certificado_Calibracion_2025.pdf', 'type' => 'Certificado', 'size' => '156 KB', 'date' => '2025-12-05'],
-    ['name' => 'Protocolo_Mantenimiento_Preventivo.pdf', 'type' => 'Protocolo', 'size' => '890 KB', 'date' => '2026-01-10'],
-    ['name' => 'Foto_Placa_Identificacion.jpg', 'type' => 'Foto', 'size' => '1.2 MB', 'date' => '2025-06-20'],
-    ['name' => 'Ficha_Tecnica_Fabricante.pdf', 'type' => 'Ficha Técnica', 'size' => '3.1 MB', 'date' => '2025-01-15'],
-];
 ?>
 
 <div class="space-y-8 animate-in fade-in duration-500">

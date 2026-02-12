@@ -1,5 +1,6 @@
 <?php
 // pages/new_asset.php
+require_once __DIR__ . '/../backend/providers/AssetProvider.php';
 
 // Verificar permisos - Solo Ingeniero/Admin puede crear activos
 if (!canModify()) {
@@ -34,7 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Completar datos técnicos según norma CMMS HEC
             </p>
         </div>
-        <a href="?page=inventory" class="p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-white transition-all flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
+        <a href="?page=inventory"
+            class="p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-white transition-all flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
             <span class="material-symbols-outlined text-sm">arrow_back</span>
             Volver
         </a>
@@ -46,38 +48,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
             <!-- Identification Section -->
             <div class="space-y-6">
-                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-medical-blue border-b border-medical-blue/20 pb-2">Identificación de Equipo</h3>
+                <h3
+                    class="text-[10px] font-black uppercase tracking-[0.2em] text-medical-blue border-b border-medical-blue/20 pb-2">
+                    Identificación de Equipo</h3>
 
                 <div class="space-y-2">
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">ID Inventario</label>
-                    <input required name="id" placeholder="Ej: PB-840-00122" class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                    <input required name="id" placeholder="Ej: PB-840-00122"
+                        class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
                 </div>
 
                 <div class="space-y-2">
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Nombre del Equipo</label>
-                    <input required name="name" placeholder="Ej: Ventilador Mecánico" class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                    <input required name="name" placeholder="Ej: Ventilador Mecánico"
+                        class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
                         <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Marca</label>
-                        <input required name="brand" class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                        <input required name="brand"
+                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
                     </div>
                     <div class="space-y-2">
                         <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Modelo</label>
-                        <input required name="model" class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                        <input required name="model"
+                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
                     </div>
                 </div>
 
                 <div class="space-y-2">
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Bajo Plan de Mantenimiento</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Bajo Plan de
+                        Mantenimiento</label>
                     <div class="flex gap-4">
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="underMaintenancePlan" value="1" checked class="size-4 accent-medical-blue" />
+                            <input type="radio" name="underMaintenancePlan" value="1" checked
+                                class="size-4 accent-medical-blue" />
                             <span class="text-sm text-slate-300">Sí</span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="underMaintenancePlan" value="0" class="size-4 accent-medical-blue" />
+                            <input type="radio" name="underMaintenancePlan" value="0"
+                                class="size-4 accent-medical-blue" />
                             <span class="text-sm text-slate-300">No</span>
                         </label>
                     </div>
@@ -86,22 +97,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <!-- Technical Specs Section -->
             <div class="space-y-6">
-                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-medical-blue border-b border-medical-blue/20 pb-2">Especificaciones Técnicas</h3>
+                <h3
+                    class="text-[10px] font-black uppercase tracking-[0.2em] text-medical-blue border-b border-medical-blue/20 pb-2">
+                    Especificaciones Técnicas</h3>
 
                 <div class="space-y-2">
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Ubicación</label>
-                    <select required name="location" class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white appearance-none">
+                    <select required name="location"
+                        class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white appearance-none">
                         <option value="">Seleccionar Ubicación</option>
-                        <option value="UCI Adultos">UCI Adultos</option>
-                        <option value="Urgencias">Urgencias</option>
-                        <option value="Pabellón Central">Pabellón Central</option>
-                        <option value="Imagenología">Imagenología</option>
+                        <?php foreach (getAllLocations() as $loc): ?>
+                            <option value="<?= $loc ?>"><?= $loc ?></option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
 
                 <div class="space-y-2">
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Criticidad</label>
-                    <select required name="criticality" class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white appearance-none">
+                    <select required name="criticality"
+                        class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white appearance-none">
                         <option value="CRITICAL">CRITICAL</option>
                         <option value="RELEVANT" selected>RELEVANT</option>
                         <option value="LOW">LOW</option>
@@ -111,33 +125,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Garantía (Proveedor)</label>
-                        <input name="warranty" placeholder="Ej: Medtronic Chile" class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Garantía
+                            (Proveedor)</label>
+                        <input name="warranty" placeholder="Ej: Medtronic Chile"
+                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Vencimiento Garantía</label>
-                        <input type="date" name="warrantyExpiration" class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Vencimiento
+                            Garantía</label>
+                        <input type="date" name="warrantyExpiration"
+                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
                         <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Vida Útil (%)</label>
-                        <input type="number" name="usefulLife" value="100" class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                        <input type="number" name="usefulLife" value="100"
+                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
                     </div>
                     <div class="space-y-2">
                         <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Años Restantes</label>
-                        <input type="number" name="yearsRemaining" value="10" class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                        <input type="number" name="yearsRemaining" value="10"
+                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="pt-8 border-t border-slate-700/50 flex justify-end gap-4">
-            <a href="?page=inventory" class="px-8 py-3 rounded-2xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all text-sm font-bold uppercase tracking-wider text-center">
+            <a href="?page=inventory"
+                class="px-8 py-3 rounded-2xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all text-sm font-bold uppercase tracking-wider text-center">
                 Cancelar
             </a>
-            <button type="submit" class="px-10 py-3 bg-medical-blue text-white rounded-2xl hover:bg-medical-blue/90 transition-all font-bold shadow-xl shadow-medical-blue/20 active:scale-95 flex items-center gap-3">
+            <button type="submit"
+                class="px-10 py-3 bg-medical-blue text-white rounded-2xl hover:bg-medical-blue/90 transition-all font-bold shadow-xl shadow-medical-blue/20 active:scale-95 flex items-center gap-3">
                 <span class="material-symbols-outlined text-xl">save</span>
                 Guardar Activo
             </button>

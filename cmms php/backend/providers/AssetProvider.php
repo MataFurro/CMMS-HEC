@@ -197,3 +197,39 @@ function getCapitalRiskCount(): int
             && ($a['years_remaining'] / $a['total_useful_life']) < 0.2;
     }));
 }
+
+/**
+ * Obtener todas las ubicaciones únicas de los activos
+ */
+function getAllLocations(): array
+{
+    $assets = getAllAssets();
+    $locations = array_unique(array_filter(array_column($assets, 'location')));
+    sort($locations);
+    return $locations;
+}
+
+/**
+ * Obtener observaciones de un activo específico
+ */
+function getAssetObservations(string $asset_id): array
+{
+    // Mock de observaciones - En un sistema real vendría de una tabla linked
+    return [
+        ['date' => date('Y-m-d H:i'), 'author' => 'Sistema BioCMMS', 'text' => 'Métrica de confiabilidad actualizada automáticamente.', 'type' => 'normal'],
+        ['date' => '2026-02-11 14:30', 'author' => 'Ing. Laura', 'text' => 'Falla reportada en el sensor. Se inicia diagnóstico.', 'type' => 'warning'],
+    ];
+}
+
+/**
+ * Obtener documentos vinculados a un activo
+ */
+function getAssetDocuments(string $asset_id): array
+{
+    $asset = getAssetById($asset_id);
+    $model = $asset['model'] ?? 'Generic';
+    return [
+        ['name' => "Manual_{$model}_ES.pdf", 'type' => 'Manual', 'size' => '2.4 MB', 'date' => '2025-01-15'],
+        ['name' => 'Ficha_Tecnica.pdf', 'type' => 'Ficha Técnica', 'size' => '3.1 MB', 'date' => '2025-01-15'],
+    ];
+}

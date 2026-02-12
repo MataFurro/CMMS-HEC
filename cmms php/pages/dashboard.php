@@ -153,7 +153,7 @@ $kpiCards = [
     ],
     [
         'label' => 'Adherencia',
-        'value' => '92%',
+        'value' => getAdherenceRate() . '%',
         'trend' => 'Gamification',
         'color' => 'border-l-indigo-500',
         'icon' => 'sports_esports',
@@ -368,7 +368,8 @@ $techComparisonData = array_map(function ($t) {
                     <span
                         class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">balance</span>
                 </div>
-                <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest italic">Saturación Media: 71%
+                <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest italic">Saturación Media:
+                    <?= getWorkloadSaturation() ?>%
                 </div>
             </div>
         </div>

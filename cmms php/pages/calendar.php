@@ -16,10 +16,10 @@ $dayEvents = array_map(function ($ot) {
         'title' => $ot['type'] ?? 'Mantenimiento',
         'equipment' => $ot['asset_name'] ?? 'Equipo Médico',
         'tech' => $ot['technician'] ?? 'Asignado',
-        'status' => $ot['status'] ?? 'PENDING',
+        'status' => $ot['status'] ?? 'Pendiente',
         'color' => ($ot['priority'] ?? '') === 'CRITICAL' ? 'danger' : 'medical-blue'
     ];
-}, array_slice($orders, 0, 4)); // Solo 4 para el mock de "Día"
+}, $orders);
 
 $annualWorkload = [];
 $months = [
@@ -36,8 +36,13 @@ $months = [
     'Noviembre',
     'Diciembre'
 ];
-foreach ($months as $m) {
-    $annualWorkload[] = ['month' => $m, 'ots' => rand(5, 20)]; // Dinamismo controlado
+
+foreach ($months as $idx => $m) {
+    $monthNum = str_pad($idx + 1, 2, '0', STR_PAD_LEFT);
+    $otsThisMonth = array_filter($orders, function ($o) use ($monthNum) {
+        return isset($o['date']) && strpos($o['date'], "-$monthNum-") !== false;
+    });
+    $annualWorkload[] = ['month' => $m, 'ots' => count($otsThisMonth)];
 }
 ?>
 

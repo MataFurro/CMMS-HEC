@@ -91,8 +91,9 @@ $stats = getWorkOrderStats();
                 <div>
                     <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest">Pendientes</p>
                     <p class="text-3xl font-black text-white mt-1">
-                        <?= str_pad($stats['PENDING'] ?? 0, 2, '0', STR_PAD_LEFT) ?> <span
-                            class="text-[10px] font-medium text-slate-600">unids</span></p>
+                        <?= str_pad($stats['Pendiente'] ?? 0, 2, '0', STR_PAD_LEFT) ?> <span
+                            class="text-[10px] font-medium text-slate-600">unids</span>
+                    </p>
                 </div>
             </div>
             <div class="h-1 w-full bg-slate-800">
@@ -109,8 +110,9 @@ $stats = getWorkOrderStats();
                 <div>
                     <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest">En Proceso</p>
                     <p class="text-3xl font-black text-white mt-1">
-                        <?= str_pad($stats['IN_PROGRESS'] ?? 0, 2, '0', STR_PAD_LEFT) ?> <span
-                            class="text-[10px] font-medium text-slate-600">unids</span></p>
+                        <?= str_pad($stats['En Proceso'] ?? 0, 2, '0', STR_PAD_LEFT) ?> <span
+                            class="text-[10px] font-medium text-slate-600">unids</span>
+                    </p>
                 </div>
             </div>
             <div class="h-1 w-full bg-slate-800">
@@ -127,8 +129,9 @@ $stats = getWorkOrderStats();
                 <div>
                     <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest">Terminadas</p>
                     <p class="text-3xl font-black text-white mt-1">
-                        <?= str_pad($stats['COMPLETED'] ?? 0, 2, '0', STR_PAD_LEFT) ?> <span
-                            class="text-[10px] font-medium text-slate-600">unids</span></p>
+                        <?= str_pad($stats['Terminada'] ?? 0, 2, '0', STR_PAD_LEFT) ?> <span
+                            class="text-[10px] font-medium text-slate-600">unids</span>
+                    </p>
                 </div>
             </div>
             <div class="h-1 w-full bg-slate-800">
@@ -146,7 +149,8 @@ $stats = getWorkOrderStats();
                     <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest">Críticas Hoy</p>
                     <p class="text-3xl font-black text-white mt-1">
                         <?= str_pad($stats['CRITICAL_TODAY'] ?? 0, 2, '0', STR_PAD_LEFT) ?> <span
-                            class="text-[10px] font-medium text-slate-600">unids</span></p>
+                            class="text-[10px] font-medium text-slate-600">unids</span>
+                    </p>
                 </div>
             </div>
             <div class="h-1 w-full bg-slate-800">

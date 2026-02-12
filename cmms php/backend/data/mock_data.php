@@ -284,14 +284,14 @@ $MOCK_WORK_ORDERS = [
 // OT CORRECTIVAS (para cálculos de confiabilidad)
 // ═══════════════════════════════════════════════════════
 $MOCK_OT_CORRECTIVAS = [
-    ['asset_id' => 'PB-840-00122', 'created_date' => '2025-06-15', 'duration_hours' => 2.5],
-    ['asset_id' => 'PB-840-00122', 'created_date' => '2026-01-20', 'duration_hours' => 3.0],
-    ['asset_id' => 'AL-500-00441', 'created_date' => '2025-08-10', 'duration_hours' => 1.5],
-    ['asset_id' => 'AL-500-00441', 'created_date' => '2026-02-05', 'duration_hours' => 2.0],
-    ['asset_id' => 'DF-CU-00210', 'created_date' => '2025-05-20', 'duration_hours' => 4.0],
-    ['asset_id' => 'DF-CU-00210', 'created_date' => '2026-01-15', 'duration_hours' => 3.5],
-    ['asset_id' => 'ECG-2024-001', 'created_date' => '2025-09-10', 'duration_hours' => 1.0],
-    ['asset_id' => 'ECG-2024-001', 'created_date' => '2026-02-01', 'duration_hours' => 1.5],
+    ['asset_id' => 'PB-840-00122', 'date' => '2025-06-15', 'duration_hours' => 2.5],
+    ['asset_id' => 'PB-840-00122', 'date' => '2026-01-20', 'duration_hours' => 3.0],
+    ['asset_id' => 'AL-500-00441', 'date' => '2025-08-10', 'duration_hours' => 1.5],
+    ['asset_id' => 'AL-500-00441', 'date' => '2026-02-05', 'duration_hours' => 2.0],
+    ['asset_id' => 'DF-CU-00210', 'date' => '2025-05-20', 'duration_hours' => 4.0],
+    ['asset_id' => 'DF-CU-00210', 'date' => '2026-01-15', 'duration_hours' => 3.5],
+    ['asset_id' => 'ECG-2024-001', 'date' => '2025-09-10', 'duration_hours' => 1.0],
+    ['asset_id' => 'ECG-2024-001', 'date' => '2026-02-01', 'duration_hours' => 1.5],
 ];
 
 // ═══════════════════════════════════════════════════════
