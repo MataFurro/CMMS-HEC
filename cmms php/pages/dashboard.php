@@ -16,7 +16,7 @@ $assets = [
         'criticality' => 'CRITICAL',
         'status' => 'OPERATIVE',
         'acquisitionCost' => 45000,
-        'purchaseYear' => 2018,
+        'purchaseYear' => 2020,
         'totalUsefulLife' => 10,
         'yearsRemaining' => 4,
         'funcion' => 10,
@@ -31,7 +31,7 @@ $assets = [
         'criticality' => 'RELEVANT',
         'status' => 'MAINTENANCE',
         'acquisitionCost' => 3500,
-        'purchaseYear' => 2021,
+        'purchaseYear' => 2022,
         'totalUsefulLife' => 7,
         'yearsRemaining' => 4,
         'funcion' => 8,
@@ -46,7 +46,7 @@ $assets = [
         'criticality' => 'CRITICAL',
         'status' => 'OPERATIVE',
         'acquisitionCost' => 18000,
-        'purchaseYear' => 2023,
+        'purchaseYear' => 2024,
         'totalUsefulLife' => 8,
         'yearsRemaining' => 7,
         'funcion' => 10,
@@ -73,20 +73,20 @@ $assets = [
 // Datos de OT correctivas (en producción vendría de BD)
 $otCorrectivas = [
     // Ventilador PB-840-00122
-    ['equipo_id' => 'PB-840-00122', 'fecha' => '2023-06-15', 'duracion_horas' => 2.5],
-    ['equipo_id' => 'PB-840-00122', 'fecha' => '2024-01-20', 'duracion_horas' => 3.0],
+    ['equipo_id' => 'PB-840-00122', 'fecha' => '2025-06-15', 'duracion_horas' => 2.5],
+    ['equipo_id' => 'PB-840-00122', 'fecha' => '2026-01-20', 'duracion_horas' => 3.0],
 
     // Bomba AL-8015-994
-    ['equipo_id' => 'AL-8015-994', 'fecha' => '2023-08-10', 'duracion_horas' => 1.5],
-    ['equipo_id' => 'AL-8015-994', 'fecha' => '2024-02-05', 'duracion_horas' => 2.0],
+    ['equipo_id' => 'AL-8015-994', 'fecha' => '2025-08-10', 'duracion_horas' => 1.5],
+    ['equipo_id' => 'AL-8015-994', 'fecha' => '2026-02-05', 'duracion_horas' => 2.0],
 
     // Desfibrilador ZL-X-44211
-    ['equipo_id' => 'ZL-X-44211', 'fecha' => '2023-05-20', 'duracion_horas' => 4.0],
-    ['equipo_id' => 'ZL-X-44211', 'fecha' => '2024-01-15', 'duracion_horas' => 3.5],
+    ['equipo_id' => 'ZL-X-44211', 'fecha' => '2025-05-20', 'duracion_horas' => 4.0],
+    ['equipo_id' => 'ZL-X-44211', 'fecha' => '2026-01-15', 'duracion_horas' => 3.5],
 
     // ECG
-    ['equipo_id' => 'ECG-2024-001', 'fecha' => '2023-09-10', 'duracion_horas' => 1.0],
-    ['equipo_id' => 'ECG-2024-001', 'fecha' => '2024-02-01', 'duracion_horas' => 1.5]
+    ['equipo_id' => 'ECG-2024-001', 'fecha' => '2025-09-10', 'duracion_horas' => 1.0],
+    ['equipo_id' => 'ECG-2024-001', 'fecha' => '2026-02-01', 'duracion_horas' => 1.5]
 ];
 
 

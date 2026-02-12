@@ -1,11 +1,15 @@
 <?php
 // pages/work_order_opening.php
 
+require_once __DIR__ . '/../includes/checklist_templates.php';
+
 // Verificar permisos - Solo Ingeniero/Admin puede crear órdenes
 if (!canModify()) {
     header('Location: ?page=work_orders');
     exit;
 }
+
+$templateOptions = listChecklistTemplates();
 
 // Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -19,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // createWorkOrder($data);
 
     // Simulate success
-    echo "<script>alert('Orden de Trabajo generada exitosamente (Simulado). ID: OT-2024-NEW'); window.location.href='?page=work_orders';</script>";
+    echo "<script>alert('Orden de Trabajo generada exitosamente (Simulado). ID: OT-2026-NEW'); window.location.href='?page=work_orders';</script>";
 }
 ?>
 
@@ -40,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </a>
     </div>
 
-    <form method="POST" class="card-glass p-8 space-y-8 shadow-2xl relative overflow-hidden">
+    <form method="POST" x-data="{ otType: 'Correctivo' }" class="card-glass p-8 space-y-8 shadow-2xl relative overflow-hidden">
         <div class="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 blur-3xl rounded-full -mr-16 -mt-16"></div>
 
         <div class="grid grid-cols-1 gap-8 relative z-10">
@@ -65,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
                         <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tipo de Orden</label>
-                        <select required name="type" class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white appearance-none">
+                        <select required name="type" x-model="otType" class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white appearance-none">
                             <option value="Correctivo">Correctivo (Falla)</option>
                             <option value="Preventivo">Preventivo</option>
                             <option value="Calibración">Calibración</option>
@@ -80,6 +84,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <option value="Baja">Baja</option>
                         </select>
                     </div>
+                </div>
+
+                <!-- Selector de Plantilla de Checklist (Preventivo/Calibración) -->
+                <div x-show="otType === 'Preventivo' || otType === 'Calibración'" x-transition class="space-y-2">
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                        <span class="material-symbols-outlined text-medical-blue text-sm">fact_check</span>
+                        Plantilla de Lista de Chequeo
+                    </label>
+                    <select name="checklist_template" class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white appearance-none">
+                        <option value="">-- Seleccionar Plantilla (según equipo) --</option>
+                        <?php foreach ($templateOptions as $key => $label): ?>
+                            <option value="<?= $key ?>"><?= $label ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <p class="text-[10px] text-slate-500 italic flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">info</span>
+                        La plantilla define los ítems de inspección y mediciones que el técnico debe completar durante la ejecución.
+                    </p>
                 </div>
 
                 <div class="space-y-2">

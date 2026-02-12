@@ -33,7 +33,7 @@ $formula_tinc = "Veq = Vo - [Pu + (At * Pt) + (At * Pm) + (At * Pv) + Ps + Pi]";
             </nav>
             <h1 class="text-4xl font-black text-white tracking-tight flex items-center gap-4">
                 Control de Activos y Capital
-                <span class="px-3 py-1 bg-medical-blue/10 text-medical-blue text-xs rounded-lg border border-medical-blue/20">FY 2024</span>
+                <span class="px-3 py-1 bg-medical-blue/10 text-medical-blue text-xs rounded-lg border border-medical-blue/20">FY 2026</span>
             </h1>
             <p class="text-slate-400 mt-2 text-lg font-medium">Gestión del Ciclo de Vida Económico y Costo Total de Propiedad (TCO).</p>
         </div>
@@ -96,7 +96,7 @@ $formula_tinc = "Veq = Vo - [Pu + (At * Pt) + (At * Pm) + (At * Pv) + Ps + Pi]";
             </div>
             <div class="flex flex-col">
                 <span class="text-3xl font-black text-white"><?= $stats['obsolescencia_proxima'] ?></span>
-                <span class="text-xs font-bold text-red-500 mt-1">Ciclo de vida finalizado (2024)</span>
+                <span class="text-xs font-bold text-red-500 mt-1">Ciclo de vida finalizado (2026)</span>
             </div>
         </div>
     </div>

@@ -37,7 +37,7 @@ $dayEvents = [
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
             <h1 class="text-4xl font-bold tracking-tight text-white flex items-center gap-3">
-                Agenda Técnica 2024
+                Agenda Técnica 2026
                 <span class="text-medical-blue material-symbols-outlined text-3xl font-variation-fill">event_upcoming</span>
             </h1>
             <p class="text-slate-400 mt-2 text-lg">Cronograma maestro sincronizado con el módulo de Órdenes de Trabajo.</p>
@@ -138,11 +138,11 @@ $dayEvents = [
                                 </div>
                                 <div class="space-y-1.5 overflow-hidden">
                                     <?php if ($i === 5): ?>
-                                        <div class="px-2 py-1 bg-danger/10 border-l-2 border-danger rounded text-[9px] font-black text-danger truncate uppercase">OT #2024-0890</div>
-                                    <?php elseif ($i === 12 || $i === 22): ?>
-                                        <div class="px-2 py-1 bg-medical-blue/10 border-l-2 border-medical-blue rounded text-[9px] font-black text-medical-blue truncate uppercase">OT #2024-0885</div>
-                                    <?php elseif ($i === 15): ?>
-                                        <div class="px-2 py-1 bg-amber-500/10 border-l-2 border-amber-500 rounded text-[9px] font-black text-amber-500 truncate uppercase">OT #2024-0891</div>
+                                        <div class="px-2 py-1 bg-danger/10 border-l-2 border-danger rounded text-[9px] font-black text-danger truncate uppercase">OT #2026-0890</div>
+                                    <?php elseif ($i === 8 || $i === 22): ?>
+                                        <div class="px-2 py-1 bg-medical-blue/10 border-l-2 border-medical-blue rounded text-[9px] font-black text-medical-blue truncate uppercase">OT #2026-0885</div>
+                                    <?php elseif ($i === 11): ?>
+                                        <div class="px-2 py-1 bg-amber-500/10 border-l-2 border-amber-500 rounded text-[9px] font-black text-amber-500 truncate uppercase">OT #2026-0891</div>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -180,7 +180,7 @@ $dayEvents = [
                         <div class="py-4 border-r border-border-dark"></div>
                         <?php foreach ($weekDays as $idx => $day): ?>
                             <div class="py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest border-r border-border-dark/30">
-                                <?= $day ?> <span class="block text-white opacity-40 mt-1">1<?= $idx + 3 ?> May</span>
+                                <?= $day ?> <span class="block text-white opacity-40 mt-1">0<?= $idx + 9 ?> Feb</span>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -192,7 +192,7 @@ $dayEvents = [
                                     <div class="border-r border-border-dark/30 relative min-h-[80px] hover:bg-white/[0.01] transition-colors">
                                         <?php if ($idx === 0 && $hour === '10:00'): ?>
                                             <div class="absolute inset-x-1 top-2 p-3 bg-medical-blue/20 border-l-4 border-medical-blue rounded-xl z-10 shadow-lg shadow-medical-blue/10">
-                                                <p class="text-[9px] font-black text-white uppercase leading-none">OT #2024-0892</p>
+                                                <p class="text-[9px] font-black text-white uppercase leading-none">OT #2026-0892</p>
                                                 <p class="text-[8px] text-medical-blue font-bold mt-1 uppercase truncate">V. Mecánico PB840</p>
                                             </div>
                                         <?php elseif ($idx === 2 && $hour === '14:00'): ?>
@@ -213,7 +213,7 @@ $dayEvents = [
                 <div class="bg-panel-dark rounded-[2rem] border border-border-dark shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
                     <div class="p-8 border-b border-border-dark bg-white/5 flex items-center justify-between">
                         <div>
-                            <h3 class="text-xl font-bold text-white uppercase tracking-tight">Jueves, 14 de Mayo, 2024</h3>
+                            <h3 class="text-xl font-bold text-white uppercase tracking-tight">Miércoles, 11 de Febrero, 2026</h3>
                             <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">4 Intervenciones Programadas para hoy</p>
                         </div>
                         <div class="flex items-center gap-4 bg-emerald-500/5 px-4 py-2 rounded-2xl border border-emerald-500/20">

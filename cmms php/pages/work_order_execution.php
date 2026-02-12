@@ -1,13 +1,19 @@
 <?php
 // pages/work_order_execution.php
 
+require_once __DIR__ . '/../includes/checklist_templates.php';
+
 $id = $_GET['id'] ?? 'OT-2024-UNKNOWN';
 $isCompleted = ($id === 'OT-2024-0742'); // Mock Logic
 
+// Mock: Determinar qué plantilla usar (en prod vendría de la DB vinculada a la OT)
+$templateKey = $_GET['tpl'] ?? 'monitor_signos_vitales';
+$template = getChecklistTemplate($templateKey);
+
 $attachments = [
-    ['name' => 'Protocolo_Seguridad_Electrica_IEC62353.pdf', 'type' => 'pdf', 'size' => '1.2 MB', 'date' => '10/05/2024'],
-    ['name' => 'Certificado_Calibracion_Fluke.pdf', 'type' => 'pdf', 'size' => '840 KB', 'date' => '10/05/2024'],
-    ['name' => 'Captura_Falla_Sensor.jpg', 'type' => 'image', 'size' => '2.1 MB', 'date' => '10/05/2024']
+    ['name' => 'Protocolo_Seguridad_Electrica_IEC62353.pdf', 'type' => 'pdf', 'size' => '1.2 MB', 'date' => '11/02/2026'],
+    ['name' => 'Certificado_Calibracion_Fluke.pdf', 'type' => 'pdf', 'size' => '840 KB', 'date' => '11/02/2026'],
+    ['name' => 'Captura_Falla_Sensor.jpg', 'type' => 'image', 'size' => '2.1 MB', 'date' => '11/02/2026']
 ];
 
 $referenceDocs = [
@@ -15,13 +21,13 @@ $referenceDocs = [
     ['name' => 'Protocolo_Preventivo_Standard.pdf', 'category' => 'Checklist Guía']
 ];
 
-$checks = [
-    'Seguridad Eléctrica (IEC 62353)',
-    'Inspección Visual de Chasis e Integridad',
-    'Prueba de Batería y Autonomía',
-    'Verificación de Calibración Sensores O2',
-    'Validación de Alarmas (ISO 60601-1-8)'
-];
+// Fallback si no hay template
+$qualitativeChecks = $template['qualitative'] ?? [];
+$quantitativeGroups = $template['quantitative'] ?? [];
+$electricalSafety = $template['electrical_safety'] ?? [];
+$templateLabel = $template['label'] ?? 'Genérico';
+$templateIcon = $template['icon'] ?? 'fact_check';
+$templateVersion = $template['version'] ?? 'V1';
 ?>
 
 <div x-data="executionState" class="max-w-[1200px] mx-auto space-y-10 animate-in fade-in duration-500">
@@ -48,7 +54,7 @@ $checks = [
                 </span>
             </div>
             <p class="text-slate-400 mt-2 text-lg">
-                <?= $isCompleted ? 'Mantenimiento Preventivo Anual' : 'Mantenimiento Correctivo' ?> · Ventilador Mecánico Puritan Bennett 840
+                <?= $isCompleted ? 'Mantenimiento Preventivo Anual' : 'Mantenimiento Correctivo' ?> · <?= $templateLabel ?>
             </p>
         </div>
         <div class="flex gap-4">
@@ -59,9 +65,21 @@ $checks = [
         </div>
     </div>
 
+    <!-- Template Badge -->
+    <div class="flex items-center gap-3 px-5 py-3 bg-indigo-500/5 border border-indigo-500/20 rounded-2xl w-fit">
+        <span class="material-symbols-outlined text-indigo-400"><?= $templateIcon ?></span>
+        <div>
+            <p class="text-xs font-black text-indigo-300 uppercase tracking-widest">Plantilla: <?= $templateLabel ?></p>
+            <p class="text-[10px] text-slate-500 font-bold">Versión <?= $templateVersion ?> · <?= count($qualitativeChecks) ?> ítems + <?= count($quantitativeGroups) ?> grupos de medición</p>
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
         <div class="lg:col-span-8 space-y-8">
-            <!-- Protocolos de Seguridad -->
+
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!-- SECCIÓN 1: Inspección Cualitativa (Checklist)          -->
+            <!-- ═══════════════════════════════════════════════════════ -->
             <div class="bg-medical-surface p-8 rounded-3xl border border-slate-700/50 shadow-2xl relative overflow-hidden">
                 <div class="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
                     <span class="material-symbols-outlined text-8xl">verified_user</span>
@@ -72,22 +90,167 @@ $checks = [
                             <span class="material-symbols-outlined font-variation-fill">fact_check</span>
                         </div>
                         <div>
-                            <h3 class="text-xl font-bold text-white">Pruebas Normativas</h3>
-                            <p class="text-xs text-slate-500 uppercase font-bold tracking-widest mt-0.5">Validación de seguridad eléctrica y funcional</p>
+                            <h3 class="text-xl font-bold text-white">Inspección Cualitativa</h3>
+                            <p class="text-xs text-slate-500 uppercase font-bold tracking-widest mt-0.5">Aprueba / Falla / No Aplica</p>
                         </div>
                     </div>
+                    <span class="text-[10px] font-black text-slate-600 uppercase tracking-widest"><?= count($qualitativeChecks) ?> ítems</span>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <?php foreach ($checks as $check): ?>
-                        <div class="flex items-center gap-4 p-5 border rounded-2xl transition-all <?= $isCompleted ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-white/5 border-slate-700/50 hover:border-medical-blue/30' ?>">
-                            <span class="material-symbols-outlined font-black <?= $isCompleted ? 'text-emerald-500' : 'text-slate-700' ?>">
-                                <?= $isCompleted ? 'check_circle' : 'radio_button_unchecked' ?>
-                            </span>
-                            <span class="text-sm font-bold <?= $isCompleted ? 'text-slate-200' : 'text-slate-400' ?>"><?= $check ?></span>
+
+                <div class="space-y-3">
+                    <?php foreach ($qualitativeChecks as $idx => $check): ?>
+                        <div class="flex items-center justify-between p-4 border rounded-2xl transition-all <?= $isCompleted ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-white/5 border-slate-700/50 hover:border-medical-blue/30' ?>">
+                            <div class="flex items-center gap-4">
+                                <span class="material-symbols-outlined font-black <?= $isCompleted ? 'text-emerald-500' : 'text-slate-700' ?>">
+                                    <?= $isCompleted ? 'check_circle' : 'radio_button_unchecked' ?>
+                                </span>
+                                <span class="text-sm font-bold <?= $isCompleted ? 'text-slate-200' : 'text-slate-400' ?>"><?= $check ?></span>
+                            </div>
+                            <?php if (!$isCompleted && canExecuteWorkOrder()): ?>
+                                <div class="flex items-center gap-2">
+                                    <label class="flex items-center gap-1 cursor-pointer">
+                                        <input type="radio" name="q_<?= $idx ?>" value="pass" class="hidden peer">
+                                        <span class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border border-slate-700/50 text-slate-600 peer-checked:bg-emerald-500/10 peer-checked:text-emerald-500 peer-checked:border-emerald-500/30 transition-all hover:border-emerald-500/30 cursor-pointer">Aprueba</span>
+                                    </label>
+                                    <label class="flex items-center gap-1 cursor-pointer">
+                                        <input type="radio" name="q_<?= $idx ?>" value="fail" class="hidden peer">
+                                        <span class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border border-slate-700/50 text-slate-600 peer-checked:bg-red-500/10 peer-checked:text-red-500 peer-checked:border-red-500/30 transition-all hover:border-red-500/30 cursor-pointer">Falla</span>
+                                    </label>
+                                    <label class="flex items-center gap-1 cursor-pointer">
+                                        <input type="radio" name="q_<?= $idx ?>" value="na" class="hidden peer">
+                                        <span class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border border-slate-700/50 text-slate-600 peer-checked:bg-slate-500/10 peer-checked:text-slate-400 peer-checked:border-slate-500/30 transition-all hover:border-slate-500/30 cursor-pointer">N/A</span>
+                                    </label>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                 </div>
             </div>
+
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!-- SECCIÓN 2: Pruebas Cuantitativas (Metrología)          -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <?php if (!empty($quantitativeGroups)): ?>
+                <div class="bg-medical-surface p-8 rounded-3xl border border-slate-700/50 shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+                        <span class="material-symbols-outlined text-8xl">speed</span>
+                    </div>
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="flex items-center gap-4">
+                            <div class="p-2.5 bg-amber-500/10 text-amber-500 rounded-xl border border-amber-500/20">
+                                <span class="material-symbols-outlined font-variation-fill">labs</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Pruebas Cuantitativas</h3>
+                                <p class="text-xs text-slate-500 uppercase font-bold tracking-widest mt-0.5">Valor simulado vs. Valor medido (Tolerancia)</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-black text-slate-600 uppercase tracking-widest"><?= count($quantitativeGroups) ?> parámetros</span>
+                    </div>
+
+                    <div class="space-y-6">
+                        <?php foreach ($quantitativeGroups as $gIdx => $group): ?>
+                            <div class="p-5 bg-white/[0.02] border border-slate-700/50 rounded-2xl space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="text-sm font-black text-white uppercase tracking-wider"><?= $group['group'] ?></h4>
+                                    <span class="px-3 py-1 bg-amber-500/10 text-amber-500 border border-amber-500/20 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                                        Tolerancia: <?= $group['tolerance_label'] ?>
+                                    </span>
+                                </div>
+
+                                <!-- Table Header -->
+                                <div class="grid grid-cols-3 gap-3 text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">
+                                    <span>Valor Simulado</span>
+                                    <span>Valor Medido</span>
+                                    <span class="text-center">Estado</span>
+                                </div>
+
+                                <!-- Table Rows -->
+                                <?php foreach ($group['points'] as $pIdx => $point): ?>
+                                    <div class="grid grid-cols-3 gap-3 items-center">
+                                        <div class="flex items-center gap-2 px-4 py-3 bg-slate-900 border border-slate-700/50 rounded-xl">
+                                            <span class="text-sm font-bold text-medical-blue"><?= $point['simulated'] ?></span>
+                                            <span class="text-[10px] text-slate-500 font-bold"><?= $group['unit'] ?></span>
+                                        </div>
+                                        <?php if ($isCompleted): ?>
+                                            <div class="flex items-center gap-2 px-4 py-3 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
+                                                <span class="text-sm font-bold text-emerald-400"><?= is_numeric($point['simulated']) ? $point['simulated'] + rand(-1, 1) : $point['simulated'] ?></span>
+                                                <span class="text-[10px] text-slate-500 font-bold"><?= $group['unit'] ?></span>
+                                            </div>
+                                        <?php else: ?>
+                                            <input
+                                                type="text"
+                                                name="m_<?= $gIdx ?>_<?= $pIdx ?>"
+                                                placeholder="—"
+                                                class="px-4 py-3 bg-slate-900 border border-slate-700/50 rounded-xl text-sm text-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all font-bold"
+                                                <?= isReadOnly() ? 'readonly' : '' ?>>
+                                        <?php endif; ?>
+                                        <div class="flex justify-center">
+                                            <?php if ($isCompleted): ?>
+                                                <span class="px-3 py-1.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-lg text-[9px] font-black uppercase tracking-widest">Pasa</span>
+                                            <?php else: ?>
+                                                <span class="px-3 py-1.5 bg-slate-500/10 text-slate-600 border border-slate-700/50 rounded-lg text-[9px] font-black uppercase tracking-widest">Pendiente</span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!-- SECCIÓN 3: Seguridad Eléctrica (IEC 62353)             -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <?php if (!empty($electricalSafety)): ?>
+                <div class="bg-medical-surface p-8 rounded-3xl border border-slate-700/50 shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+                        <span class="material-symbols-outlined text-8xl">bolt</span>
+                    </div>
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="flex items-center gap-4">
+                            <div class="p-2.5 bg-red-500/10 text-red-400 rounded-xl border border-red-500/20">
+                                <span class="material-symbols-outlined font-variation-fill">electrical_services</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Seguridad Eléctrica</h3>
+                                <p class="text-xs text-slate-500 uppercase font-bold tracking-widest mt-0.5">IEC 62353 · Mediciones Normativas</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <!-- Header -->
+                        <div class="grid grid-cols-4 gap-3 text-[10px] font-black text-slate-500 uppercase tracking-widest px-4">
+                            <span>Parámetro</span>
+                            <span>Valor Esperado</span>
+                            <span>Valor Medido</span>
+                            <span class="text-center">Tolerancia</span>
+                        </div>
+                        <?php foreach ($electricalSafety as $sIdx => $safety): ?>
+                            <div class="grid grid-cols-4 gap-3 items-center p-4 bg-white/[0.02] border border-slate-700/50 rounded-2xl hover:border-red-500/20 transition-all">
+                                <span class="text-sm font-bold text-white"><?= $safety['param'] ?></span>
+                                <span class="text-sm font-bold text-red-400"><?= $safety['expected'] ?></span>
+                                <?php if ($isCompleted): ?>
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-emerald-500 text-sm">check_circle</span>
+                                        <span class="text-sm font-bold text-emerald-400">Conforme</span>
+                                    </div>
+                                <?php else: ?>
+                                    <input
+                                        type="text"
+                                        name="es_<?= $sIdx ?>"
+                                        placeholder="—"
+                                        class="px-3 py-2 bg-slate-900 border border-slate-700/50 rounded-xl text-sm text-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none transition-all font-bold"
+                                        <?= isReadOnly() ? 'readonly' : '' ?>>
+                                <?php endif; ?>
+                                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-center"><?= $safety['tolerance'] ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <!-- Documentación y Archivos Adjuntos -->
             <div class="bg-medical-surface p-8 rounded-3xl border border-slate-700/50 shadow-2xl">
@@ -179,6 +342,33 @@ $checks = [
                 </div>
             </div>
 
+            <!-- Datos del Equipo (Bloque Estandarizado) -->
+            <div class="bg-medical-surface p-6 rounded-3xl border border-slate-700/50 shadow-xl">
+                <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">Datos del Activo</h4>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center p-3 bg-white/5 rounded-xl">
+                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Nombre</span>
+                        <span class="text-xs font-bold text-white"><?= $templateLabel ?></span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-white/5 rounded-xl">
+                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Marca</span>
+                        <span class="text-xs font-bold text-slate-300">—</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-white/5 rounded-xl">
+                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Modelo</span>
+                        <span class="text-xs font-bold text-slate-300">—</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-white/5 rounded-xl">
+                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Serie</span>
+                        <span class="text-xs font-bold text-slate-300">—</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-white/5 rounded-xl">
+                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Servicio</span>
+                        <span class="text-xs font-bold text-slate-300">—</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="bg-medical-surface p-8 rounded-3xl border border-slate-700/50 shadow-2xl sticky top-28">
                 <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-8">Información de Cierre</h3>
 
@@ -192,6 +382,28 @@ $checks = [
                                 <p class="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Ing. Electromedicina</p>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Equipo Operativo -->
+                    <div class="p-5 bg-white/5 rounded-2xl border border-slate-700/50">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">¿Equipo Operativo al Cierre?</p>
+                        <?php if ($isCompleted): ?>
+                            <div class="flex items-center gap-2 text-emerald-500">
+                                <span class="material-symbols-outlined">check_circle</span>
+                                <span class="text-sm font-bold">SÍ — Operativo</span>
+                            </div>
+                        <?php else: ?>
+                            <div class="flex gap-3">
+                                <label class="flex-1 cursor-pointer">
+                                    <input type="radio" name="equipo_operativo" value="si" class="hidden peer">
+                                    <div class="p-3 text-center rounded-xl border border-slate-700/50 text-slate-600 text-xs font-black uppercase tracking-widest peer-checked:bg-emerald-500/10 peer-checked:text-emerald-500 peer-checked:border-emerald-500/30 transition-all hover:border-emerald-500/30">SÍ</div>
+                                </label>
+                                <label class="flex-1 cursor-pointer">
+                                    <input type="radio" name="equipo_operativo" value="no" class="hidden peer">
+                                    <div class="p-3 text-center rounded-xl border border-slate-700/50 text-slate-600 text-xs font-black uppercase tracking-widest peer-checked:bg-red-500/10 peer-checked:text-red-500 peer-checked:border-red-500/30 transition-all hover:border-red-500/30">NO</div>
+                                </label>
+                            </div>
+                        <?php endif; ?>
                     </div>
 
                     <?php if ($isCompleted): ?>
@@ -218,13 +430,7 @@ $checks = [
                                     <span class="material-symbols-outlined text-xl">save</span>
                                     <span>Guardar Borrador</span>
                                 </button>
-                                <div class="mt-4 p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/20 flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-indigo-400 text-sm">stars</span>
-                                        <span class="text-[9px] font-black text-indigo-400 uppercase tracking-widest">Recompensa Estimada</span>
-                                    </div>
-                                    <span class="text-xs font-black text-white">+350 XP</span>
-                                </div>
+
                             <?php endif; ?>
                         </div>
                     <?php endif; ?>
@@ -251,6 +457,22 @@ $checks = [
                         <p class="text-[11px] text-slate-400 italic leading-relaxed">
                             "Certifico que el equipo ha sido intervenido siguiendo los protocolos del fabricante y cumple con los estándares de seguridad vigentes."
                         </p>
+                    </div>
+
+                    <!-- Firmas: Técnico Ejecutante, Técnico HEC, Jefe de Servicio -->
+                    <div class="space-y-3">
+                        <div class="p-3 bg-white/5 rounded-xl border border-slate-700/50 flex items-center justify-between">
+                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Técnico Ejecutante</span>
+                            <span class="text-xs font-bold text-medical-blue">Ana Muñoz</span>
+                        </div>
+                        <div class="p-3 bg-white/5 rounded-xl border border-slate-700/50 flex items-center justify-between">
+                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Técnico HEC</span>
+                            <span class="text-xs text-slate-600">Pendiente</span>
+                        </div>
+                        <div class="p-3 bg-white/5 rounded-xl border border-slate-700/50 flex items-center justify-between">
+                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Jefe de Servicio</span>
+                            <span class="text-xs text-slate-600">Pendiente</span>
+                        </div>
                     </div>
 
                     <div class="space-y-2">

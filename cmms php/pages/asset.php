@@ -18,18 +18,18 @@ $asset = [
 
 // Mock Work Orders for this asset
 $workOrders = [
-    ['id' => 'OT-2024-001', 'type' => 'Preventivo', 'status' => 'Terminada', 'date' => '2024-01-10', 'tech' => 'Mario Gómez', 'desc' => 'Cambio de filtros y batería'],
-    ['id' => 'OT-2024-015', 'type' => 'Correctivo', 'status' => 'En Proceso', 'date' => '2024-01-25', 'tech' => 'Pablo Rojas', 'desc' => 'Falla en sensor de flujo'],
-    ['id' => 'OT-2023-089', 'type' => 'Calibración', 'status' => 'Terminada', 'date' => '2023-12-05', 'tech' => 'Ana Muñoz', 'desc' => 'Calibración anual de sensores'],
-    ['id' => 'OT-2023-045', 'type' => 'Preventivo', 'status' => 'Terminada', 'date' => '2023-08-15', 'tech' => 'Mario Gómez', 'desc' => 'Mantenimiento semestral'],
+    ['id' => 'OT-2026-001', 'type' => 'Preventivo', 'status' => 'Terminada', 'date' => '2026-01-10', 'tech' => 'Mario Gómez', 'desc' => 'Cambio de filtros y batería'],
+    ['id' => 'OT-2026-015', 'type' => 'Correctivo', 'status' => 'En Proceso', 'date' => '2026-02-11', 'tech' => 'Pablo Rojas', 'desc' => 'Falla en sensor de flujo'],
+    ['id' => 'OT-2025-089', 'type' => 'Calibración', 'status' => 'Terminada', 'date' => '2025-12-05', 'tech' => 'Ana Muñoz', 'desc' => 'Calibración anual de sensores'],
+    ['id' => 'OT-2024-045', 'type' => 'Preventivo', 'status' => 'Terminada', 'date' => '2024-08-15', 'tech' => 'Mario Gómez', 'desc' => 'Mantenimiento preventivo anual 2024'],
 ];
 
 // Mock Observations
 $observations = [
-    ['date' => '2024-01-25 14:30', 'author' => 'Ing. Laura', 'text' => 'Se detectó desgaste en válvula de exhalación. Programar reemplazo en próximo mantenimiento.', 'type' => 'warning'],
-    ['date' => '2024-01-10 09:15', 'author' => 'Téc. Mario Gómez', 'text' => 'Mantenimiento preventivo completado sin novedades. Equipo operativo al 100%.', 'type' => 'normal'],
-    ['date' => '2023-12-05 16:45', 'author' => 'Ing. Roberto Jefe', 'text' => 'Calibración exitosa. Todos los parámetros dentro de rango. Certificado adjunto.', 'type' => 'normal'],
-    ['date' => '2023-08-20 11:00', 'author' => 'Téc. Pablo Rojas', 'text' => 'CRÍTICO: Batería interna con vida útil al 15%. Reemplazo urgente requerido.', 'type' => 'critical'],
+    ['date' => '2026-02-11 14:30', 'author' => 'Ing. Laura', 'text' => 'Falla reportada hoy en el sensor. Se inicia diagnóstico inmediato.', 'type' => 'warning'],
+    ['date' => '2026-01-10 09:15', 'author' => 'Téc. Mario Gómez', 'text' => 'Mantenimiento preventivo completado sin novedades.', 'type' => 'normal'],
+    ['date' => '2025-12-05 16:45', 'author' => 'Ing. Roberto Jefe', 'text' => 'Calibración 2025 exitosa.', 'type' => 'normal'],
+    ['date' => '2024-08-20 11:00', 'author' => 'Téc. Pablo Rojas', 'text' => 'HISTÓRICO: Batería reemplazada en agosto 2024.', 'type' => 'normal'],
 ];
 
 require_once 'config.php';
@@ -37,11 +37,11 @@ require_once 'includes/audit_trail.php';
 
 // Mock Documents
 $documents = [
-    ['name' => 'Manual_PB840_ES.pdf', 'type' => 'Manual', 'size' => '2.4 MB', 'date' => '2023-01-15'],
-    ['name' => 'Certificado_Calibracion_2023.pdf', 'type' => 'Certificado', 'size' => '156 KB', 'date' => '2023-12-05'],
-    ['name' => 'Protocolo_Mantenimiento_Preventivo.pdf', 'type' => 'Protocolo', 'size' => '890 KB', 'date' => '2024-01-10'],
-    ['name' => 'Foto_Placa_Identificacion.jpg', 'type' => 'Foto', 'size' => '1.2 MB', 'date' => '2023-06-20'],
-    ['name' => 'Ficha_Tecnica_Fabricante.pdf', 'type' => 'Ficha Técnica', 'size' => '3.1 MB', 'date' => '2023-01-15'],
+    ['name' => 'Manual_PB840_ES.pdf', 'type' => 'Manual', 'size' => '2.4 MB', 'date' => '2025-01-15'],
+    ['name' => 'Certificado_Calibracion_2025.pdf', 'type' => 'Certificado', 'size' => '156 KB', 'date' => '2025-12-05'],
+    ['name' => 'Protocolo_Mantenimiento_Preventivo.pdf', 'type' => 'Protocolo', 'size' => '890 KB', 'date' => '2026-01-10'],
+    ['name' => 'Foto_Placa_Identificacion.jpg', 'type' => 'Foto', 'size' => '1.2 MB', 'date' => '2025-06-20'],
+    ['name' => 'Ficha_Tecnica_Fabricante.pdf', 'type' => 'Ficha Técnica', 'size' => '3.1 MB', 'date' => '2025-01-15'],
 ];
 
 // Mock Accounting Data
@@ -72,7 +72,7 @@ $asset['normativa'] = [
     'codigoUMDNS' => '17-429',
     'estandar' => 'ISO 13485 / FDA 21 CFR Part 11',
     'recalls' => [
-        ['id' => 'AV-2024-05', 'fecha' => '2024-01-10', 'agencia' => 'ISP', 'priority' => 'Alta', 'description' => 'Revisión obligatoria de válvula de exhalación']
+        ['id' => 'AV-2026-05', 'fecha' => '2026-01-10', 'agencia' => 'ISP', 'priority' => 'Alta', 'description' => 'Revisión obligatoria de válvula de exhalación']
     ]
 ];
 ?>
