@@ -189,8 +189,8 @@ $otPorTipoData = [
 $techComparisonData = array_map(function ($t) {
     return [
         'name' => explode(' ', $t['name'])[0],
-        'terminadas' => $t['otTerminadas'],
-        'xp' => ($t['otTerminadas'] ?? 0) * 100 / 100
+        'terminadas' => $t['ot_terminadas'],
+        'xp' => ($t['ot_terminadas'] ?? 0) * 100 / 100
     ];
 }, $technicians);
 ?>
@@ -205,7 +205,8 @@ $techComparisonData = array_map(function ($t) {
         </div>
         <?php if (canModify()): ?>
             <div class="flex gap-3">
-                <button class="h-11 px-6 border border-slate-700 text-slate-300 rounded-xl text-sm font-bold hover:bg-slate-800 flex items-center gap-2 transition-all active:scale-95">
+                <button
+                    class="h-11 px-6 border border-slate-700 text-slate-300 rounded-xl text-sm font-bold hover:bg-slate-800 flex items-center gap-2 transition-all active:scale-95">
                     <span class="material-symbols-outlined text-xl">file_download</span>
                     Exportar Reporte
                 </button>
@@ -218,8 +219,10 @@ $techComparisonData = array_map(function ($t) {
         <?php foreach ($kpiCards as $idx => $kpi): ?>
             <div class="card-glass p-5 border-l-4 <?= $kpi['color'] ?>">
                 <div class="flex justify-between items-start mb-2">
-                    <span class="material-symbols-outlined text-slate-400 text-lg font-variation-fill"><?= $kpi['icon'] ?></span>
-                    <span class="text-[9px] font-black px-2 py-0.5 rounded <?= $idx === 3 ? 'bg-red-500/10 text-red-500' : 'bg-emerald-500/10 text-emerald-500' ?>">
+                    <span
+                        class="material-symbols-outlined text-slate-400 text-lg font-variation-fill"><?= $kpi['icon'] ?></span>
+                    <span
+                        class="text-[9px] font-black px-2 py-0.5 rounded <?= $idx === 3 ? 'bg-red-500/10 text-red-500' : 'bg-emerald-500/10 text-emerald-500' ?>">
                         <?= $kpi['trend'] ?>
                     </span>
                 </div>
@@ -240,14 +243,16 @@ $techComparisonData = array_map(function ($t) {
             </div>
             <div class="flex items-center justify-between mb-8">
                 <div>
-                    <h3 class="text-sm font-black text-white uppercase tracking-[0.2em]">Modelado de Fallas (Weibull)</h3>
+                    <h3 class="text-sm font-black text-white uppercase tracking-[0.2em]">Modelado de Fallas (Weibull)
+                    </h3>
                     <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">
                         Probabilidad Acumulada $F(t) = 1 - e^{-(t/\eta)^\beta}$
                     </p>
                 </div>
                 <div class="flex gap-4">
                     <div class="px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-                        <span class="text-[10px] font-black text-amber-500 uppercase">Beta: <?= $beta ?> (Desgaste)</span>
+                        <span class="text-[10px] font-black text-amber-500 uppercase">Beta: <?= $beta ?>
+                            (Desgaste)</span>
                     </div>
                 </div>
             </div>
@@ -262,25 +267,33 @@ $techComparisonData = array_map(function ($t) {
                             Pronóstico de Confiabilidad
                         </h4>
                         <p class="text-sm text-slate-300 leading-relaxed mb-4">
-                            Predicción basada en fase de <b>desgaste inicial</b> ($\beta > 1$) para el parque tecnológico crítico.
+                            Predicción basada en fase de <b>desgaste inicial</b> ($\beta > 1$) para el parque
+                            tecnológico crítico.
                         </p>
                         <div class="space-y-3">
                             <div class="flex justify-between items-center text-[10px] py-2 border-b border-white/5">
-                                <span class="text-slate-500 font-bold uppercase tracking-widest">PROBABILIDAD FALLA (30D)</span>
-                                <span class="text-amber-500 font-black"><?= round((1 - exp(-pow(30 / $eta, $beta))) * 100, 1) ?>%</span>
+                                <span class="text-slate-500 font-bold uppercase tracking-widest">PROBABILIDAD FALLA
+                                    (30D)</span>
+                                <span
+                                    class="text-amber-500 font-black"><?= round((1 - exp(-pow(30 / $eta, $beta))) * 100, 1) ?>%</span>
                             </div>
                             <div class="flex justify-between items-center text-[10px] py-2 border-b border-white/5">
-                                <span class="text-slate-500 font-bold uppercase tracking-widest">PROBABILIDAD FALLA (60D)</span>
-                                <span class="text-red-500 font-black"><?= round((1 - exp(-pow(60 / $eta, $beta))) * 100, 1) ?>%</span>
+                                <span class="text-slate-500 font-bold uppercase tracking-widest">PROBABILIDAD FALLA
+                                    (60D)</span>
+                                <span
+                                    class="text-red-500 font-black"><?= round((1 - exp(-pow(60 / $eta, $beta))) * 100, 1) ?>%</span>
                             </div>
                         </div>
                     </div>
                     <div class="p-5 rounded-2xl bg-slate-900/50 border border-slate-700/50">
                         <div class="flex items-center gap-2 mb-2">
                             <span class="material-symbols-outlined text-medical-blue text-sm">lightbulb</span>
-                            <p class="text-[10px] text-medical-blue font-black uppercase tracking-widest">Recomendación Clínico 2.0</p>
+                            <p class="text-[10px] text-medical-blue font-black uppercase tracking-widest">Recomendación
+                                Clínico 2.0</p>
                         </div>
-                        <p class="text-[11px] text-slate-400 italic">"Dada la pendiente de la curva, se sugiere adelantar mantenimientos preventivos en ventilación mecánica para mitigar el riesgo de correctivos en el próximo trimestre."</p>
+                        <p class="text-[11px] text-slate-400 italic">"Dada la pendiente de la curva, se sugiere
+                            adelantar mantenimientos preventivos en ventilación mecánica para mitigar el riesgo de
+                            correctivos en el próximo trimestre."</p>
                     </div>
                 </div>
             </div>
@@ -297,35 +310,34 @@ $techComparisonData = array_map(function ($t) {
                         <span class="size-2 bg-医-blue rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]"></span>
                         Carga de Trabajo del Equipo
                     </h3>
-                    <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-1">Análisis de capacidad y OTs activas</p>
+                    <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-1">Análisis de capacidad
+                        y OTs activas</p>
                 </div>
                 <div class="flex items-center gap-2">
-                    <span class="px-3 py-1 bg-white/5 rounded-lg text-[10px] font-black text-slate-400 border border-white/10 uppercase tracking-tighter">Semana Actual</span>
+                    <span
+                        class="px-3 py-1 bg-white/5 rounded-lg text-[10px] font-black text-slate-400 border border-white/10 uppercase tracking-tighter">Semana
+                        Actual</span>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <?php
-                $techWorkload = [
-                    ['name' => 'Carlos Rodriguez', 'role' => 'Ing. Clínico Sr.', 'active' => 8, 'completed' => 12, 'capacity' => 85, 'initial' => 'CR'],
-                    ['name' => 'Ana Martínez', 'role' => 'Técnico Biomédico', 'active' => 3, 'completed' => 15, 'capacity' => 45, 'initial' => 'AM'],
-                    ['name' => 'Roberto Paiva', 'role' => 'Ing. Electrónico', 'active' => 11, 'completed' => 5, 'capacity' => 95, 'initial' => 'RP'],
-                    ['name' => 'Elena Solís', 'role' => 'Técnico Especialista', 'active' => 5, 'completed' => 10, 'capacity' => 60, 'initial' => 'ES'],
-                ];
-
-                foreach ($techWorkload as $tech):
+                foreach ($technicians as $tech):
                     $statusColor = $tech['capacity'] > 90 ? 'text-red-500' : ($tech['capacity'] > 70 ? 'text-amber-500' : 'text-emerald-400');
                     $progressBarColor = $tech['capacity'] > 90 ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]' : ($tech['capacity'] > 70 ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]');
-                ?>
-                    <div class="relative hover:bg-white/5 p-5 rounded-2xl transition-all border border-white/5 hover:border-white/10 bg-white/[0.02]">
+                    ?>
+                    <div
+                        class="relative hover:bg-white/5 p-5 rounded-2xl transition-all border border-white/5 hover:border-white/10 bg-white/[0.02]">
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center gap-3">
-                                <div class="size-10 rounded-xl bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center text-white font-black text-sm shadow-xl">
+                                <div
+                                    class="size-10 rounded-xl bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center text-white font-black text-sm shadow-xl">
                                     <?= $tech['initial'] ?>
                                 </div>
                                 <div class="overflow-hidden">
                                     <h4 class="text-xs font-black text-white truncate w-24"><?= $tech['name'] ?></h4>
-                                    <p class="text-[8px] text-slate-500 font-bold uppercase truncate"><?= $tech['role'] ?></p>
+                                    <p class="text-[8px] text-slate-500 font-bold uppercase truncate"><?= $tech['role'] ?>
+                                    </p>
                                 </div>
                             </div>
                             <div class="text-right">
@@ -334,11 +346,14 @@ $techComparisonData = array_map(function ($t) {
                         </div>
                         <div class="space-y-3">
                             <div class="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
-                                <div class="h-full <?= $progressBarColor ?> transition-all duration-1000" style="width: <?= $tech['capacity'] ?>%"></div>
+                                <div class="h-full <?= $progressBarColor ?> transition-all duration-1000"
+                                    style="width: <?= $tech['capacity'] ?>%"></div>
                             </div>
                             <div class="flex justify-between items-center text-[9px] font-black uppercase tracking-tighter">
-                                <span class="text-slate-500">Pendientes: <span class="text-医-blue"><?= $tech['active'] ?></span></span>
-                                <span class="text-slate-500">Cerradas: <span class="text-emerald-500"><?= $tech['completed'] ?></span></span>
+                                <span class="text-slate-500">Pendientes: <span
+                                        class="text-医-blue"><?= $tech['active'] ?></span></span>
+                                <span class="text-slate-500">Cerradas: <span
+                                        class="text-emerald-500"><?= $tech['completed'] ?></span></span>
                             </div>
                         </div>
                     </div>
@@ -347,10 +362,14 @@ $techComparisonData = array_map(function ($t) {
 
             <div class="mt-8 pt-6 border-t border-white/5 flex items-center justify-between">
                 <div class="flex items-center gap-2 group cursor-pointer text-医-blue">
-                    <span class="text-[10px] font-black uppercase tracking-[0.2em] group-hover:underline transition-all">Balancear Carga Equitativa</span>
-                    <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">balance</span>
+                    <span
+                        class="text-[10px] font-black uppercase tracking-[0.2em] group-hover:underline transition-all">Balancear
+                        Carga Equitativa</span>
+                    <span
+                        class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">balance</span>
                 </div>
-                <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest italic">Saturación Media: 71%</div>
+                <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest italic">Saturación Media: 71%
+                </div>
             </div>
         </div>
 
@@ -368,11 +387,15 @@ $techComparisonData = array_map(function ($t) {
         <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-8">Historial de Órdenes</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <?php foreach ($recentEvents as $event): ?>
-                <div class="relative pl-10 before:content-[''] before:absolute before:left-3 before:top-2 before:bottom-2 before:w-px before:bg-slate-700/50">
-                    <div class="absolute left-1 top-1 w-4 h-4 rounded-full bg-<?= $event['colorClass'] ?> ring-4 ring-medical-dark shadow-xl shadow-<?= $event['colorClass'] ?>/20"></div>
+                <div
+                    class="relative pl-10 before:content-[''] before:absolute before:left-3 before:top-2 before:bottom-2 before:w-px before:bg-slate-700/50">
+                    <div
+                        class="absolute left-1 top-1 w-4 h-4 rounded-full bg-<?= $event['color_class'] ?> ring-4 ring-medical-dark shadow-xl shadow-<?= $event['color_class'] ?>/20">
+                    </div>
                     <p class="text-sm font-bold text-white"><?= $event['title'] ?></p>
                     <p class="text-xs text-slate-400 mt-1"><?= $event['subtitle'] ?></p>
-                    <p class="text-[10px] text-slate-600 font-black uppercase tracking-tighter mt-2"><?= $event['time'] ?></p>
+                    <p class="text-[10px] text-slate-600 font-black uppercase tracking-tighter mt-2"><?= $event['time'] ?>
+                    </p>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -441,7 +464,7 @@ $techComparisonData = array_map(function ($t) {
                     },
                     ticks: {
                         color: '#64748b',
-                        callback: function(value) {
+                        callback: function (value) {
                             return value + '%'
                         }
                     },
@@ -458,7 +481,7 @@ $techComparisonData = array_map(function ($t) {
             plugins: {
                 tooltip: {
                     callbacks: {
-                        label: function(context) {
+                        label: function (context) {
                             return 'Riesgo de Falla: ' + context.parsed.y + '%';
                         }
                     }
@@ -543,17 +566,17 @@ $techComparisonData = array_map(function ($t) {
         data: {
             labels: <?= json_encode(array_column($techComparisonData, 'name')) ?>,
             datasets: [{
-                    label: 'OT Cerradas',
-                    data: <?= json_encode(array_column($techComparisonData, 'terminadas')) ?>,
-                    backgroundColor: '#10b981',
-                    borderRadius: 4
-                },
-                {
-                    label: 'XP Score (x100)',
-                    data: <?= json_encode(array_column($techComparisonData, 'xp')) ?>,
-                    backgroundColor: '#6366f1',
-                    borderRadius: 4
-                }
+                label: 'OT Cerradas',
+                data: <?= json_encode(array_column($techComparisonData, 'terminadas')) ?>,
+                backgroundColor: '#10b981',
+                borderRadius: 4
+            },
+            {
+                label: 'XP Score (x100)',
+                data: <?= json_encode(array_column($techComparisonData, 'xp')) ?>,
+                backgroundColor: '#6366f1',
+                borderRadius: 4
+            }
             ]
         },
         options: {
