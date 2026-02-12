@@ -1,0 +1,13 @@
+name: CI Baseline
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Basic Check
+        run: echo "CI Basline OK. Configura tus propios tests aquí."
