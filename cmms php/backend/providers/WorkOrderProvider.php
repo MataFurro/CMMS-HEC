@@ -8,6 +8,7 @@
  */
 
 require_once __DIR__ . '/../data/mock_data.php';
+require_once __DIR__ . '/UserProvider.php';
 
 /**
  * Obtener todas las órdenes de trabajo
@@ -109,13 +110,67 @@ function getAdherenceRate(): int
     return round(($stats['Terminada'] / $stats['TOTAL']) * 100);
 }
 
-/**
- * Obtener saturación media del equipo (%)
- */
 function getWorkloadSaturation(): int
 {
     // Simulación basada en técnicos y sus OTs activas
     $technicians = getTechnicianRanking();
+    if (empty($technicians)) return 0;
+
     $totalCapacity = array_sum(array_column($technicians, 'capacity'));
-    return count($technicians) > 0 ? round($totalCapacity / count($technicians)) : 0;
+    return (int)round($totalCapacity / count($technicians));
+}
+
+/**
+ * Crear una Orden de Trabajo a partir de una solicitud (Proceso de Conversión)
+ */
+function createWorkOrderFromRequest(array $data): string
+{
+    global $MOCK_WORK_ORDERS;
+
+    // Persistencia en sesión para que no se pierdan al navegar
+    if (!isset($_SESSION['MOCK_WORK_ORDERS_PERSIST'])) {
+        $_SESSION['MOCK_WORK_ORDERS_PERSIST'] = $MOCK_WORK_ORDERS;
+    }
+
+    $newId = "OT-" . date("Y") . "-" . str_pad(count($_SESSION['MOCK_WORK_ORDERS_PERSIST']) + 101, 4, "0", STR_PAD_LEFT);
+
+    $newOrder = [
+        'id' => $newId,
+        'asset' => $data['asset_name'] ?? 'Equipo Desconocido',
+        'asset_id' => $data['asset_id'] ?? 'S/N',
+        'type' => $data['type'] ?? 'Correctiva',
+        'status' => 'Pendiente',
+        'priority' => $data['priority'] ?? 'Media',
+        'tech' => $data['tech'] ?? 'Por Asignar',
+        'date' => date("Y-m-d"),
+        'problem' => $data['problem'] ?? '',
+        'location' => $data['location'] ?? 'Hospital General',
+        'ms_email' => $data['ms_email'] ?? null
+    ];
+
+    $_SESSION['MOCK_WORK_ORDERS_PERSIST'][] = $newOrder;
+
+    return $newId;
+}
+
+/**
+ * Finalizar una OT y enviar notificación si aplica (Feedback Loop)
+ */
+function completeWorkOrder(string $otId): bool
+{
+    if (!isset($_SESSION['MOCK_WORK_ORDERS_PERSIST'])) return false;
+
+    foreach ($_SESSION['MOCK_WORK_ORDERS_PERSIST'] as &$order) {
+        if ($order['id'] === $otId) {
+            $order['status'] = 'Terminada';
+
+            // Simulación de Feedback Loop
+            if (!empty($order['ms_email'])) {
+                error_log("FEEDBACK LOOP: Notificando a " . $order['ms_email'] . " sobre finalización de OT " . $otId);
+            }
+            return true;
+        }
+    }
+
+    return false;
 }

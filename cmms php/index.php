@@ -2,12 +2,13 @@
 // index.php - Main Router
 
 require_once 'config.php';
+if (!defined('APP_NAME')) define('APP_NAME', 'BioCMMS v4.2 Pro');
 
 // Simple Router
 $page = $_GET['page'] ?? 'dashboard';
 
 // Safe allow-list of pages
-$allowed_pages = ['dashboard', 'inventory', 'calendar', 'work_orders', 'new_asset', 'login', 'asset', 'work_order_execution', 'work_order_opening', 'family_analysis', 'financial_analysis'];
+$allowed_pages = ['dashboard', 'inventory', 'calendar', 'work_orders', 'new_asset', 'login', 'asset', 'work_order_execution', 'work_order_opening', 'family_analysis', 'financial_analysis', 'messenger_requests', 'service_request', 'service_request_review'];
 
 if (!in_array($page, $allowed_pages)) {
     $page = 'dashboard';
