@@ -49,12 +49,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'convert') {
         </div>
     </div>
 
-    <?php if ($converted): ?>
+    <?php if ($convertedId): ?>
         <div class="bg-blue-500/10 border border-blue-500/20 p-6 rounded-2xl flex items-center gap-4 text-blue-500 shadow-xl shadow-blue-500/5 animate-in slide-in-from-top-4 duration-300">
             <span class="material-symbols-outlined text-4xl">task_alt</span>
             <div>
                 <p class="font-black uppercase tracking-widest text-sm">Solicitud Convertida a OT</p>
-                <p class="text-blue-500/80 text-xs mt-1">La solicitud SOL-2026-0045 ha sido procesada. ID Generado: <span class="font-mono font-bold">OT-2026-0899</span>.</p>
+                <p class="text-blue-500/80 text-xs mt-1">La solicitud ha sido procesada con éxito. ID Generado: <span class="font-mono font-bold"><?= $convertedId ?></span>.</p>
             </div>
             <button onclick="window.location.href='?page=work_orders'" class="ml-auto px-4 py-2 bg-blue-500 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-600 transition-all">Ver Órdenes</button>
         </div>
@@ -98,16 +98,14 @@ if (isset($_GET['action']) && $_GET['action'] === 'convert') {
                             <span class="material-symbols-outlined text-lg">edit_note</span>
                             Completar Antecedentes
                         </button>
-                        <button class="w-full h-12 bg-slate-800 text-slate-400 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-slate-700 hover:text-white flex items-center justify-center gap-2 transition-all border border-slate-700/50">
-                            <span class="material-symbols-outlined text-lg">close</span>
-                            Desestimar
-                        </button>
                     </div>
                 </div>
 
                 <!-- Simulation Modal (Hidden by default) -->
                 <div id="modal-<?= $req['id'] ?>" class="hidden bg-slate-950/80 backdrop-blur-md p-8 border-t border-slate-800 animate-in fade-in duration-300">
-                    <div class="max-w-2xl mx-auto space-y-6">
+                    <form method="POST" class="max-w-2xl mx-auto space-y-6">
+                        <input type="hidden" name="action" value="convert">
+                        <input type="hidden" name="req_id" value="<?= $req['id'] ?>">
                         <h4 class="text-lg font-black text-white uppercase tracking-tight flex items-center gap-3">
                             <span class="material-symbols-outlined text-medical-blue">engineering</span>
                             Análisis Técnico Sugerido
@@ -115,12 +113,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'convert') {
                         <div class="space-y-4">
                             <div>
                                 <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2 block">Antecedentes y Diagnóstico Preliminar</label>
-                                <textarea placeholder="Ingeniero: Agregue antecedentes técnicos aquí..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-medical-blue h-24 resize-none"></textarea>
+                                <textarea name="diagnosis" placeholder="Ingeniero: Agregue antecedentes técnicos aquí..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-medical-blue h-24 resize-none"></textarea>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2 block">Asignar Técnico</label>
-                                    <select class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-medical-blue">
+                                    <select name="tech" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-medical-blue">
                                         <option>Mario Gómez (Senior)</option>
                                         <option>Pablo Rojas (Especialista)</option>
                                         <option>Ana Muñoz (Calibración)</option>
@@ -128,7 +126,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'convert') {
                                 </div>
                                 <div>
                                     <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2 block">Tipo de Intervención</label>
-                                    <select class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-medical-blue">
+                                    <select name="intervention_type" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-medical-blue">
                                         <option>Mantenimiento Correctivo</option>
                                         <option>Revisión Técnica</option>
                                         <option>Validación Operativa</option>
@@ -137,12 +135,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'convert') {
                             </div>
                         </div>
                         <div class="flex justify-end gap-3 pt-4">
-                            <button onclick="document.getElementById('modal-<?= $req['id'] ?>').classList.add('hidden')" class="px-6 py-2.5 text-xs font-black text-slate-500 uppercase tracking-widest">Cancelar</button>
-                            <a href="?page=service_request_review&action=convert" class="px-8 py-2.5 bg-emerald-500 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-emerald-600 shadow-lg shadow-emerald-500/20">
+                            <button type="button" onclick="document.getElementById('modal-<?= $req['id'] ?>').classList.add('hidden')" class="px-6 py-2.5 text-xs font-black text-slate-500 uppercase tracking-widest">Cancelar</button>
+                            <button type="submit" class="px-8 py-2.5 bg-emerald-500 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-emerald-600 shadow-lg shadow-emerald-500/20">
                                 Emitir Orden de Trabajo
-                            </a>
+                            </button>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         <?php endforeach; ?>
