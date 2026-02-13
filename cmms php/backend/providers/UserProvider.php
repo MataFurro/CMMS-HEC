@@ -19,20 +19,29 @@ function getAllUserRoles(): array
 }
 
 /**
- * Autenticar usuario por email (mock)
- * En producción: validar contra BD con hash de contraseña
+ * Autenticar usuario por email y contraseña (mock)
  */
-function authenticateUser(string $email): ?array
+function authenticateUser(string $email, string $password = ''): ?array
 {
     global $MOCK_USERS;
 
-    $userKey = 'auditor'; // Default
-    if (strpos($email, 'jefe') !== false) $userKey = 'chief';
-    if (strpos($email, 'ing') !== false) $userKey = 'engineer';
-    if (strpos($email, 'tec') !== false) $userKey = 'tech';
+    $userKey = null;
+    if (strpos($email, 'jefe') !== false)
+        $userKey = 'chief';
+    elseif (strpos($email, 'ing') !== false)
+        $userKey = 'engineer';
+    elseif (strpos($email, 'tec') !== false)
+        $userKey = 'tech';
+    elseif (strpos($email, 'auditor') !== false)
+        $userKey = 'auditor';
 
-    if (!empty($email) && isset($MOCK_USERS[$userKey])) {
-        return $MOCK_USERS[$userKey];
+    if ($userKey && isset($MOCK_USERS[$userKey])) {
+        $user = $MOCK_USERS[$userKey];
+        // En modo demo, si no se provee pass, dejamos pasar (solo para login simplificado)
+        // En producción ESTO DEBE SER OBLIGATORIO
+        if (empty($password) || password_verify($password, $user['password_hash'])) {
+            return $user;
+        }
     }
 
     return null;
@@ -53,7 +62,7 @@ function getAllTechnicians(): array
 function getTechnicianRanking(): array
 {
     $techs = getAllTechnicians();
-    usort($techs, fn($a, $b) => $b['otTerminadas'] - $a['otTerminadas']);
+    usort($techs, fn($a, $b) => $b['ot_terminadas'] - $a['ot_terminadas']);
     return $techs;
 }
 

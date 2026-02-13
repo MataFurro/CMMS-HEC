@@ -11,16 +11,32 @@
  */
 function calcularMTBF($equipo_id, $otCorrectivas)
 {
-    $fallos = array_filter($otCorrectivas, fn($ot) => $ot['equipo_id'] === $equipo_id);
+    $fallos = array_filter($otCorrectivas, function ($ot) use ($equipo_id) {
+        return ($ot['asset_id'] ?? '') === $equipo_id && !empty($ot['date']);
+    });
     $numFallos = count($fallos);
 
-    if ($numFallos <= 1) return null; // Necesita al menos 2 fallos
+    if ($numFallos <= 1)
+        return null; // Necesita al menos 2 fallos
 
-    // Ordenar por fecha
-    usort($fallos, fn($a, $b) => strtotime($a['fecha']) - strtotime($b['fecha']));
+    // Ordenar por date
+    usort($fallos, function ($a, $b) {
+        $t1 = strtotime($a['date'] ?? '');
+        $t2 = strtotime($b['date'] ?? '');
+        return $t1 - $t2;
+    });
+
+    $first = reset($fallos);
+    $last = end($fallos);
 
     // Tiempo entre primera y última falla (en días)
-    $tiempoTotal = (strtotime(end($fallos)['fecha']) - strtotime($fallos[0]['fecha'])) / 86400;
+    $t1 = strtotime($first['date'] ?? '');
+    $t2 = strtotime($last['date'] ?? '');
+
+    if (!$t1 || !$t2)
+        return null;
+
+    $tiempoTotal = ($t2 - $t1) / 86400;
 
     return $tiempoTotal / ($numFallos - 1);
 }
@@ -34,7 +50,7 @@ function calcularMTBF($equipo_id, $otCorrectivas)
  */
 function calcularMTTR($equipo_id, $otCorrectivas)
 {
-    $fallos = array_filter($otCorrectivas, fn($ot) => $ot['equipo_id'] === $equipo_id);
+    $fallos = array_filter($otCorrectivas, fn($ot) => ($ot['asset_id'] ?? '') === $equipo_id);
     $duraciones = array_column($fallos, 'duracion_horas');
 
     return count($duraciones) > 0 ? array_sum($duraciones) / count($duraciones) : 0;
@@ -49,7 +65,8 @@ function calcularMTTR($equipo_id, $otCorrectivas)
  */
 function calcularDisponibilidad($MTBF, $MTTR)
 {
-    if ($MTBF === null || $MTBF == 0) return 0;
+    if ($MTBF === null || $MTBF == 0)
+        return 0;
 
     // Convertir MTBF de días a horas
     $MTBF_horas = $MTBF * 24;

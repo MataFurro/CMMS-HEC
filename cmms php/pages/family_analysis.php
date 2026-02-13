@@ -2,66 +2,9 @@
 // pages/family_analysis.php
 // Análisis de equipos por familia - Métricas de uso, vida útil, fallas y tiempo fuera
 
-// --- MOCK DATA ---
+require_once __DIR__ . '/../backend/providers/AssetProvider.php';
 
-// Familias de equipos con métricas agregadas
-$families = [
-    [
-        'name' => 'Ventilación',
-        'icon' => 'air',
-        'totalAssets' => 24,
-        'hoursUsed' => 18450,
-        'avgLifeRemaining' => 68,
-        'totalFailures' => 12,
-        'downtime' => 156, // horas
-        'availability' => 95.2,
-        'color' => '#0ea5e9' // medical-blue
-    ],
-    [
-        'name' => 'Imagenología',
-        'icon' => 'radiology',
-        'totalAssets' => 18,
-        'hoursUsed' => 12300,
-        'avgLifeRemaining' => 52,
-        'totalFailures' => 8,
-        'downtime' => 98,
-        'availability' => 92.8,
-        'color' => '#10b981' // emerald
-    ],
-    [
-        'name' => 'Monitorización',
-        'icon' => 'monitor_heart',
-        'totalAssets' => 42,
-        'hoursUsed' => 32100,
-        'avgLifeRemaining' => 71,
-        'totalFailures' => 15,
-        'downtime' => 124,
-        'availability' => 96.5,
-        'color' => '#f59e0b' // amber
-    ],
-    [
-        'name' => 'Infusión',
-        'icon' => 'water_drop',
-        'totalAssets' => 35,
-        'hoursUsed' => 28700,
-        'avgLifeRemaining' => 64,
-        'totalFailures' => 22,
-        'downtime' => 187,
-        'availability' => 93.1,
-        'color' => '#8b5cf6' // violet (excepción al purple ban, es para datos)
-    ],
-    [
-        'name' => 'Desfibrilación',
-        'icon' => 'ecg_heart',
-        'totalAssets' => 16,
-        'hoursUsed' => 8920,
-        'avgLifeRemaining' => 82,
-        'totalFailures' => 4,
-        'downtime' => 42,
-        'availability' => 98.1,
-        'color' => '#ef4444' // red
-    ]
-];
+$families = getAssetFamilies();
 
 // Tendencia de fallas por mes (últimos 6 meses)
 $failureTrend = [
@@ -74,19 +17,19 @@ $failureTrend = [
 ];
 
 // Calcular totales
-$totalAssets = array_sum(array_column($families, 'totalAssets'));
-$totalHours = array_sum(array_column($families, 'hoursUsed'));
-$totalFailures = array_sum(array_column($families, 'totalFailures'));
-$avgAvailability = round(array_sum(array_column($families, 'availability')) / count($families), 1);
+$totalAssets = array_sum(array_column($families, 'total_assets'));
+$totalHours = array_sum(array_column($families, 'hours_used'));
+$totalFailures = array_sum(array_column($families, 'total_failures'));
+$avgAvailability = count($families) > 0 ? round(array_sum(array_column($families, 'availability')) / count($families), 1) : 0;
 
 // Familia con más fallas
 $maxFailuresFamily = array_reduce($families, function ($carry, $item) {
-    return (!$carry || $item['totalFailures'] > $carry['totalFailures']) ? $item : $carry;
+    return (!$carry || $item['total_failures'] > $carry['total_failures']) ? $item : $carry;
 });
 
 // Familia con más uso
 $maxUsageFamily = array_reduce($families, function ($carry, $item) {
-    return (!$carry || $item['hoursUsed'] > $carry['hoursUsed']) ? $item : $carry;
+    return (!$carry || $item['hours_used'] > $carry['hours_used']) ? $item : $carry;
 });
 
 ?>
@@ -97,10 +40,12 @@ $maxUsageFamily = array_reduce($families, function ($carry, $item) {
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
             <h1 class="text-3xl font-bold text-white tracking-tight">Análisis por Familia</h1>
-            <p class="text-xs text-slate-500 mt-1 uppercase tracking-wider font-bold">Métricas agregadas por tipo de equipo</p>
+            <p class="text-xs text-slate-500 mt-1 uppercase tracking-wider font-bold">Métricas agregadas por tipo de
+                equipo</p>
         </div>
         <div class="flex gap-3">
-            <button class="h-11 px-6 border border-slate-700 text-slate-300 rounded-xl text-sm font-bold hover:bg-slate-800 flex items-center gap-2 transition-all active:scale-95">
+            <button
+                class="h-11 px-6 border border-slate-700 text-slate-300 rounded-xl text-sm font-bold hover:bg-slate-800 flex items-center gap-2 transition-all active:scale-95">
                 <span class="material-symbols-outlined text-xl">file_download</span>
                 Exportar Análisis
             </button>
@@ -125,7 +70,7 @@ $maxUsageFamily = array_reduce($families, function ($carry, $item) {
             <div class="flex justify-between items-start mb-2">
                 <span class="material-symbols-outlined text-slate-400 text-lg">schedule</span>
                 <span class="text-[9px] font-black px-2 py-0.5 rounded bg-amber-500/10 text-amber-500">
-                    <?= $maxUsageFamily['name'] ?>
+                    <?= $maxUsageFamily['name'] ?? 'N/A' ?>
                 </span>
             </div>
             <p class="stat-label">Horas de Uso Total</p>
@@ -137,7 +82,7 @@ $maxUsageFamily = array_reduce($families, function ($carry, $item) {
             <div class="flex justify-between items-start mb-2">
                 <span class="material-symbols-outlined text-slate-400 text-lg">warning</span>
                 <span class="text-[9px] font-black px-2 py-0.5 rounded bg-red-500/10 text-red-500">
-                    <?= $maxFailuresFamily['name'] ?>
+                    <?= $maxFailuresFamily['name'] ?? 'N/A' ?>
                 </span>
             </div>
             <p class="stat-label">Fallas Totales</p>
@@ -211,13 +156,26 @@ $maxUsageFamily = array_reduce($families, function ($carry, $item) {
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-white/5 border-b border-slate-700/50">
-                        <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">Familia</th>
-                        <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-center">Activos</th>
-                        <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-right">Hrs Uso</th>
-                        <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-center">Vida Útil</th>
-                        <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-center">Fallas</th>
-                        <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-right">Tiempo Fuera</th>
-                        <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-center">Disponibilidad</th>
+                        <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">Familia
+                        </th>
+                        <th
+                            class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-center">
+                            Activos</th>
+                        <th
+                            class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-right">
+                            Hrs Uso</th>
+                        <th
+                            class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-center">
+                            Vida Útil</th>
+                        <th
+                            class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-center">
+                            Fallas</th>
+                        <th
+                            class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-right">
+                            Tiempo Fuera</th>
+                        <th
+                            class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-center">
+                            Disponibilidad</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-700/50">
@@ -225,37 +183,44 @@ $maxUsageFamily = array_reduce($families, function ($carry, $item) {
                         <tr class="hover:bg-white/5 transition-colors group">
                             <td class="px-8 py-6">
                                 <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background-color: <?= $family['color'] ?>20; border: 1px solid <?= $family['color'] ?>40;">
-                                        <span class="material-symbols-outlined text-xl" style="color: <?= $family['color'] ?>;"><?= $family['icon'] ?></span>
+                                    <div class="w-10 h-10 rounded-lg flex items-center justify-center"
+                                        style="background-color: <?= $family['color'] ?>20; border: 1px solid <?= $family['color'] ?>40;">
+                                        <span class="material-symbols-outlined text-xl"
+                                            style="color: <?= $family['color'] ?>;"><?= $family['icon'] ?></span>
                                     </div>
                                     <div>
                                         <p class="font-bold text-white text-base"><?= $family['name'] ?></p>
-                                        <p class="text-xs text-slate-500 uppercase font-semibold mt-0.5">Familia de equipos</p>
+                                        <p class="text-xs text-slate-500 uppercase font-semibold mt-0.5">Familia de equipos
+                                        </p>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-6 py-6 text-center">
-                                <span class="text-lg font-black text-white"><?= $family['totalAssets'] ?></span>
+                                <span class="text-lg font-black text-white"><?= $family['total_assets'] ?></span>
                             </td>
                             <td class="px-6 py-6 text-right">
-                                <span class="text-base font-bold text-slate-200"><?= number_format($family['hoursUsed']) ?></span>
+                                <span
+                                    class="text-base font-bold text-slate-200"><?= number_format($family['hours_used']) ?></span>
                                 <span class="text-xs text-slate-500 ml-1">hrs</span>
                             </td>
                             <td class="px-6 py-6">
                                 <div class="w-32 mx-auto">
                                     <div class="flex items-center justify-between mb-2">
-                                        <span class="text-[10px] font-black text-slate-500"><?= $family['avgLifeRemaining'] ?>%</span>
+                                        <span
+                                            class="text-[10px] font-black text-slate-500"><?= $family['avg_life_remaining'] ?>%</span>
                                         <span class="text-[9px] text-slate-600 font-bold uppercase">Restante</span>
                                     </div>
                                     <div class="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
-                                        <div class="h-full <?= $family['avgLifeRemaining'] > 60 ? 'bg-emerald-500' : ($family['avgLifeRemaining'] > 40 ? 'bg-amber-500' : 'bg-red-500') ?>" style="width: <?= $family['avgLifeRemaining'] ?>%"></div>
+                                        <div class="h-full <?= $family['avg_life_remaining'] > 60 ? 'bg-emerald-500' : ($family['avg_life_remaining'] > 40 ? 'bg-amber-500' : 'bg-red-500') ?>"
+                                            style="width: <?= $family['avg_life_remaining'] ?>%"></div>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-6 py-6 text-center">
-                                <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black uppercase border <?= $family['totalFailures'] > 15 ? 'bg-red-500/10 text-red-500 border-red-500/30' : 'bg-amber-500/10 text-amber-500 border-amber-500/30' ?>">
+                                <span
+                                    class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black uppercase border <?= $family['total_failures'] > 15 ? 'bg-red-500/10 text-red-500 border-red-500/30' : 'bg-amber-500/10 text-amber-500 border-amber-500/30' ?>">
                                     <span class="material-symbols-outlined text-sm">warning</span>
-                                    <?= $family['totalFailures'] ?>
+                                    <?= $family['total_failures'] ?>
                                 </span>
                             </td>
                             <td class="px-6 py-6 text-right">
@@ -263,8 +228,10 @@ $maxUsageFamily = array_reduce($families, function ($carry, $item) {
                                 <span class="text-xs text-slate-500 ml-1">hrs</span>
                             </td>
                             <td class="px-6 py-6 text-center">
-                                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs font-black uppercase border <?= $family['availability'] >= 95 ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30' : 'bg-amber-500/10 text-amber-500 border-amber-500/30' ?>">
-                                    <span class="size-2 rounded-full <?= $family['availability'] >= 95 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-amber-500' ?>"></span>
+                                <span
+                                    class="inline-flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs font-black uppercase border <?= $family['availability'] >= 95 ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30' : 'bg-amber-500/10 text-amber-500 border-amber-500/30' ?>">
+                                    <span
+                                        class="size-2 rounded-full <?= $family['availability'] >= 95 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-amber-500' ?>"></span>
                                     <?= $family['availability'] ?>%
                                 </span>
                             </td>
@@ -322,7 +289,7 @@ $maxUsageFamily = array_reduce($families, function ($carry, $item) {
             labels: <?= json_encode(array_column($families, 'name')) ?>,
             datasets: [{
                 label: 'Horas de Uso',
-                data: <?= json_encode(array_column($families, 'hoursUsed')) ?>,
+                data: <?= json_encode(array_column($families, 'hours_used')) ?>,
                 backgroundColor: <?= json_encode(array_column($families, 'color')) ?>,
                 borderRadius: 8,
                 barThickness: 32
@@ -359,7 +326,7 @@ $maxUsageFamily = array_reduce($families, function ($carry, $item) {
             labels: <?= json_encode(array_column($families, 'name')) ?>,
             datasets: [{
                 label: 'Vida Útil %',
-                data: <?= json_encode(array_column($families, 'avgLifeRemaining')) ?>,
+                data: <?= json_encode(array_column($families, 'avg_life_remaining')) ?>,
                 borderColor: '#0ea5e9',
                 backgroundColor: 'rgba(14, 165, 233, 0.1)',
                 borderWidth: 2

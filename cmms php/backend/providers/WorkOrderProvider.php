@@ -25,7 +25,8 @@ function getWorkOrderById(string $id): ?array
 {
     global $MOCK_WORK_ORDERS;
     foreach ($MOCK_WORK_ORDERS as $order) {
-        if ($order['id'] === $id) return $order;
+        if ($order['id'] === $id)
+            return $order;
     }
     return null;
 }
@@ -48,7 +49,8 @@ function countWorkOrdersByStatus(): array
     $counts = ['total' => count($orders), 'Pendiente' => 0, 'En Proceso' => 0, 'Terminada' => 0];
     foreach ($orders as $o) {
         $key = $o['status'] ?? 'Pendiente';
-        if (isset($counts[$key])) $counts[$key]++;
+        if (isset($counts[$key]))
+            $counts[$key]++;
     }
     return $counts;
 }
@@ -62,7 +64,58 @@ function countWorkOrdersByType(): array
     $counts = ['Preventiva' => 0, 'Correctiva' => 0, 'Calibración' => 0];
     foreach ($orders as $o) {
         $key = $o['type'] ?? '';
-        if (isset($counts[$key])) $counts[$key]++;
+        if (isset($counts[$key]))
+            $counts[$key]++;
     }
     return $counts;
+}
+
+/**
+ * Obtener estadísticas globales de OTs
+ */
+function getWorkOrderStats(): array
+{
+    global $MOCK_WORK_ORDERS;
+    $stats = [
+        'TOTAL' => count($MOCK_WORK_ORDERS),
+        'Pendiente' => 0,
+        'En Proceso' => 0,
+        'Terminada' => 0,
+        'CRITICAL_TODAY' => 0
+    ];
+
+    foreach ($MOCK_WORK_ORDERS as $order) {
+        $status = $order['status'] ?? 'Pendiente';
+        if (isset($stats[$status])) {
+            $stats[$status]++;
+        }
+        if (($order['priority'] ?? '') === 'CRITICAL') {
+            $stats['CRITICAL_TODAY']++;
+        }
+    }
+
+    return $stats;
+}
+
+/**
+ * Obtener tasa de adherencia al plan de mantenimiento (%)
+ */
+function getAdherenceRate(): int
+{
+    // Simulación lógica: (OT Terminadas / OT Totales) * 100 con un factor de corrección
+    $stats = getWorkOrderStats();
+    if ($stats['TOTAL'] === 0)
+        return 100;
+    return round(($stats['Terminada'] / $stats['TOTAL']) * 100);
+}
+
+/**
+ * Obtener saturación media del equipo (%)
+ */
+function getWorkloadSaturation(): int
+{
+    // Simulación basada en técnicos y sus OTs activas
+    $technicians = getTechnicianRanking();
+    $totalCapacity = array_sum(array_column($technicians, 'capacity'));
+    return count($technicians) > 0 ? round($totalCapacity / count($technicians)) : 0;
 }
