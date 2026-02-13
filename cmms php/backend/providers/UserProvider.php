@@ -32,6 +32,10 @@ function authenticateUser(string $email, string $password = ''): ?array
         $userKey = 'engineer';
     elseif (strpos($email, 'tec') !== false)
         $userKey = 'tech';
+    elseif (strpos($email, 'user') !== false)
+        $userKey = 'user';
+    elseif (strpos($email, 'demo') !== false)
+        $userKey = 'demo';
     elseif (strpos($email, 'auditor') !== false)
         $userKey = 'auditor';
 
@@ -57,9 +61,9 @@ function getAllTechnicians(): array
 }
 
 /**
- * Obtener técnicos ordenados por OT terminadas (ranking)
+ * Obtener técnicos ordenados por carga de trabajo/productividad
  */
-function getTechnicianRanking(): array
+function getTechnicianProductivity(): array
 {
     $techs = getAllTechnicians();
     usort($techs, fn($a, $b) => $b['ot_terminadas'] - $a['ot_terminadas']);

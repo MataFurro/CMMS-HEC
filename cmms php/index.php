@@ -14,6 +14,11 @@ if (!in_array($page, $allowed_pages)) {
     $page = 'dashboard';
 }
 
+// Redirect 'Usuario' to service_request if on dashboard
+if ($page === 'dashboard' && ($_SESSION['user_role'] ?? '') === 'Usuario') {
+    $page = 'service_request';
+}
+
 // Handle Login Layout vs Main Layout
 if ($page === 'login') {
     include "pages/{$page}.php";
@@ -23,6 +28,12 @@ if ($page === 'login') {
 // Check Auth
 if (!isset($_SESSION['user_id'])) {
     header('Location: ?page=login');
+    exit;
+}
+
+// Handle Standalone Pages (Authenticated but Custom Layout)
+if ($page === 'service_request') {
+    include "pages/{$page}.php";
     exit;
 }
 ?>

@@ -17,6 +17,7 @@ define('SIDEBAR_CALENDAR', 'Agenda Técnica');
 define('SIDEBAR_ORDERS', 'Órdenes');
 define('SIDEBAR_INVENTORY', 'Inventario');
 define('SIDEBAR_FAMILY_ANALYSIS', 'Análisis por Familia');
+define('SIDEBAR_MESSENGER', 'SMS OT');
 
 define('BTN_NEW_ASSET', 'Nuevo Activo');
 define('BTN_UPLOAD_EXCEL', 'Cargar Excel');
@@ -52,8 +53,8 @@ function isReadOnly()
 
 function canViewDashboard()
 {
-    // Técnico NO puede ver el dashboard — solo Ingeniero, Admin, Auditor
-    return !in_array($_SESSION['user_role'] ?? '', ['Técnico']);
+    // Técnico y Usuario NO pueden ver el dashboard
+    return !in_array($_SESSION['user_role'] ?? '', ['Técnico', 'Usuario']);
 }
 
 function canRequestService()

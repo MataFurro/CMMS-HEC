@@ -50,6 +50,24 @@ $MOCK_USERS = [
         'avatar_url' => 'https://i.pravatar.cc/150?u=tech',
         'desc' => 'Ejecución de OTs'
     ],
+    'user' => [
+        'id' => 5,
+        'name' => 'Usuario Clínico',
+        'email' => 'user@biocmms.com',
+        'password_hash' => '$2y$10$placeholder_hash',
+        'role' => 'Usuario',
+        'avatar_url' => 'https://i.pravatar.cc/150?u=user',
+        'desc' => 'Solicitud de Servicios'
+    ],
+    'demo' => [
+        'id' => 6,
+        'name' => 'Usuario Demo',
+        'email' => 'demo@biocmms.com',
+        'password_hash' => '$2y$10$placeholder_hash',
+        'role' => 'Usuario', // Comparte privilegios de 'Usuario'
+        'avatar_url' => 'https://i.pravatar.cc/150?u=demo',
+        'desc' => 'Cuenta de Demostración'
+    ],
 ];
 
 // ═══════════════════════════════════════════════════════

@@ -5,6 +5,16 @@ require_once __DIR__ . '/../includes/checklist_templates.php';
 require_once __DIR__ . '/../backend/providers/WorkOrderProvider.php';
 
 $id = $_GET['id'] ?? 'OT-2024-UNKNOWN';
+
+// Handle Completion Action
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'complete_ot') {
+    if (completeWorkOrder($id)) {
+        // Redirigir para refrescar estado
+        header("Location: ?page=work_order_execution&id=$id&completed=1");
+        exit;
+    }
+}
+
 $orderData = getWorkOrderById($id);
 
 $isCompleted = ($orderData['status'] ?? '') === 'COMPLETED';
@@ -309,7 +319,7 @@ $templateVersion = $template['version'] ?? 'V1';
                     $displayFiles = $isCompleted ? $attachments : array_slice($attachments, 0, 1);
                     foreach ($displayFiles as $file):
                         $isPdf = $file['type'] === 'pdf';
-                        ?>
+                    ?>
                         <div
                             class="flex items-center justify-between p-4 bg-white/5 border border-slate-700/50 rounded-2xl group hover:border-medical-blue/30 transition-all">
                             <div class="flex items-center gap-4">
@@ -484,11 +494,14 @@ $templateVersion = $template['version'] ?? 'V1';
                     <?php else: ?>
                         <div class="space-y-4">
                             <?php if (canCompleteWorkOrder()): ?>
-                                <button @click="showSignatureModal = true"
-                                    class="w-full py-4 bg-emerald-500 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 hover:bg-emerald-500/90 transition-all flex items-center justify-center gap-3 text-xs">
-                                    <span class="material-symbols-outlined text-xl">verified</span>
-                                    <span>Finalizar e Informar</span>
-                                </button>
+                                <form method="POST">
+                                    <input type="hidden" name="action" value="complete_ot">
+                                    <button type="submit"
+                                        class="w-full py-4 bg-emerald-500 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 hover:bg-emerald-500/90 transition-all flex items-center justify-center gap-3 text-xs">
+                                        <span class="material-symbols-outlined text-xl">verified</span>
+                                        <span>Finalizar e Informar</span>
+                                    </button>
+                                </form>
                             <?php endif; ?>
                             <?php if (canExecuteWorkOrder()): ?>
                                 <button
