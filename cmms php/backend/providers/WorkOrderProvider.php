@@ -16,6 +16,10 @@ require_once __DIR__ . '/UserProvider.php';
 function getAllWorkOrders(): array
 {
     global $MOCK_WORK_ORDERS;
+    // Persistencia en sesión para la demo sin base de datos real
+    if (isset($_SESSION['MOCK_WORK_ORDERS_PERSIST'])) {
+        return $_SESSION['MOCK_WORK_ORDERS_PERSIST'];
+    }
     return $MOCK_WORK_ORDERS;
 }
 
@@ -114,10 +118,11 @@ function getWorkloadSaturation(): int
 {
     // Simulación basada en técnicos y sus OTs activas
     $technicians = getTechnicianProductivity();
-    if (empty($technicians)) return 0;
+    if (empty($technicians))
+        return 0;
 
     $totalCapacity = array_sum(array_column($technicians, 'capacity'));
-    return (int)round($totalCapacity / count($technicians));
+    return count($technicians) > 0 ? (int) round($totalCapacity / count($technicians)) : 0;
 }
 
 /**
@@ -136,8 +141,8 @@ function createWorkOrderFromRequest(array $data): string
 
     $newOrder = [
         'id' => $newId,
-        'asset' => $data['asset_name'] ?? 'Equipo Desconocido',
         'asset_id' => $data['asset_id'] ?? 'S/N',
+        'asset_name' => $data['asset_name'] ?? 'Equipo Desconocido',
         'type' => $data['type'] ?? 'Correctiva',
         'status' => 'Pendiente',
         'priority' => $data['priority'] ?? 'Media',
@@ -159,7 +164,8 @@ function createWorkOrderFromRequest(array $data): string
  */
 function completeWorkOrder(string $otId): bool
 {
-    if (!isset($_SESSION['MOCK_WORK_ORDERS_PERSIST'])) return false;
+    if (!isset($_SESSION['MOCK_WORK_ORDERS_PERSIST']))
+        return false;
 
     foreach ($_SESSION['MOCK_WORK_ORDERS_PERSIST'] as &$order) {
         if ($order['id'] === $otId) {
@@ -183,9 +189,16 @@ function completeWorkOrder(string $otId): bool
                     error_log("ERROR FEEDBACK LOOP: " . $e->getMessage());
                 }
             }
+
+            // Simulación de Feedback Loop a través del Messenger (Log secundario por email)
+            if (!empty($order['ms_email'])) {
+                error_log("FEEDBACK LOOP: Notificando a " . $order['ms_email'] . " que la OT " . $otId . " ha finalizado.");
+            }
+
             return true;
         }
     }
 
     return false;
 }
+
