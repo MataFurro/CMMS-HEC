@@ -12,7 +12,8 @@ if (!canViewDashboard()) {
 }
 
 // Ruta a la base de datos del Mensajero (Ajustar según ubicación real)
-$msDbPath = __DIR__ . '/../../API Mail/database/messenger.db';
+// ── Backend Provider ──
+require_once __DIR__ . '/../backend/providers/WorkOrderProvider.php';
 
 try {
     if (!file_exists($msDbPath)) {
@@ -25,14 +26,28 @@ try {
     // ── Manejar Acción: Crear OT ──
     if (isset($_POST['action']) && $_POST['action'] === 'create_ot' && isset($_POST['request_id'])) {
         $requestId = $_POST['request_id'];
-        // Cambiar estado a 'Procesado' para que desaparezca de la lista activa
-        $stmt = $db->prepare("UPDATE reports SET status = 'Procesado' WHERE id = :id");
-        $stmt->execute([':id' => $requestId]);
 
-        // Aquí se podría redirigir a la página de creación de OT con los datos precargados
-        // header('Location: ?page=work_order_opening&serie=' . $_POST['serie']); 
-        // Por ahora, solo refrescamos la lista
-        echo "<script>window.location.href = '?page=messenger_requests';</script>";
+        // 1. Obtener datos del reporte antes de marcarlo como procesado
+        $stmt_get = $db->prepare("SELECT * FROM reports WHERE id = :id");
+        $stmt_get->execute([':id' => $requestId]);
+        $report = $stmt_get->fetch(PDO::FETCH_ASSOC);
+
+        if ($report) {
+            // 2. Crear OT Real en el sistema
+            createWorkOrderFromRequest([
+                'asset_id' => $report['serie'],
+                'asset_name' => $report['servicio'],
+                'problem' => $report['texto'],
+                'priority' => 'Alta', // Por defecto desde Messenger
+                'ms_email' => $report['email']
+            ]);
+
+            // 3. Cambiar estado en SQLite a 'Procesado'
+            $stmt = $db->prepare("UPDATE reports SET status = 'Procesado' WHERE id = :id");
+            $stmt->execute([':id' => $requestId]);
+        }
+
+        echo "<script>window.location.href = '?page=messenger_requests&success=1';</script>";
         exit;
     }
 
@@ -59,6 +74,17 @@ try {
             <p class="text-slate-400 mt-2 text-lg font-medium italic opacity-80">Reportes entrantes desde el anexo satélite de servicios clínicos.</p>
         </div>
     </div>
+
+    <?php if (isset($_GET['success'])): ?>
+        <div class="bg-emerald-500/10 border border-emerald-500/20 p-6 rounded-2xl flex items-center gap-4 text-emerald-500 shadow-xl shadow-emerald-500/5 animate-in slide-in-from-top-4 duration-300">
+            <span class="material-symbols-outlined text-4xl">task_alt</span>
+            <div>
+                <p class="font-black uppercase tracking-widest text-sm">Orden de Trabajo Generada</p>
+                <p class="text-emerald-500/80 text-xs mt-1">La solicitud ha sido procesada y vinculada al sistema central de mantenimiento.</p>
+            </div>
+            <button onclick="window.location.href='?page=work_orders'" class="ml-auto px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-emerald-600 transition-all">Ver Órdenes</button>
+        </div>
+    <?php endif; ?>
 
     <?php if (isset($error)): ?>
         <div class="card-glass border-l-4 border-l-red-500 p-4">
