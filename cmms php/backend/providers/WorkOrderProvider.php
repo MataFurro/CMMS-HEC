@@ -8,6 +8,7 @@
  */
 
 require_once __DIR__ . '/../data/mock_data.php';
+require_once __DIR__ . '/UserProvider.php';
 
 /**
  * Obtener todas las órdenes de trabajo

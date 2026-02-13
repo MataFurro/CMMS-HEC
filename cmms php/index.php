@@ -2,6 +2,7 @@
 // index.php - Main Router
 
 require_once 'config.php';
+if (!defined('APP_NAME')) define('APP_NAME', 'BioCMMS v4.2 Pro');
 
 // Simple Router
 $page = $_GET['page'] ?? 'dashboard';
