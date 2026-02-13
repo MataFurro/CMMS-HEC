@@ -97,6 +97,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="text-xs font-bold text-white group-hover:text-medical-blue">Técnico</div>
                     <div class="text-[9px] text-slate-500">Operativo</div>
                 </button>
+                <button type="button" onclick="fillLogin('demo@biocmms.com')" class="text-left p-2 hover:bg-white/5 rounded-lg transition-colors group col-span-2 border border-dashed border-slate-700 hover:border-medical-blue/50">
+                    <div class="text-xs font-bold text-white group-hover:text-medical-blue flex items-center gap-2">
+                        <span class="material-symbols-outlined text-xs">science</span> Usuario Clínico (Demo)
+                    </div>
+                    <div class="text-[9px] text-slate-500">Solicitud de Servicios</div>
+                </button>
             </div>
         </div>
 
