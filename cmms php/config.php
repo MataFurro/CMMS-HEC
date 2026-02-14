@@ -1,7 +1,17 @@
 <?php
 // BioCMMS v4.2 Pro - Configuración Global (Portado a cmms php)
 require_once __DIR__ . '/includes/constants.php';
+require_once __DIR__ . '/Backend/autoloader.php';
 session_start();
+
+// Parámetros de Base de Datos
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'biocmms');
+define('DB_USER', 'biocmms_user');
+define('DB_PASS', 'BioPass2026');
+
+// Modo Demo - Activar para auditoría (Desconecta la DB)
+define('USE_MOCK_DATA', true);
 
 // Datos Simulados (Mock Database) - Paridad con versión GitHub
 $technicians = [
@@ -25,6 +35,14 @@ define('SIDEBAR_ORDERS', 'Órdenes');
 define('SIDEBAR_INVENTORY', 'Inventario');
 define('SIDEBAR_FAMILY_ANALYSIS', 'Análisis por Familia');
 define('SIDEBAR_MESSENGER', 'SMS OT');
+
+// ── Factores de Cálculo (Dynamicization) ──
+define('REPLACEMENT_COST_FACTOR', 1.25);  // Factor de escalamiento para valor de reposición
+define('MAINTENANCE_COST_FACTOR', 0.08);  // 8% del valor de adquisición como costo anual estimado
+define('DEFAULT_BETA_WEIBULL', 1.45);     // Factor beta por defecto para modelado de fallas
+define('DEFAULT_HOSPITAL_NAME', 'Hospital General HEC');
+define('RESIDUAL_VALUE_FACTOR', 0.10);    // 10% de valor residual estimado
+define('UPTIME_GOAL', 98.5);             // Meta de Uptime Clínico
 
 // Login simulado para compatibilidad con router legacy
 if (!isset($_SESSION['user_id'])) {

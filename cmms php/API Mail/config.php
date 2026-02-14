@@ -15,4 +15,4 @@ define('SMTP_USER', 'soporte@hec.cl');
 define('SMTP_PASS', 'clave_segura');
 
 // Nota: Integración con CMMS PHP desactivada temporalmente
-// define('CMMS_PROVIDERS_PATH', __DIR__ . '/../backend/providers/');
+// define('CMMS_PROVIDERS_PATH', __DIR__ . '/../Backend/providers/');

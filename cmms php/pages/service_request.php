@@ -15,7 +15,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // ── Backend Logic ──
-require_once __DIR__ . '/../backend/providers/AssetProvider.php';
+require_once __DIR__ . '/../Backend/Providers/AssetProvider.php';
 
 // Paths
 $msDbPath = __DIR__ . '/../API Mail/database/messenger.db';

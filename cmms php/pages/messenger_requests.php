@@ -1,8 +1,7 @@
 <?php
-
 /**
  * pages/messenger_requests.php
- * Integración de reportes desde el Mensajero Satélite (SQLite).
+ * Integración de reportes desde MySQL (Migrado desde SQLite).
  */
 
 // ── Control de Acceso ──
@@ -11,26 +10,21 @@ if (!canViewDashboard()) {
     return;
 }
 
-// ── Backend Provider ──
-require_once __DIR__ . '/../backend/providers/WorkOrderProvider.php';
+// ── Backend Providers & Core ──
+require_once __DIR__ . '/../Backend/Providers/WorkOrderProvider.php';
+require_once __DIR__ . '/../Backend/Core/DatabaseService.php';
 
-// Ruta a la base de datos del Mensajero (Consolidada)
-$msDbPath = __DIR__ . '/../API Mail/database/messenger.db';
+use Backend\Core\DatabaseService;
 
 try {
-    if (!file_exists($msDbPath)) {
-        throw new Exception("La base de datos del Mensajero no se encuentra en: " . $msDbPath);
-    }
-
-    $db = new PDO('sqlite:' . $msDbPath);
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $db = DatabaseService::getInstance();
 
     // ── Manejar Acción: Crear OT ──
     if (isset($_POST['action']) && $_POST['action'] === 'create_ot' && isset($_POST['request_id'])) {
         $requestId = $_POST['request_id'];
 
         // 1. Obtener datos del reporte antes de marcarlo como procesado
-        $stmt_get = $db->prepare("SELECT * FROM reports WHERE id = :id");
+        $stmt_get = $db->prepare("SELECT * FROM messenger_reports WHERE id = :id");
         $stmt_get->execute([':id' => $requestId]);
         $report = $stmt_get->fetch(PDO::FETCH_ASSOC);
 
@@ -40,13 +34,13 @@ try {
                 'asset_id' => $report['serie'],
                 'asset_name' => $report['servicio'],
                 'problem' => $report['texto'],
-                'priority' => 'Alta', // Por defecto desde Messenger
+                'priority' => 'Alta',
                 'ms_email' => $report['email'],
-                'ms_request_id' => $report['id'] // Pasamos el ID para el feedback loop
+                'ms_request_id' => $report['id']
             ]);
 
-            // 3. Cambiar estado en SQLite a 'Procesado'
-            $stmt = $db->prepare("UPDATE reports SET status = 'Procesado' WHERE id = :id");
+            // 3. Cambiar estado a 'Procesado'
+            $stmt = $db->prepare("UPDATE messenger_reports SET status = 'Procesado' WHERE id = :id");
             $stmt->execute([':id' => $requestId]);
         }
 
@@ -55,10 +49,10 @@ try {
     }
 
     // Solo traer solicitudes PENDIENTES
-    $requests = $db->query("SELECT * FROM reports WHERE status = 'Pendiente' ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+    $requests = $db->query("SELECT * FROM messenger_reports WHERE status = 'Pendiente' ORDER BY created_at DESC")->fetchAll();
 } catch (Exception $e) {
     $requests = [];
-    $error = $e->getMessage();
+    $error = "Error de Conexión MySQL (Módulo Mensajería): " . $e->getMessage();
 }
 ?>
 
@@ -67,7 +61,7 @@ try {
         <div>
             <nav class="flex items-center gap-2 mb-4">
                 <span
-                    class="text-[10px] font-black uppercase tracking-[0.2em] text-medical-blue bg-medical-blue/10 px-2 py-0.5 rounded">Mensajería</span>
+                    class="text-[10px] font-black uppercase tracking-[0.2em] text-medical-blue bg-medical-blue/10 px-2 py-0.5 rounded">Mensajería Profesional</span>
                 <span class="material-symbols-outlined text-xs text-slate-600">chevron_right</span>
                 <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Solicitudes
                     Clínicas</span>
@@ -76,8 +70,7 @@ try {
                 Solicitudes Pendientes
                 <span class="text-medical-blue material-symbols-outlined text-3xl font-variation-fill">mail</span>
             </h1>
-            <p class="text-slate-400 mt-2 text-lg font-medium italic opacity-80">Reportes entrantes desde el anexo
-                satélite de servicios clínicos.</p>
+            <p class="text-slate-400 mt-2 text-lg font-medium italic opacity-80">Integración directa MySQL v4.2 PRO.</p>
         </div>
     </div>
 
@@ -87,8 +80,7 @@ try {
             <span class="material-symbols-outlined text-4xl">task_alt</span>
             <div>
                 <p class="font-black uppercase tracking-widest text-sm">Orden de Trabajo Generada</p>
-                <p class="text-emerald-500/80 text-xs mt-1">La solicitud ha sido procesada y vinculada al sistema central de
-                    mantenimiento.</p>
+                <p class="text-emerald-500/80 text-xs mt-1">La solicitud ha sido procesada y vinculada al sistema central MySQL.</p>
             </div>
             <button onclick="window.location.href='?page=work_orders'"
                 class="ml-auto px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-emerald-600 transition-all">Ver
@@ -98,7 +90,7 @@ try {
 
     <?php if (isset($error)): ?>
         <div class="card-glass border-l-4 border-l-red-500 p-4">
-            <p class="text-red-400 font-bold">Error de Conexión:</p>
+            <p class="text-red-400 font-bold">Resumen del Estado:</p>
             <p class="text-slate-400 text-sm">
                 <?= $error ?>
             </p>
@@ -162,11 +154,6 @@ try {
                                         <span class="material-symbols-outlined text-xl">add_task</span>
                                     </button>
                                 </form>
-                                <button
-                                    class="p-2 bg-emerald-500/10 text-emerald-500 rounded-lg hover:bg-emerald-500/20 transition-all border border-emerald-500/20"
-                                    title="Ver Detalle">
-                                    <span class="material-symbols-outlined text-xl">visibility</span>
-                                </button>
                             </div>
                         </td>
                     </tr>
@@ -175,7 +162,7 @@ try {
                     <tr>
                         <td colspan="6" class="px-6 py-20 text-center">
                             <span class="material-symbols-outlined text-5xl text-slate-700 mb-4 block">inbox</span>
-                            <p class="text-slate-500 font-bold">No hay nuevas solicitudes en la bandeja.</p>
+                            <p class="text-slate-500 font-bold">No hay nuevas solicitudes en la bandeja central MySQL.</p>
                         </td>
                     </tr>
                 <?php endif; ?>

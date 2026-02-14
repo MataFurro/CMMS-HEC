@@ -2,7 +2,7 @@
 // pages/family_analysis.php
 // Análisis de equipos por familia - Métricas de uso, vida útil, fallas y tiempo fuera
 
-require_once __DIR__ . '/../backend/providers/AssetProvider.php';
+require_once __DIR__ . '/../Backend/Providers/AssetProvider.php';
 
 $families = getAssetFamilies();
 

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * backend/providers/AssetProvider.php
+ * Backend/providers/AssetProvider.php
  * ─────────────────────────────────────────────────────
  * Interfaz de acceso a datos de Activos Biomédicos.
  * El frontend (pages/) SOLO usa estas funciones.
@@ -9,47 +9,51 @@
  * ─────────────────────────────────────────────────────
  */
 
-require_once __DIR__ . '/../data/mock_data.php';
+require_once __DIR__ . '/../Core/DatabaseService.php';
+require_once __DIR__ . '/../Repositories/AssetRepository.php';
+
+use Backend\Repositories\AssetRepository;
 
 /**
- * Obtener todos los activos
+ * Obtener todos los activos usando Generadores internos
  */
 function getAllAssets(): array
 {
-    global $MOCK_ASSETS;
-    return $MOCK_ASSETS;
+    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+        return []; // Return empty for hardcoded data audit
+    }
+    $repo = new AssetRepository();
+    $assets = [];
+    foreach ($repo->findAll() as $entity) {
+        $assets[] = $entity->toArray();
+    }
+    return $assets;
 }
 
 /**
- * Obtener un activo por ID
+ * Obtener un activo por ID (retorna array para compatibilidad)
  */
 function getAssetById(string $id): ?array
 {
-    global $MOCK_ASSETS;
-    foreach ($MOCK_ASSETS as $asset) {
-        if ($asset['id'] === $id)
-            return $asset;
-    }
-    return null;
+    $repo = new AssetRepository();
+    $entity = $repo->findById($id);
+    return $entity ? $entity->toArray() : null;
 }
 
 /**
- * Buscar activos con filtros
+ * Buscar activos con filtros usando Generadores
  */
 function searchAssets(string $search = '', string $statusFilter = 'ALL'): array
 {
-    $assets = getAllAssets();
-
-    return array_filter($assets, function ($asset) use ($search, $statusFilter) {
-        $matchSearch = empty($search) ||
-            stripos($asset['name'], $search) !== false ||
-            stripos($asset['brand'], $search) !== false ||
-            stripos($asset['id'], $search) !== false;
-
-        $matchStatus = $statusFilter === 'ALL' || $asset['status'] === $statusFilter;
-
-        return $matchSearch && $matchStatus;
-    });
+    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+        return [];
+    }
+    $repo = new AssetRepository();
+    $assets = [];
+    foreach ($repo->search($search, $statusFilter) as $entity) {
+        $assets[] = $entity->toArray();
+    }
+    return $assets;
 }
 
 /**
@@ -72,10 +76,10 @@ function getAssetOptions(): array
  */
 function getAssetFamilies(): array
 {
-    global $MOCK_ASSETS;
+    $assets = getAllAssets();
     $families = [];
 
-    foreach ($MOCK_ASSETS as $asset) {
+    foreach ($assets as $asset) {
         $familyName = $asset['family'] ?? 'Genérico';
         if (!isset($families[$familyName])) {
             $families[$familyName] = [
@@ -101,7 +105,6 @@ function getAssetFamilies(): array
 
     foreach ($families as &$f) {
         $f['avg_life_remaining'] = $f['total_assets'] > 0 ? round($f['life_sum'] / $f['total_assets']) : 0;
-        // Simulación de disponibilidad basada en downtime y horas totales (ejemplo)
         $totalPotentialHours = ($f['hours_used'] + $f['downtime']);
         $f['availability'] = $totalPotentialHours > 0 ? round(($f['hours_used'] / $totalPotentialHours) * 100, 1) : 100;
     }
@@ -114,27 +117,26 @@ function getAssetFamilies(): array
  */
 function getFinancialStats(): array
 {
-    global $MOCK_ASSETS;
+    $assets = getAllAssets();
     $totalVal = 0;
-    $totalReposicion = 0;
-    $costoMantenimiento = 0;
-    $obsolescencia = 0;
-
-    foreach ($MOCK_ASSETS as $asset) {
+    foreach ($assets as $asset) {
         $totalVal += $asset['acquisition_cost'] ?? 0;
-        $totalReposicion += ($asset['acquisition_cost'] ?? 1000) * 1.25;
-        $costoMantenimiento += ($asset['acquisition_cost'] ?? 0) * 0.08;
-        if (($asset['useful_life_pct'] ?? 0) > 90)
-            $obsolescencia++;
     }
+
+    $totalReposicion = $totalVal * REPLACEMENT_COST_FACTOR;
+    $costoMantenimiento = $totalVal * MAINTENANCE_COST_FACTOR;
+
+    $obsolescencia = count(array_filter($assets, function ($a) {
+        return ($a['useful_life_pct'] ?? 0) > 90;
+    }));
 
     return [
         'valor_inventario' => $totalVal,
         'valor_reposicion' => $totalReposicion,
         'costo_mantenimiento_anual' => $costoMantenimiento,
-        'tco_avg' => $totalVal / (count($MOCK_ASSETS) ?: 1),
+        'tco_avg' => $totalVal / (count($assets) ?: 1),
         'obsolescencia_proxima' => $obsolescencia,
-        'roi_contratos' => 28,
+        'roi_contratos' => 28, // Simulado
     ];
 }
 
@@ -143,24 +145,17 @@ function getFinancialStats(): array
  */
 function countAssetsByStatus(): array
 {
-    $assets = getAllAssets();
-    $counts = [
-        'total' => count($assets),
-        'operative' => 0,
-        'maintenance' => 0,
-        'no_operative' => 0,
-        'with_obs' => 0
-    ];
-    foreach ($assets as $a) {
-        match ($a['status']) {
-            'OPERATIVE' => $counts['operative']++,
-            'MAINTENANCE' => $counts['maintenance']++,
-            'NO_OPERATIVE' => $counts['no_operative']++,
-            'OPERATIVE_WITH_OBS' => $counts['with_obs']++,
-            default => null
-        };
+    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+        return [
+            'total' => 0,
+            'operative' => 0,
+            'maintenance' => 0,
+            'no_operative' => 0,
+            'with_obs' => 0
+        ];
     }
-    return $counts;
+    $repo = new AssetRepository();
+    return $repo->getStatusCounts();
 }
 
 /**
@@ -203,10 +198,11 @@ function getCapitalRiskCount(): int
  */
 function getAllLocations(): array
 {
-    $assets = getAllAssets();
-    $locations = array_unique(array_filter(array_column($assets, 'location')));
-    sort($locations);
-    return $locations;
+    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+        return [];
+    }
+    $repo = new AssetRepository();
+    return $repo->getUniqueLocations();
 }
 
 /**
@@ -227,9 +223,31 @@ function getAssetObservations(string $asset_id): array
 function getAssetDocuments(string $asset_id): array
 {
     $asset = getAssetById($asset_id);
+    if (!$asset)
+        return [];
+
     $model = $asset['model'] ?? 'Generic';
     return [
-        ['name' => "Manual_{$model}_ES.pdf", 'type' => 'Manual', 'size' => '2.4 MB', 'date' => '2025-01-15'],
-        ['name' => 'Ficha_Tecnica.pdf', 'type' => 'Ficha Técnica', 'size' => '3.1 MB', 'date' => '2025-01-15'],
+        ['name' => "Manual_{$model}_ES.pdf", 'type' => 'Manual', 'size' => '2.4 MB', 'date' => date('Y-m-d', strtotime('-1 year'))],
+        ['name' => 'Ficha_Tecnica.pdf', 'type' => 'Ficha Técnica', 'size' => '3.1 MB', 'date' => date('Y-m-d', strtotime('-1 year'))],
+    ];
+}
+
+/**
+ * Obtener métricas de rendimiento específicas de un activo
+ */
+function getAssetPerformanceMetrics(string $asset_id): array
+{
+    $asset = getAssetById($asset_id);
+    if (!$asset)
+        return [];
+
+    $acquisition = $asset['acquisition_cost'] ?? 0;
+
+    return [
+        'uptime' => UPTIME_GOAL, // Simulado según meta
+        'depreciacion_anual' => $acquisition / ($asset['total_useful_life'] ?: 1),
+        'valor_residual' => $acquisition * RESIDUAL_VALUE_FACTOR,
+        'costo_mtto_estimado' => $acquisition * MAINTENANCE_COST_FACTOR * 1.5, // Factor de corrección para activos críticos
     ];
 }

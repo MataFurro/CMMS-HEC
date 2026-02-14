@@ -1,39 +1,42 @@
 <?php
 
 /**
- * backend/providers/WorkOrderProvider.php
+ * Backend/providers/WorkOrderProvider.php
  * ─────────────────────────────────────────────────────
  * Interfaz de acceso a datos de Órdenes de Trabajo.
  * ─────────────────────────────────────────────────────
  */
 
-require_once __DIR__ . '/../data/mock_data.php';
+require_once __DIR__ . '/../Core/DatabaseService.php';
+require_once __DIR__ . '/../Repositories/WorkOrderRepository.php';
 require_once __DIR__ . '/UserProvider.php';
 
+use Backend\Repositories\WorkOrderRepository;
+
 /**
- * Obtener todas las órdenes de trabajo
+ * Obtener todas las órdenes de trabajo usando Generadores
  */
 function getAllWorkOrders(): array
 {
-    global $MOCK_WORK_ORDERS;
-    // Persistencia en sesión para la demo sin base de datos real
-    if (isset($_SESSION['MOCK_WORK_ORDERS_PERSIST'])) {
-        return $_SESSION['MOCK_WORK_ORDERS_PERSIST'];
+    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+        return [];
     }
-    return $MOCK_WORK_ORDERS;
+    $repo = new WorkOrderRepository();
+    $orders = [];
+    foreach ($repo->findAll() as $entity) {
+        $orders[] = $entity->toArray();
+    }
+    return $orders;
 }
 
 /**
- * Obtener una OT por ID
+ * Obtener una OT por ID (retorna array para compatibilidad)
  */
 function getWorkOrderById(string $id): ?array
 {
-    global $MOCK_WORK_ORDERS;
-    foreach ($MOCK_WORK_ORDERS as $order) {
-        if ($order['id'] === $id)
-            return $order;
-    }
-    return null;
+    $repo = new WorkOrderRepository();
+    $entity = $repo->findById($id);
+    return $entity ? $entity->toArray() : null;
 }
 
 /**
@@ -41,8 +44,8 @@ function getWorkOrderById(string $id): ?array
  */
 function getCorrectiveWorkOrders(): array
 {
-    global $MOCK_OT_CORRECTIVAS;
-    return $MOCK_OT_CORRECTIVAS;
+    $orders = getAllWorkOrders();
+    return array_filter($orders, fn($o) => ($o['type'] ?? '') === 'Correctiva');
 }
 
 /**
@@ -80,26 +83,31 @@ function countWorkOrdersByType(): array
  */
 function getWorkOrderStats(): array
 {
-    global $MOCK_WORK_ORDERS;
-    $stats = [
-        'TOTAL' => count($MOCK_WORK_ORDERS),
-        'Pendiente' => 0,
-        'En Proceso' => 0,
-        'Terminada' => 0,
-        'CRITICAL_TODAY' => 0
-    ];
-
-    foreach ($MOCK_WORK_ORDERS as $order) {
-        $status = $order['status'] ?? 'Pendiente';
-        if (isset($stats[$status])) {
-            $stats[$status]++;
-        }
-        if (($order['priority'] ?? '') === 'CRITICAL') {
-            $stats['CRITICAL_TODAY']++;
-        }
+    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+        return [
+            'total' => 0,
+            'total_ot' => 0,
+            'TOTAL' => 0,
+            'Pendiente' => 0,
+            'En Proceso' => 0,
+            'Terminada' => 0,
+            'CRITICAL_TODAY' => 0,
+            'pending' => 0,
+            'progress' => 0,
+            'completed' => 0,
+            'critical_today' => 0
+        ];
     }
+    $repo = new WorkOrderRepository();
+    $stats = $repo->getStatusStats();
 
-    return $stats;
+    return [
+        'TOTAL' => (int) $stats['total'],
+        'Pendiente' => (int) $stats['pending'],
+        'En Proceso' => (int) $stats['progress'],
+        'Terminada' => (int) $stats['completed'],
+        'CRITICAL_TODAY' => (int) $stats['critical_today']
+    ];
 }
 
 /**
@@ -149,7 +157,7 @@ function createWorkOrderFromRequest(array $data): string
         'tech' => $data['tech'] ?? 'Por Asignar',
         'date' => date("Y-m-d"),
         'problem' => $data['problem'] ?? '',
-        'location' => $data['location'] ?? 'Hospital General',
+        'location' => $data['location'] ?? DEFAULT_HOSPITAL_NAME,
         'ms_email' => $data['ms_email'] ?? null,
         'ms_request_id' => $data['ms_request_id'] ?? null // Vinculación por ID
     ];
@@ -164,41 +172,37 @@ function createWorkOrderFromRequest(array $data): string
  */
 function completeWorkOrder(string $otId): bool
 {
-    if (!isset($_SESSION['MOCK_WORK_ORDERS_PERSIST']))
+    $repo = new WorkOrderRepository();
+    $order = $repo->findById($otId);
+
+    if (!$order) {
         return false;
+    }
 
-    foreach ($_SESSION['MOCK_WORK_ORDERS_PERSIST'] as &$order) {
-        if ($order['id'] === $otId) {
-            $order['status'] = 'Terminada';
+    $success = $repo->updateStatus($otId, 'Terminada');
 
-            // Feedback Loop: Actualizar base de datos del Mensajero
-            if (!empty($order['ms_request_id'])) {
-                try {
-                    $msDbPath = __DIR__ . '/../../API Mail/database/messenger.db';
-                    if (file_exists($msDbPath)) {
-                        $db = new PDO('sqlite:' . $msDbPath);
-                        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    if ($success) {
+        \Backend\Core\LoggerService::info("Orden de Trabajo finalizada", ['id' => $otId]);
 
-                        // Actualizar estado a 'Finalizado'
-                        $stmt = $db->prepare("UPDATE reports SET status = 'Finalizado' WHERE id = :id");
-                        $stmt->execute([':id' => $order['ms_request_id']]);
+        // Feedback Loop: Actualizar base de datos del Mensajero
+        if ($order instanceof \Backend\Models\WorkOrderEntity && $order->msRequestId) {
+            try {
+                $msDbPath = __DIR__ . '/../../API Mail/database/messenger.db';
+                if (file_exists($msDbPath)) {
+                    $db = new PDO('sqlite:' . $msDbPath);
+                    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                        error_log("FEEDBACK LOOP: Solicitud ID " . $order['ms_request_id'] . " marcada como Finalizada.");
-                    }
-                } catch (Exception $e) {
-                    error_log("ERROR FEEDBACK LOOP: " . $e->getMessage());
+                    $stmt = $db->prepare("UPDATE reports SET status = 'Finalizado' WHERE id = :id");
+                    $stmt->execute([':id' => $order->msRequestId]);
+
+                    \Backend\Core\LoggerService::info("FEEDBACK LOOP: Solicitud vinculada finalizada.", ['ms_id' => $order->msRequestId]);
                 }
+            } catch (Exception $e) {
+                \Backend\Core\LoggerService::error("ERROR FEEDBACK LOOP", ['error' => $e->getMessage()]);
             }
-
-            // Simulación de Feedback Loop a través del Messenger (Log secundario por email)
-            if (!empty($order['ms_email'])) {
-                error_log("FEEDBACK LOOP: Notificando a " . $order['ms_email'] . " que la OT " . $otId . " ha finalizado.");
-            }
-
-            return true;
         }
     }
 
-    return false;
+    return $success;
 }
 

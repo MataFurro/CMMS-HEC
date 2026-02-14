@@ -1,7 +1,7 @@
 <?php
 
 /**
- * backend/data/mock_data.php
+ * Backend/data/mock_data.php
  * ─────────────────────────────────────────────────────
  * FUENTE ÚNICA DE DATOS MOCK
  * En producción, este archivo se reemplaza por consultas a BD.
