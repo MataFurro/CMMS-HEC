@@ -113,7 +113,7 @@ function getAdherenceRate(): int
 function getWorkloadSaturation(): int
 {
     // Simulación basada en técnicos y sus OTs activas
-    $technicians = getTechnicianRanking();
+    $technicians = getTechnicianProductivity();
     if (empty($technicians)) return 0;
 
     $totalCapacity = array_sum(array_column($technicians, 'capacity'));
@@ -145,7 +145,8 @@ function createWorkOrderFromRequest(array $data): string
         'date' => date("Y-m-d"),
         'problem' => $data['problem'] ?? '',
         'location' => $data['location'] ?? 'Hospital General',
-        'ms_email' => $data['ms_email'] ?? null
+        'ms_email' => $data['ms_email'] ?? null,
+        'ms_request_id' => $data['ms_request_id'] ?? null // Vinculación por ID
     ];
 
     $_SESSION['MOCK_WORK_ORDERS_PERSIST'][] = $newOrder;
@@ -164,9 +165,23 @@ function completeWorkOrder(string $otId): bool
         if ($order['id'] === $otId) {
             $order['status'] = 'Terminada';
 
-            // Simulación de Feedback Loop
-            if (!empty($order['ms_email'])) {
-                error_log("FEEDBACK LOOP: Notificando a " . $order['ms_email'] . " sobre finalización de OT " . $otId);
+            // Feedback Loop: Actualizar base de datos del Mensajero
+            if (!empty($order['ms_request_id'])) {
+                try {
+                    $msDbPath = __DIR__ . '/../../API Mail/database/messenger.db';
+                    if (file_exists($msDbPath)) {
+                        $db = new PDO('sqlite:' . $msDbPath);
+                        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                        // Actualizar estado a 'Finalizado'
+                        $stmt = $db->prepare("UPDATE reports SET status = 'Finalizado' WHERE id = :id");
+                        $stmt->execute([':id' => $order['ms_request_id']]);
+
+                        error_log("FEEDBACK LOOP: Solicitud ID " . $order['ms_request_id'] . " marcada como Finalizada.");
+                    }
+                } catch (Exception $e) {
+                    error_log("ERROR FEEDBACK LOOP: " . $e->getMessage());
+                }
             }
             return true;
         }

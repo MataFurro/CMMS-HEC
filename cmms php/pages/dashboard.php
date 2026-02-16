@@ -19,7 +19,7 @@ require_once __DIR__ . '/../backend/providers/EventProvider.php';
 // --- DATOS DESDE PROVIDERS ---
 $assets = getAllAssets();
 $otCorrectivas = getCorrectiveWorkOrders();
-$technicians = getTechnicianRanking();
+$technicians = getTechnicianProductivity();
 $recentEvents = getRecentEvents();
 
 // --- CÁLCULO DINÁMICO DE MÉTRICAS ---
@@ -154,9 +154,9 @@ $kpiCards = [
     [
         'label' => 'Adherencia',
         'value' => getAdherenceRate() . '%',
-        'trend' => 'Gamification',
+        'trend' => 'Meta > 90%',
         'color' => 'border-l-indigo-500',
-        'icon' => 'sports_esports',
+        'icon' => 'check_circle',
         'sub' => 'Cierre de OT'
     ]
 ];
@@ -189,8 +189,7 @@ $otPorTipoData = [
 $techComparisonData = array_map(function ($t) {
     return [
         'name' => explode(' ', $t['name'])[0],
-        'terminadas' => $t['ot_terminadas'],
-        'xp' => ($t['ot_terminadas'] ?? 0) * 100 / 100
+        'terminadas' => $t['ot_terminadas']
     ];
 }, $technicians);
 ?>
@@ -325,7 +324,7 @@ $techComparisonData = array_map(function ($t) {
                 foreach ($technicians as $tech):
                     $statusColor = $tech['capacity'] > 90 ? 'text-red-500' : ($tech['capacity'] > 70 ? 'text-amber-500' : 'text-emerald-400');
                     $progressBarColor = $tech['capacity'] > 90 ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]' : ($tech['capacity'] > 70 ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]');
-                    ?>
+                ?>
                     <div
                         class="relative hover:bg-white/5 p-5 rounded-2xl transition-all border border-white/5 hover:border-white/10 bg-white/[0.02]">
                         <div class="flex items-center justify-between mb-4">
@@ -465,7 +464,7 @@ $techComparisonData = array_map(function ($t) {
                     },
                     ticks: {
                         color: '#64748b',
-                        callback: function (value) {
+                        callback: function(value) {
                             return value + '%'
                         }
                     },
@@ -482,7 +481,7 @@ $techComparisonData = array_map(function ($t) {
             plugins: {
                 tooltip: {
                     callbacks: {
-                        label: function (context) {
+                        label: function(context) {
                             return 'Riesgo de Falla: ' + context.parsed.y + '%';
                         }
                     }
@@ -567,18 +566,11 @@ $techComparisonData = array_map(function ($t) {
         data: {
             labels: <?= json_encode(array_column($techComparisonData, 'name')) ?>,
             datasets: [{
-                label: 'OT Cerradas',
+                label: 'Productividad',
                 data: <?= json_encode(array_column($techComparisonData, 'terminadas')) ?>,
                 backgroundColor: '#10b981',
                 borderRadius: 4
-            },
-            {
-                label: 'XP Score (x100)',
-                data: <?= json_encode(array_column($techComparisonData, 'xp')) ?>,
-                backgroundColor: '#6366f1',
-                borderRadius: 4
-            }
-            ]
+            }]
         },
         options: {
             ...commonOptions,

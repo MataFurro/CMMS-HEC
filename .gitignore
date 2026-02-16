@@ -6,3 +6,6 @@ verify_github.py
 cmms/
 Reporte/
 reporte/
+Backup/
+MS/
+*.db

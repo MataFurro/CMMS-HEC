@@ -7,6 +7,7 @@ $menuItems = [
     ['name' => SIDEBAR_ORDERS, 'path' => 'work_orders', 'icon' => 'assignment'],
     ['name' => SIDEBAR_INVENTORY, 'path' => 'inventory', 'icon' => 'precision_manufacturing'],
     ['name' => SIDEBAR_FAMILY_ANALYSIS, 'path' => 'family_analysis', 'icon' => 'analytics'],
+    ['name' => SIDEBAR_MESSENGER, 'path' => 'messenger_requests', 'icon' => 'mail'],
     ['name' => 'Análisis Financiero', 'path' => 'financial_analysis', 'icon' => 'payments'],
 ];
 ?>

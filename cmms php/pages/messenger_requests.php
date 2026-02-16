@@ -13,8 +13,8 @@ if (!canViewDashboard()) {
 // ── Backend Provider ──
 require_once __DIR__ . '/../backend/providers/WorkOrderProvider.php';
 
-// Ruta a la base de datos del Mensajero
-$msDbPath = __DIR__ . '/../../API Mail/database/messenger.db';
+// Ruta a la base de datos del Mensajero (Consolidada)
+$msDbPath = __DIR__ . '/../API Mail/database/messenger.db';
 
 try {
     if (!file_exists($msDbPath)) {
@@ -38,7 +38,8 @@ try {
                 'asset_name' => $report['servicio'],
                 'problem' => $report['texto'],
                 'priority' => 'Alta',
-                'ms_email' => $report['email']
+                'ms_email' => $report['email'],
+                'ms_request_id' => $report['id'] // Pasamos el ID para el feedback loop
             ]);
 
             $stmt = $db->prepare("UPDATE reports SET status = 'Procesado' WHERE id = :id");
@@ -89,33 +90,42 @@ try {
                 <tr class="bg-white/5 border-b border-white/10 uppercase text-[10px] font-black tracking-widest text-slate-500">
                     <th class="px-6 py-4">ID</th>
                     <th class="px-6 py-4">Servicio / Equipo</th>
+                    <th class="px-6 py-4">Serie</th>
                     <th class="px-6 py-4">Descripción de Falla</th>
-                    <th class="px-6 py-4">Estado</th>
+                    <th class="px-6 py-4">Email</th>
                     <th class="px-6 py-4 text-center">Acciones</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-white/5">
                 <?php foreach ($requests as $r): ?>
-                    <tr class="hover:bg-white/5 transition-all text-sm">
-                        <td class="px-6 py-4 font-black">#<?= $r['id'] ?></td>
+                    <tr class="hover:bg-white/5 transition-all text-sm border-b border-white/5">
+                        <td class="px-6 py-4 font-black text-slate-400">#<?= $r['id'] ?></td>
                         <td class="px-6 py-4">
-                            <div class="font-bold text-white"><?= $r['servicio'] ?></div>
-                            <div class="text-medical-blue text-xs font-mono"><?= $r['serie'] ?></div>
+                            <div class="flex flex-col">
+                                <span class="font-bold text-white"><?= htmlspecialchars($r['equipo'] ?? 'N/A') ?></span>
+                                <span class="text-xs text-slate-500"><?= htmlspecialchars($r['servicio']) ?></span>
+                            </div>
                         </td>
-                        <td class="px-6 py-4 text-slate-400 line-clamp-2 max-w-xs">
-                            <?= $r['texto'] ?>
+                        <td class="px-6 py-4 font-mono text-xs text-medical-blue"><?= htmlspecialchars($r['serie']) ?></td>
+                        <td class="px-6 py-4 text-slate-400 max-w-xs truncate" title="<?= htmlspecialchars($r['texto']) ?>">
+                            <?= htmlspecialchars($r['texto']) ?>
                         </td>
-                        <td class="px-6 py-4">
-                            <span class="px-2 py-1 rounded-full text-[10px] font-black uppercase bg-amber-500/10 text-amber-500 border border-amber-500/20">
-                                <?= $r['status'] ?>
-                            </span>
+                        <td class="px-6 py-4 text-xs text-slate-500">
+                            <?= htmlspecialchars($r['email']) ?>
+                            <?php if (!empty($r['imagen_path'])): ?>
+                                <div class="mt-1">
+                                    <span class="text-[10px] uppercase bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700 flex items-center w-fit gap-1">
+                                        <span class="material-symbols-outlined text-[10px]">image</span> Foto
+                                    </span>
+                                </div>
+                            <?php endif; ?>
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex justify-center gap-2">
                                 <form method="POST">
                                     <input type="hidden" name="action" value="create_ot">
                                     <input type="hidden" name="request_id" value="<?= $r['id'] ?>">
-                                    <button type="submit" class="p-2 bg-medical-blue/10 text-medical-blue rounded-lg hover:bg-medical-blue/20 transition-all" title="Generar OT">
+                                    <button type="submit" class="p-2 bg-medical-blue/10 text-medical-blue rounded-lg hover:bg-medical-blue/20 transition-all shadow-lg hover:shadow-medical-blue/10 border border-medical-blue/20" title="Crear Orden de Trabajo">
                                         <span class="material-symbols-outlined text-xl">add_task</span>
                                     </button>
                                 </form>
