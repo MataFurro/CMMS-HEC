@@ -12,12 +12,15 @@
 require_once __DIR__ . '/../data/mock_data.php';
 
 /**
- * Obtener todos los activos
+ * Obtener todos los activos con persistencia de sesión
  */
 function getAllAssets(): array
 {
     global $MOCK_ASSETS;
-    return $MOCK_ASSETS;
+    if (!isset($_SESSION['MOCK_ASSETS_PERSIST'])) {
+        $_SESSION['MOCK_ASSETS_PERSIST'] = $MOCK_ASSETS;
+    }
+    return $_SESSION['MOCK_ASSETS_PERSIST'];
 }
 
 /**
@@ -232,4 +235,21 @@ function getAssetDocuments(string $asset_id): array
         ['name' => "Manual_{$model}_ES.pdf", 'type' => 'Manual', 'size' => '2.4 MB', 'date' => '2025-01-15'],
         ['name' => 'Ficha_Tecnica.pdf', 'type' => 'Ficha Técnica', 'size' => '3.1 MB', 'date' => '2025-01-15'],
     ];
+}
+
+/**
+ * Dar de baja un activo
+ */
+function decommissionAsset(string $id): bool
+{
+    if (!isset($_SESSION['MOCK_ASSETS_PERSIST'])) return false;
+
+    foreach ($_SESSION['MOCK_ASSETS_PERSIST'] as &$asset) {
+        if ($asset['id'] === $id) {
+            $asset['status'] = STATUS_DECOMMISSIONED;
+            error_log("ACTIVO DEBAJA: $id ha sido dado de baja.");
+            return true;
+        }
+    }
+    return false;
 }

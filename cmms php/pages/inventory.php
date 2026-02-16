@@ -8,7 +8,18 @@ require_once __DIR__ . '/../backend/providers/AssetProvider.php';
 $searchTerm = $_GET['search'] ?? '';
 $statusFilter = $_GET['status'] ?? 'ALL';
 
+// --- ACTION HANDLER ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    if ($_POST['action'] === 'decommission' && isset($_POST['asset_id'])) {
+        if (decommissionAsset($_POST['asset_id'])) {
+            header("Location: ?page=inventory&decommissioned=1");
+            exit;
+        }
+    }
+}
+
 $filteredAssets = searchAssets($searchTerm, $statusFilter);
+$assets = getAllAssets(); // Para el conteo total
 
 ?>
 
@@ -74,6 +85,7 @@ $filteredAssets = searchAssets($searchTerm, $statusFilter);
                     <option value="<?= STATUS_MAINTENANCE ?>" <?= $statusFilter === STATUS_MAINTENANCE ? 'selected' : '' ?>>En Mantención</option>
                     <option value="<?= STATUS_OPERATIVE_WITH_OBS ?>" <?= $statusFilter === STATUS_OPERATIVE_WITH_OBS ? 'selected' : '' ?>>Operativo con Obs.</option>
                     <option value="<?= STATUS_OUT_OF_SERVICE ?>" <?= $statusFilter === STATUS_OUT_OF_SERVICE ? 'selected' : '' ?>>Fuera de Servicio</option>
+                    <option value="<?= STATUS_DECOMMISSIONED ?>" <?= $statusFilter === STATUS_DECOMMISSIONED ? 'selected' : '' ?>>Dados de Baja</option>
                 </select>
             </div>
             <div class="lg:col-span-2">
@@ -149,7 +161,7 @@ $filteredAssets = searchAssets($searchTerm, $statusFilter);
                                             <?= $asset['name'] ?>
                                         </a>
                                         <div class="text-xs text-slate-500 mt-1 uppercase font-semibold">
-                                            <?= $asset['brand'] ?>     <?= $asset['model'] ?> · <span
+                                            <?= $asset['brand'] ?> <?= $asset['model'] ?> · <span
                                                 class="font-mono text-medical-blue"><?= $asset['id'] ?></span>
                                         </div>
                                     </div>
@@ -199,12 +211,17 @@ $filteredAssets = searchAssets($searchTerm, $statusFilter);
                                     STATUS_MAINTENANCE => 'bg-amber-500/10 text-amber-500 border-amber-500/30',
                                     STATUS_OPERATIVE_WITH_OBS => 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30',
                                     STATUS_NO_OPERATIVE => 'bg-red-500/10 text-red-500 border-red-500/30',
+                                    STATUS_DECOMMISSIONED => 'bg-slate-500/10 text-slate-400 border-slate-500/30',
                                     default => 'bg-slate-700/10 text-slate-500 border-slate-700/30'
                                 };
                                 ?>
                                 <span
                                     class="px-4 py-1.5 rounded-xl text-xs font-black inline-flex items-center gap-2 uppercase tracking-wide border <?= $statusClass ?>">
-                                    <?= $asset['status'] === STATUS_OPERATIVE ? 'Operativo' : $asset['status'] ?>
+                                    <?= match ($asset['status']) {
+                                        STATUS_OPERATIVE => 'Operativo',
+                                        STATUS_DECOMMISSIONED => 'BAJA',
+                                        default => $asset['status']
+                                    } ?>
                                 </span>
                             </td>
                             <td class="px-6 py-6">
@@ -229,10 +246,38 @@ $filteredAssets = searchAssets($searchTerm, $statusFilter);
                                         <span class="material-symbols-outlined text-sm">history</span>
                                         Historial
                                     </a>
-                                    <button
-                                        class="p-2 text-slate-500 hover:text-white hover:bg-white/5 rounded-xl border border-transparent hover:border-slate-700/50 transition-all">
-                                        <span class="material-symbols-outlined text-xl">more_vert</span>
-                                    </button>
+
+                                    <?php if (canModify()): ?>
+                                        <div x-data="{ open: false }" class="relative">
+                                            <button @click="open = !open" @click.away="open = false"
+                                                class="p-2 text-slate-500 hover:text-white hover:bg-white/5 rounded-xl border border-transparent hover:border-slate-700/50 transition-all">
+                                                <span class="material-symbols-outlined text-xl">more_vert</span>
+                                            </button>
+
+                                            <div x-show="open"
+                                                class="absolute right-0 mt-2 w-48 bg-medical-surface border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden"
+                                                x-transition:enter="transition ease-out duration-100"
+                                                x-transition:enter-start="transform opacity-0 scale-95"
+                                                x-transition:enter-end="transform opacity-100 scale-100">
+
+                                                <div class="py-1">
+                                                    <a href="?page=asset&id=<?= $asset['id'] ?>" class="flex items-center gap-3 px-4 py-2 text-xs text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
+                                                        <span class="material-symbols-outlined text-lg">edit</span>
+                                                        Editar Activo
+                                                    </a>
+                                                    <div class="border-t border-slate-700/50 my-1"></div>
+                                                    <form method="POST" onsubmit="return confirm('¿Está seguro de dar de baja este activo? Esta acción no se puede deshacer.')">
+                                                        <input type="hidden" name="action" value="decommission">
+                                                        <input type="hidden" name="asset_id" value="<?= $asset['id'] ?>">
+                                                        <button type="submit" class="w-full flex items-center gap-3 px-4 py-2 text-xs text-rose-400 hover:bg-rose-500/10 transition-colors text-left">
+                                                            <span class="material-symbols-outlined text-lg">delete_sweep</span>
+                                                            Dar de Baja
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>
