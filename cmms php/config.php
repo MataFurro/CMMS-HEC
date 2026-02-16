@@ -4,14 +4,29 @@ require_once __DIR__ . '/includes/constants.php';
 require_once __DIR__ . '/Backend/autoloader.php';
 session_start();
 
-// Parámetros de Base de Datos
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'biocmms');
-define('DB_USER', 'biocmms_user');
-define('DB_PASS', 'BioPass2026');
+// --- Soporte para Variables de Entorno (.env) ---
+function loadEnv($path)
+{
+    if (!file_exists($path))
+        return;
+    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0)
+            continue;
+        list($name, $value) = explode('=', $line, 2);
+        $_ENV[trim($name)] = trim($value);
+    }
+}
+loadEnv(__DIR__ . '/.env');
+
+// Parámetros de Base de Datos (Prioridad: .env > Constantes locales)
+define('DB_HOST', $_ENV['DB_HOST'] ?? 'localhost');
+define('DB_NAME', $_ENV['DB_NAME'] ?? 'biocmms');
+define('DB_USER', $_ENV['DB_USER'] ?? 'biocmms_user');
+define('DB_PASS', $_ENV['DB_PASS'] ?? 'BioPass2026');
 
 // Modo Demo - Activar para auditoría (Desconecta la DB)
-define('USE_MOCK_DATA', true);
+define('USE_MOCK_DATA', filter_var($_ENV['USE_MOCK_DATA'] ?? false, FILTER_VALIDATE_BOOLEAN));
 
 // Datos Simulados (Mock Database) - Paridad con versión GitHub
 $technicians = [
