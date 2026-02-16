@@ -1,6 +1,6 @@
 <?php
 // pages/new_asset.php
-require_once __DIR__ . '/../backend/providers/AssetProvider.php';
+require_once __DIR__ . '/../Backend/Providers/AssetProvider.php';
 
 // Verificar permisos - Solo Ingeniero/Admin puede crear activos
 if (!canModify()) {

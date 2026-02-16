@@ -2,7 +2,7 @@
 // pages/work_orders.php
 
 // ── Backend Provider ──
-require_once __DIR__ . '/../backend/providers/WorkOrderProvider.php';
+require_once __DIR__ . '/../Backend/Providers/WorkOrderProvider.php';
 
 $orders = getAllWorkOrders();
 $stats = getWorkOrderStats();

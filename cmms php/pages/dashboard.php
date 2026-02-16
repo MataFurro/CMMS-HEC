@@ -11,16 +11,17 @@ if (!canViewDashboard()) {
 require_once __DIR__ . '/../includes/reliability_metrics.php';
 
 // ── Backend Providers ──
-require_once __DIR__ . '/../backend/providers/AssetProvider.php';
-require_once __DIR__ . '/../backend/providers/WorkOrderProvider.php';
-require_once __DIR__ . '/../backend/providers/UserProvider.php';
-require_once __DIR__ . '/../backend/providers/EventProvider.php';
+require_once __DIR__ . '/../Backend/Providers/AssetProvider.php';
+require_once __DIR__ . '/../Backend/Providers/WorkOrderProvider.php';
+require_once __DIR__ . '/../Backend/Providers/UserProvider.php';
+require_once __DIR__ . '/../Backend/Providers/EventProvider.php';
 
 // --- DATOS DESDE PROVIDERS ---
 $assets = getAllAssets();
 $otCorrectivas = getCorrectiveWorkOrders();
 $technicians = getTechnicianProductivity();
 $recentEvents = getRecentEvents();
+$financialStats = getFinancialStats();
 
 // --- CÁLCULO DINÁMICO DE MÉTRICAS ---
 $totalEquipos = count($assets);
@@ -38,8 +39,8 @@ $equiposCriticos = $critCounts['CRITICAL'];
 $equiposRelevantes = $critCounts['RELEVANT'];
 
 // --- CÁLCULO DE MÉTRICAS CLÍNICAS 2.0 ---
-$totalAcquisitionValue = getTotalInventoryValue();
-$totalMaintenanceCost = 12500; // Mock de costos de mantenimiento acumulados
+$totalAcquisitionValue = $financialStats['valor_inventario'];
+$totalMaintenanceCost = $financialStats['costo_mantenimiento_anual'];
 $cosr = $totalAcquisitionValue > 0 ? ($totalMaintenanceCost / $totalAcquisitionValue) * 100 : 0;
 
 // Riesgo de Capital
@@ -91,7 +92,7 @@ $metricasGlobales = calcularMetricasGlobales($assets, $otCorrectivas);
 
 // --- GENERAR DATOS PARA LA CURVA DE PROBABILIDAD DE FALLA ACUMULADA F(t) ---
 $mtbf_global = $metricasGlobales['mtbf_promedio'] > 0 ? $metricasGlobales['mtbf_promedio'] : 30;
-$beta = 1.45;
+$beta = DEFAULT_BETA_WEIBULL;
 $eta = $mtbf_global / gamma_approx(1 + 1 / $beta);
 
 function gamma_approx($n)
@@ -322,16 +323,17 @@ $techComparisonData = array_map(function ($t) {
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <?php
                 foreach ($technicians as $tech):
-                    $statusColor = $tech['capacity'] > 90 ? 'text-red-500' : ($tech['capacity'] > 70 ? 'text-amber-500' : 'text-emerald-400');
-                    $progressBarColor = $tech['capacity'] > 90 ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]' : ($tech['capacity'] > 70 ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]');
-                ?>
+                    $techCapacity = $tech['capacity'] ?? 0;
+                    $statusColor = $techCapacity > 90 ? 'text-red-500' : ($techCapacity > 70 ? 'text-amber-500' : 'text-emerald-400');
+                    $progressBarColor = $techCapacity > 90 ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]' : ($techCapacity > 70 ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]');
+                    ?>
                     <div
                         class="relative hover:bg-white/5 p-5 rounded-2xl transition-all border border-white/5 hover:border-white/10 bg-white/[0.02]">
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center gap-3">
                                 <div
                                     class="size-10 rounded-xl bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center text-white font-black text-sm shadow-xl">
-                                    <?= $tech['initial'] ?>
+                                    <?= $tech['initial'] ?? '?' ?>
                                 </div>
                                 <div class="overflow-hidden">
                                     <h4 class="text-xs font-black text-white truncate w-24"><?= $tech['name'] ?></h4>
@@ -350,9 +352,9 @@ $techComparisonData = array_map(function ($t) {
                             </div>
                             <div class="flex justify-between items-center text-[9px] font-black uppercase tracking-tighter">
                                 <span class="text-slate-500">Pendientes: <span
-                                        class="text-医-blue"><?= $tech['active'] ?></span></span>
+                                        class="text-medical-blue"><?= $tech['active'] ?? 0 ?></span></span>
                                 <span class="text-slate-500">Cerradas: <span
-                                        class="text-emerald-500"><?= $tech['completed'] ?></span></span>
+                                        class="text-emerald-500"><?= $tech['completed'] ?? 0 ?></span></span>
                             </div>
                         </div>
                     </div>
@@ -464,7 +466,7 @@ $techComparisonData = array_map(function ($t) {
                     },
                     ticks: {
                         color: '#64748b',
-                        callback: function(value) {
+                        callback: function (value) {
                             return value + '%'
                         }
                     },
@@ -481,7 +483,7 @@ $techComparisonData = array_map(function ($t) {
             plugins: {
                 tooltip: {
                     callbacks: {
-                        label: function(context) {
+                        label: function (context) {
                             return 'Riesgo de Falla: ' + context.parsed.y + '%';
                         }
                     }

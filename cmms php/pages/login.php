@@ -9,7 +9,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
 }
 
 // ── Backend Provider ──
-require_once __DIR__ . '/../backend/providers/UserProvider.php';
+require_once __DIR__ . '/../Backend/Providers/UserProvider.php';
 
 // Handle Login POST
 $error = '';

@@ -2,14 +2,14 @@
 // pages/inventory.php
 
 // ── Backend Provider ──
-require_once __DIR__ . '/../backend/providers/AssetProvider.php';
+require_once __DIR__ . '/../Backend/Providers/AssetProvider.php';
 
 // --- FILTERING LOGIC ---
 $searchTerm = $_GET['search'] ?? '';
 $statusFilter = $_GET['status'] ?? 'ALL';
 
 $filteredAssets = searchAssets($searchTerm, $statusFilter);
-
+$assets = getAllAssets();
 ?>
 
 <div class="space-y-10">
@@ -166,7 +166,8 @@ $filteredAssets = searchAssets($searchTerm, $statusFilter);
                             <td class="px-6 py-6">
                                 <div class="font-bold text-slate-200 text-sm"><?= $asset['location'] ?></div>
                                 <div class="text-[10px] text-slate-500 uppercase mt-0.5 font-bold">
-                                    <?= $asset['sub_location'] ?? '-' ?></div>
+                                    <?= $asset['sub_location'] ?? '-' ?>
+                                </div>
                             </td>
                             <td class="px-6 py-6">
                                 <div class="font-bold text-slate-200 text-xs"><?= $asset['vendor'] ?? '-' ?></div>

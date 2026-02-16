@@ -1,7 +1,7 @@
 <?php
 // pages/asset.php (Asset History)
 
-require_once __DIR__ . '/../backend/providers/AssetProvider.php';
+require_once __DIR__ . '/../Backend/Providers/AssetProvider.php';
 
 $id = $_GET['id'] ?? 'UNKNOWN';
 $asset = getAssetById($id);
@@ -12,15 +12,16 @@ if (!$asset) {
 }
 
 // Backend Providers
-require_once __DIR__ . '/../backend/providers/WorkOrderProvider.php';
+require_once __DIR__ . '/../Backend/Providers/WorkOrderProvider.php';
 
 // Get all work orders and filter for this asset
 $allWorkOrders = getAllWorkOrders();
 $workOrders = array_filter($allWorkOrders, fn($wo) => ($wo['asset_id'] ?? '') === $id);
 
-// Get dynamic observations and documents
+// Get dynamic observations, documents, and performance metrics
 $observations = getAssetObservations($id);
 $documents = getAssetDocuments($id);
+$metrics = getAssetPerformanceMetrics($id);
 
 require_once 'config.php';
 require_once 'includes/audit_trail.php';
@@ -459,14 +460,15 @@ require_once 'includes/audit_trail.php';
                                 <span class="text-xs text-slate-500 font-bold uppercase tracking-wider">Depreciación
                                     Anual (Meta)</span>
                                 <p class="text-xl font-bold text-white mt-1">
-                                    $<?= number_format(($asset['acquisition_cost'] ?? 0) / ($asset['total_useful_life'] ?: 1)) ?>
+                                    $<?= number_format($metrics['depreciacion_anual'] ?? 0) ?>
                                 </p>
                             </div>
                             <div class="bg-slate-800/50 p-4 rounded-lg">
                                 <span class="text-xs text-slate-500 font-bold uppercase tracking-wider">Uptime
                                     Clínico</span>
                                 <p class="text-xl font-bold text-emerald-500 mt-1">
-                                    98.5%</p>
+                                    <?= $metrics['uptime'] ?? UPTIME_GOAL ?>%
+                                </p>
                             </div>
                             <div class="bg-slate-800/50 p-4 rounded-lg">
                                 <span class="text-xs text-slate-500 font-bold uppercase tracking-wider">Mantenimiento
@@ -484,7 +486,7 @@ require_once 'includes/audit_trail.php';
                                     Residual Estimado</span>
                             </div>
                             <p class="text-lg font-bold text-white">
-                                $<?= number_format(($asset['acquisition_cost'] ?? 0) * 0.1) ?> USD</p>
+                                $<?= number_format($metrics['valor_residual'] ?? 0) ?> USD</p>
                         </div>
                         <div class="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
                             <div class="flex items-center gap-2 mb-1">
@@ -514,12 +516,13 @@ require_once 'includes/audit_trail.php';
                                 <span class="text-xs text-slate-500 font-bold uppercase tracking-wider">Costo
                                     Estimado</span>
                                 <p class="text-xl font-bold text-white mt-1">
-                                    $<?= number_format(($asset['acquisition_cost'] ?? 0) * 0.15) ?> USD</p>
+                                    $<?= number_format($metrics['costo_mtto_estimado'] ?? 0) ?> USD</p>
                             </div>
                             <div class="bg-slate-800/50 p-4 rounded-lg">
                                 <span class="text-xs text-slate-500 font-bold uppercase tracking-wider">Uptime</span>
                                 <p class="text-xl font-bold text-emerald-500 mt-1">
-                                    98.5%</p>
+                                    <?= $metrics['uptime'] ?? UPTIME_GOAL ?>%
+                                </p>
                             </div>
                         </div>
                     </div>
