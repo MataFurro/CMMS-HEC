@@ -62,7 +62,13 @@ function countWorkOrdersByStatus(): array
 function countWorkOrdersByType(): array
 {
     $orders = getAllWorkOrders();
-    $counts = ['Preventiva' => 0, 'Correctiva' => 0, 'Calibración' => 0];
+    $counts = [
+        'Preventiva' => 0,
+        'Correctiva' => 0,
+        'Calibración' => 0,
+        'Revision' => 0,
+        'Instalacion' => 0
+    ];
     foreach ($orders as $o) {
         $key = $o['type'] ?? '';
         if (isset($counts[$key]))
@@ -188,4 +194,62 @@ function completeWorkOrder(string $otId): bool
     }
 
     return false;
+}
+/**
+ * Transformar una OT (Metamorfosis)
+ * Ej: De Revisión a Correctiva por hallazgo técnico.
+ */
+function transformWorkOrder(string $id, string $newType): bool
+{
+    if (!isset($_SESSION['MOCK_WORK_ORDERS_PERSIST'])) return false;
+
+    foreach ($_SESSION['MOCK_WORK_ORDERS_PERSIST'] as &$order) {
+        if ($order['id'] === $id) {
+            $order['original_type'] = $order['type'];
+            $order['type'] = $newType;
+
+            // Si pasa a Correctiva, usualmente sube la prioridad
+            if ($newType === 'Correctiva') {
+                $order['priority'] = 'Alta';
+            }
+
+            error_log("METAMORFOSIS: OT $id transformada de " . $order['original_type'] . " a $newType");
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Buscar preventivos que pueden ser absorbidos por una intervención mayor
+ */
+function findAbsorbablePreventives(string $assetId): array
+{
+    $orders = getAllWorkOrders();
+    $absorbable = [];
+
+    foreach ($orders as $o) {
+        if ($o['asset_id'] === $assetId && $o['type'] === 'Preventiva' && $o['status'] === 'Pendiente') {
+            $absorbable[] = $o;
+        }
+    }
+    return $absorbable;
+}
+
+/**
+ * Cierre masivo por absorción
+ */
+function completeByAbsorption(string $assetId, array $absorbedIds): int
+{
+    if (!isset($_SESSION['MOCK_WORK_ORDERS_PERSIST'])) return 0;
+
+    $count = 0;
+    foreach ($_SESSION['MOCK_WORK_ORDERS_PERSIST'] as &$order) {
+        if (in_array($order['id'], $absorbedIds)) {
+            $order['status'] = 'Terminada';
+            $order['observations'] = ($order['observations'] ?? '') . "\n[ABSORCIÓN] Cerrada automáticamente por intervención mayor.";
+            $count++;
+        }
+    }
+    return $count;
 }

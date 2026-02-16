@@ -275,6 +275,27 @@ $MOCK_WORK_ORDERS = [
         'checklist_template' => null
     ],
     [
+        'id' => 'OT-2026-5001',
+        'asset_id' => 'ECG-2024-001',
+        'asset' => 'Electrocardiógrafo',
+        'type' => 'Revisión',
+        'status' => 'Pendiente',
+        'tech' => 'Téc. Mario',
+        'date' => '2026-02-16',
+        'priority' => 'Baja',
+        'is_internal_support' => true // OT-S oculta
+    ],
+    [
+        'id' => 'OT-2026-5002',
+        'asset_id' => 'PB-840-00122',
+        'asset' => 'Ventilador Mecánico',
+        'type' => 'Instalación',
+        'status' => 'Pendiente',
+        'tech' => 'Ing. Laura',
+        'date' => '2026-02-15',
+        'priority' => 'Alta'
+    ],
+    [
         'id' => 'OT-2025-3210',
         'asset_id' => 'DF-CU-00210',
         'asset' => 'Rayos X Portátil',

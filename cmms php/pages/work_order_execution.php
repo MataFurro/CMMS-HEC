@@ -15,9 +15,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
-$orderData = getWorkOrderById($id);
+// Handle Transformation Action (Metamorphosis)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'transform_to_corrective') {
+    if (transformWorkOrder($id, 'Correctiva')) {
+        header("Location: ?page=work_order_execution&id=$id&transformed=1");
+        exit;
+    }
+}
 
-$isCompleted = ($orderData['status'] ?? '') === 'COMPLETED';
+// Handle Absorption Completion
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'complete_with_absorption') {
+    if (completeWorkOrder($id)) {
+        $absorbedIds = $_POST['absorb_ids'] ?? [];
+        if (!empty($absorbedIds)) {
+            completeByAbsorption($orderData['asset_id'], $absorbedIds);
+        }
+        header("Location: ?page=work_order_execution&id=$id&completed=absorbed");
+        exit;
+    }
+}
+
+$isCompleted = ($orderData['status'] ?? '') === 'Terminada';
 
 // Mock: Determinar qué plantilla usar (en prod vendría de la DB vinculada a la OT)
 $templateKey = $_GET['tpl'] ?? 'monitor_signos_vitales';
@@ -77,6 +95,17 @@ $templateVersion = $template['version'] ?? 'V1';
                 <span class="material-symbols-outlined text-xl">history</span>
                 Ficha del Activo
             </a>
+
+            <?php if (!$isCompleted && $orderData['type'] === 'Revision' && canExecuteWorkOrder()): ?>
+                <form method="POST" onsubmit="return confirm('¿Confirmar transformación a Correctivo? Se registrará como hallazgo técnico.');">
+                    <input type="hidden" name="action" value="transform_to_corrective">
+                    <button type="submit"
+                        class="px-6 py-3 bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-2xl font-bold text-sm flex items-center gap-3 hover:bg-rose-500/20 transition-all">
+                        <span class="material-symbols-outlined text-xl">metabolism</span>
+                        Transformar a Correctivo
+                    </button>
+                </form>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -494,8 +523,31 @@ $templateVersion = $template['version'] ?? 'V1';
                     <?php else: ?>
                         <div class="space-y-4">
                             <?php if (canCompleteWorkOrder()): ?>
+                                <?php
+                                $absorbable = findAbsorbablePreventives($orderData['asset_id'] ?? '');
+                                // Filtrar la propia OT si es preventiva
+                                $absorbable = array_filter($absorbable, fn($a) => $a['id'] !== $id);
+                                ?>
                                 <form method="POST">
-                                    <input type="hidden" name="action" value="complete_ot">
+                                    <?php if (!empty($absorbable)): ?>
+                                        <div class="mb-4 p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
+                                            <p class="text-[10px] font-black text-indigo-300 uppercase tracking-widest mb-2">Intervención Mayor Detectada</p>
+                                            <p class="text-[11px] text-slate-400 mb-3">Esta reparación cubre los puntos de los siguientes preventivos pendientes:</p>
+                                            <div class="space-y-2">
+                                                <?php foreach ($absorbable as $abs): ?>
+                                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                                        <input type="checkbox" name="absorb_ids[]" value="<?= $abs['id'] ?>" checked
+                                                            class="rounded border-slate-700 bg-slate-900 text-medical-blue focus:ring-medical-blue/20">
+                                                        <span class="text-xs text-slate-300 group-hover:text-white transition-colors"><?= $abs['id'] ?> (<?= $abs['type'] ?>)</span>
+                                                    </label>
+                                                <?php endforeach; ?>
+                                            </div>
+                                            <input type="hidden" name="action" value="complete_with_absorption">
+                                        </div>
+                                    <?php else: ?>
+                                        <input type="hidden" name="action" value="complete_ot">
+                                    <?php endif; ?>
+
                                     <button type="submit"
                                         class="w-full py-4 bg-emerald-500 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 hover:bg-emerald-500/90 transition-all flex items-center justify-center gap-3 text-xs">
                                         <span class="material-symbols-outlined text-xl">verified</span>
