@@ -2,7 +2,7 @@
 // pages/work_orders.php
 
 // ── Backend Provider ──
-require_once __DIR__ . '/../backend/providers/WorkOrderProvider.php';
+require_once __DIR__ . '/../Backend/Providers/WorkOrderProvider.php';
 
 $orders = getAllWorkOrders();
 $stats = getWorkOrderStats();
@@ -45,8 +45,6 @@ $stats = getWorkOrderStats();
                     <option value="Preventiva">Preventiva</option>
                     <option value="Correctiva">Correctiva</option>
                     <option value="Calibración">Calibración</option>
-                    <option value="Revision">Revisión</option>
-                    <option value="Instalacion">Instalación</option>
                 </select>
             </div>
             <div>
@@ -57,7 +55,6 @@ $stats = getWorkOrderStats();
                     <option value="En Proceso">En Proceso</option>
                     <option value="Terminada">Terminada</option>
                     <option value="Pendiente">Pendiente</option>
-                    <option value="Suspendida">Suspendida</option>
                 </select>
             </div>
             <div>
@@ -208,6 +205,12 @@ $stats = getWorkOrderStats();
                     </th>
                     <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-500">
                         <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">event</span>
+                            Fecha
+                        </div>
+                    </th>
+                    <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-500">
+                        <div class="flex items-center gap-2">
                             <span class="material-symbols-outlined text-sm">precision_manufacturing</span>
                             Activo
                         </div>
@@ -245,24 +248,12 @@ $stats = getWorkOrderStats();
                     <tr class="ot-row hover:bg-white/5 transition-colors" data-tipo="<?= $ot['type'] ?>"
                         data-estado="<?= $ot['status'] ?>" data-fecha="<?= $ot['date'] ?>">
                         <td class="px-6 py-4 font-mono text-sm text-medical-blue font-bold"><?= $ot['id'] ?></td>
-                        <td class="px-6 py-4">
-                            <?php
-                            $typeClass = match ($ot['type']) {
-                                'Revision' => 'text-indigo-400 bg-indigo-500/10',
-                                'Instalacion' => 'text-purple-400 bg-purple-500/10',
-                                'Correctiva' => 'text-rose-400 bg-rose-500/10',
-                                'Preventiva' => 'text-emerald-400 bg-emerald-500/10',
-                                default => 'text-slate-300 bg-slate-500/10'
-                            };
-                            ?>
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase <?= $typeClass ?>">
-                                <?= htmlspecialchars($ot['type']) ?>
-                            </span>
-                        </td>
+                        <td class="px-6 py-4 text-xs font-bold text-slate-400"><?= date('d/m/Y', strtotime($ot['date'])) ?></td>
+                        <td class="px-6 py-4 text-sm font-bold text-white"><?= $ot['asset'] ?></td>
+                        <td class="px-6 py-4 text-xs font-bold text-slate-300 uppercase"><?= $ot['type'] ?></td>
                         <td class="px-6 py-4 text-center">
                             <?php
                             $prioClass = match ($ot['priority']) {
-                                'CRITICAL' => 'text-red-600 bg-red-600/20 border-red-600/30 font-black animate-pulse',
                                 'Alta' => 'text-red-500 bg-red-500/10 border-red-500/20',
                                 'Media' => 'text-amber-500 bg-amber-500/10 border-amber-500/20',
                                 default => 'text-slate-400 bg-slate-500/10 border-slate-500/20'
@@ -278,14 +269,11 @@ $stats = getWorkOrderStats();
                                 'Terminada' => 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
                                 'En Proceso' => 'text-blue-500 bg-blue-500/10 border-blue-500/20',
                                 'Pendiente' => 'text-slate-400 bg-slate-500/10 border-slate-500/20',
-                                'Suspendida' => 'text-amber-400 bg-amber-400/10 border-amber-400/20',
                                 default => ''
                             };
-                            $statusIcon = ($ot['status'] === 'Suspendida') ? '<span class="material-symbols-outlined text-[10px] mr-1">timer</span>' : '';
                             ?>
                             <span
-                                class="px-3 py-1 rounded-full text-[10px] font-black uppercase border flex items-center justify-center <?= $statusClass ?>">
-                                <?= $statusIcon ?>
+                                class="px-3 py-1 rounded-full text-[10px] font-black uppercase border <?= $statusClass ?>">
                                 <?= $ot['status'] ?>
                             </span>
                         </td>

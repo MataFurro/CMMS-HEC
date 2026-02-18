@@ -18,7 +18,7 @@ CREATE TABLE users (
     name            VARCHAR(120) NOT NULL,
     email           VARCHAR(180) NOT NULL UNIQUE,
     password_hash   VARCHAR(255) NOT NULL,
-    role            ENUM('Auditor','Tecnico','Ingeniero','Admin') NOT NULL DEFAULT 'Tecnico',
+    role            ENUM('AUDITOR','TECHNICIAN','ENGINEER','CHIEF_ENGINEER','USER') NOT NULL DEFAULT 'TECHNICIAN',
     avatar_url      VARCHAR(500) NULL,
     active          TINYINT(1) NOT NULL DEFAULT 1,
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -90,15 +90,12 @@ CREATE TABLE technicians (
 CREATE TABLE work_orders (
     id                  VARCHAR(30) PRIMARY KEY COMMENT 'Ej: OT-2026-4584',
     asset_id            VARCHAR(30) NOT NULL COMMENT 'FK central al equipo',
-    type                ENUM('Preventiva','Correctiva','Calibracion','Revision','Instalacion') NOT NULL,
-    status              ENUM('Pendiente','En Proceso','Terminada','Cancelada','Suspendida') NOT NULL DEFAULT 'Pendiente',
+    type                ENUM('Preventiva','Correctiva','Calibracion') NOT NULL,
+    status              ENUM('Pendiente','En Proceso','Terminada','Cancelada') NOT NULL DEFAULT 'Pendiente',
     assigned_tech_id    INT NULL,
-    parent_id           VARCHAR(30) NULL COMMENT 'Referencia a OT Padre si es una mutación o dependencia',
-    original_type       VARCHAR(50) NULL COMMENT 'Tipo original antes de la metamorfosis',
-    is_internal_support TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Tag oculto para OT-S',
     created_date        DATE NOT NULL,
     completed_date      DATE NULL,
-    priority            ENUM('Baja','Media','Alta','CRITICAL') NOT NULL DEFAULT 'Media',
+    priority            ENUM('Baja','Media','Alta') NOT NULL DEFAULT 'Media',
     checklist_template  VARCHAR(80) NULL COMMENT 'Key del template en checklist_templates.php',
     observations        TEXT NULL,
     duration_hours      DECIMAL(6,2) NULL DEFAULT 0.00,
@@ -107,12 +104,10 @@ CREATE TABLE work_orders (
 
     FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE RESTRICT,
     FOREIGN KEY (assigned_tech_id) REFERENCES users(id) ON DELETE SET NULL,
-    FOREIGN KEY (parent_id) REFERENCES work_orders(id) ON DELETE SET NULL,
     INDEX idx_wo_asset (asset_id),
     INDEX idx_wo_status (status),
     INDEX idx_wo_type (type),
-    INDEX idx_wo_tech (assigned_tech_id),
-    INDEX idx_wo_parent (parent_id)
+    INDEX idx_wo_tech (assigned_tech_id)
 ) ENGINE=InnoDB;
 
 -- ───────────────────────────────────────────────────────
@@ -226,10 +221,11 @@ CREATE TABLE asset_recalls (
 
 -- Usuarios de prueba
 INSERT INTO users (id, name, email, password_hash, role, avatar_url) VALUES
-(1, 'Lic. Auditor',      'auditor@biocmms.com', '$2y$10$placeholder_hash', 'Auditor',    'https://i.pravatar.cc/150?u=auditor'),
-(2, 'Ing. Roberto Jefe', 'jefe@biocmms.com',    '$2y$10$placeholder_hash', 'Ingeniero',  'https://i.pravatar.cc/150?u=chief'),
-(3, 'Ing. Laura',        'ing@biocmms.com',     '$2y$10$placeholder_hash', 'Ingeniero',  'https://i.pravatar.cc/150?u=eng'),
-(4, 'Téc. Mario',        'tec@biocmms.com',     '$2y$10$placeholder_hash', 'Tecnico',    'https://i.pravatar.cc/150?u=tech');
+(1, 'Lic. Auditor',      'auditor@biocmms.com', '$2y$10$placeholder_hash', 'AUDITOR',    'https://i.pravatar.cc/150?u=auditor'),
+(2, 'Ing. Roberto Jefe', 'jefe@biocmms.com',    '$2y$10$placeholder_hash', 'CHIEF_ENGINEER',  'https://i.pravatar.cc/150?u=chief'),
+(3, 'Ing. Laura',        'ing@biocmms.com',     '$2y$10$placeholder_hash', 'ENGINEER',  'https://i.pravatar.cc/150?u=eng'),
+(4, 'Téc. Mario',        'tec@biocmms.com',     '$2y$10$placeholder_hash', 'TECHNICIAN',    'https://i.pravatar.cc/150?u=tech'),
+(5, 'Dr. Clínico Demo',  'demo@biocmms.com',    '$2y$10$placeholder_hash', 'USER',    'https://i.pravatar.cc/150?u=demo');
 
 -- Técnicos
 INSERT INTO technicians (user_id, specialty, active_ots, completed_ots, capacity_pct) VALUES

@@ -4,7 +4,6 @@
  * Backend/providers/WorkOrderProvider.php
  * ─────────────────────────────────────────────────────
  * Interfaz de acceso a datos de Órdenes de Trabajo.
- * Acceso directo a MySQL (Repositorios).
  * ─────────────────────────────────────────────────────
  */
 
@@ -25,6 +24,9 @@ require_once __DIR__ . '/../Models/WorkOrderEntity.php';
  */
 function getAllWorkOrders(): array
 {
+    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+        return [];
+    }
     $repo = new WorkOrderRepository();
     $orders = [];
     foreach ($repo->findAll() as $entity) {
@@ -87,15 +89,30 @@ function countWorkOrdersByType(): array
  */
 function getWorkOrderStats(): array
 {
+    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+        return [
+            'total' => 0,
+            'total_ot' => 0,
+            'TOTAL' => 0,
+            'Pendiente' => 0,
+            'En Proceso' => 0,
+            'Terminada' => 0,
+            'CRITICAL_TODAY' => 0,
+            'pending' => 0,
+            'progress' => 0,
+            'completed' => 0,
+            'critical_today' => 0
+        ];
+    }
     $repo = new WorkOrderRepository();
     $stats = $repo->getStatusStats();
 
     return [
-        'TOTAL' => (int) ($stats['total'] ?? 0),
-        'Pendiente' => (int) ($stats['pending'] ?? 0),
-        'En Proceso' => (int) ($stats['progress'] ?? 0),
-        'Terminada' => (int) ($stats['completed'] ?? 0),
-        'CRITICAL_TODAY' => (int) ($stats['critical_today'] ?? 0)
+        'TOTAL' => (int) $stats['total'],
+        'Pendiente' => (int) $stats['pending'],
+        'En Proceso' => (int) $stats['progress'],
+        'Terminada' => (int) $stats['completed'],
+        'CRITICAL_TODAY' => (int) $stats['critical_today']
     ];
 }
 
@@ -116,7 +133,7 @@ function getWorkloadSaturation(): int
     if (empty($technicians))
         return 0;
 
-    $totalCapacity = array_sum(array_column($technicians, 'capacity_pct'));
+    $totalCapacity = array_sum(array_column($technicians, 'capacity'));
     return count($technicians) > 0 ? (int) round($totalCapacity / count($technicians)) : 0;
 }
 
@@ -126,7 +143,7 @@ function getWorkloadSaturation(): int
 function createWorkOrder(array $data): string
 {
     $repo = new WorkOrderRepository();
-
+    
     // Generar ID único dinámico (Formato: OT-2026-0001)
     $stats = getWorkOrderStats();
     $newCount = ($stats['TOTAL'] ?? 0) + 1;
@@ -143,8 +160,7 @@ function createWorkOrder(array $data): string
         'created_date' => $data['created_date'] ?? date('Y-m-d'),
         'observations' => $data['observations'] ?? '',
         'ms_request_id' => $data['ms_request_id'] ?? null,
-        'ms_email' => $data['ms_email'] ?? null,
-        'checklist_template' => $data['checklist_template'] ?? null
+        'ms_email' => $data['ms_email'] ?? null
     ];
 
     return $repo->create($dbData);

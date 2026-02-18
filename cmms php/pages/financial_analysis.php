@@ -1,7 +1,7 @@
 <?php
 // pages/financial_analysis.php
 
-require_once __DIR__ . '/../backend/providers/AssetProvider.php';
+require_once __DIR__ . '/../Backend/Providers/AssetProvider.php';
 $stats = getFinancialStats();
 
 $depreciacion_data = [

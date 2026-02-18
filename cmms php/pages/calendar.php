@@ -1,5 +1,6 @@
 <?php
-require_once __DIR__ . '/../backend/providers/WorkOrderProvider.php';
+require_once __DIR__ . '/../Backend/Providers/WorkOrderProvider.php';
+require_once __DIR__ . '/../Backend/Providers/AssetProvider.php';
 
 $view = $_GET['view'] ?? 'month';
 
@@ -114,7 +115,9 @@ foreach ($months as $idx => $m) {
                     <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Filtro por
                         Servicio</p>
                     <div class="space-y-3">
-                        <?php foreach (['UCI Adultos', 'Pabellón Central', 'Urgencias'] as $loc): ?>
+                        <?php
+                        $allLocations = getAllLocations();
+                        foreach ($allLocations as $loc): ?>
                             <label class="flex items-center gap-3 cursor-pointer group">
                                 <input type="checkbox" checked
                                     class="size-5 rounded-lg border-border-dark bg-background-dark text-medical-blue focus:ring-0" />
@@ -268,7 +271,7 @@ foreach ($months as $idx => $m) {
                     class="bg-panel-dark rounded-[2rem] border border-border-dark shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
                     <div class="p-8 border-b border-border-dark bg-white/5 flex items-center justify-between">
                         <div>
-                            <h3 class="text-xl font-bold text-white uppercase tracking-tight">Miércoles, 11 de Febrero, 2026
+                            <h3 class="text-xl font-bold text-white uppercase tracking-tight"><?= date('l, d \d\e F, Y') ?>
                             </h3>
                             <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">4 Intervenciones
                                 Programadas para hoy</p>

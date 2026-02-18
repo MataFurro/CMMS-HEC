@@ -10,6 +10,7 @@ $checklist_templates = [
     // ═══════════════════════════════════════════════════════════════
     'monitor_signos_vitales' => [
         'label' => 'Monitor de Signos Vitales',
+        'family' => 'Monitor',
         'icon'  => 'monitor_heart',
         'version' => 'V2',
 
@@ -93,6 +94,7 @@ $checklist_templates = [
     // ═══════════════════════════════════════════════════════════════
     'monitor_desfibrilador' => [
         'label' => 'Monitor Desfibrilador',
+        'family' => 'Monitor',
         'icon'  => 'electrical_services',
         'version' => 'V2',
 
@@ -157,6 +159,7 @@ $checklist_templates = [
     // ═══════════════════════════════════════════════════════════════
     'incubadora_fija' => [
         'label' => 'Incubadora Fija',
+        'family' => 'Incubadora',
         'icon'  => 'child_care',
         'version' => 'V1',
 
@@ -190,6 +193,7 @@ $checklist_templates = [
     // ═══════════════════════════════════════════════════════════════
     'incubadora_transporte' => [
         'label' => 'Incubadora de Transporte',
+        'family' => 'Incubadora',
         'icon'  => 'local_shipping',
         'version' => 'V1',
 
@@ -220,6 +224,7 @@ $checklist_templates = [
     // ═══════════════════════════════════════════════════════════════
     'ventilador_mecanico' => [
         'label' => 'Ventilador Mecánico',
+        'family' => 'Ventilador',
         'icon'  => 'air',
         'version' => 'V2',
 
@@ -302,6 +307,7 @@ $checklist_templates = [
     // ═══════════════════════════════════════════════════════════════
     'maquina_anestesia' => [
         'label' => 'Máquina de Anestesia',
+        'family' => 'Anestesia',
         'icon'  => 'vaccines',
         'version' => 'V2',
 
@@ -364,6 +370,7 @@ $checklist_templates = [
     // ═══════════════════════════════════════════════════════════════
     'monitor_cardiofetal' => [
         'label' => 'Monitor Cardiofetal',
+        'family' => 'Monitor',
         'icon'  => 'pregnant_woman',
         'version' => 'V1',
 
@@ -394,6 +401,7 @@ $checklist_templates = [
     // ═══════════════════════════════════════════════════════════════
     'monitor_gasto_cardiaco' => [
         'label' => 'Monitor de Gasto Cardíaco',
+        'family' => 'Monitor',
         'icon'  => 'cardiology',
         'version' => 'V2',
 
@@ -429,6 +437,32 @@ $checklist_templates = [
             ['param' => 'Corriente de fuga',    'expected' => '≤ 0.5 mA', 'tolerance' => 'Normativo'],
         ],
     ],
+
+    // ═══════════════════════════════════════════════════════════════
+    // FORMATO GENERAL (Equipo Médico No Específico)
+    // ═══════════════════════════════════════════════════════════════
+    'formato_general' => [
+        'label' => 'Protocolo General de Inspección',
+        'family' => 'General',
+        'icon'  => 'settings',
+        'version' => 'V1',
+
+        'qualitative' => [
+            'Verificar encendido y estado general',
+            'Limpieza externa y desinfección',
+            'Estado de cables, conectores y carcasas',
+            'Funcionamiento de controles y selectores',
+            'Alarmas y sistemas de seguridad operativos',
+            'Estado de baterías y respaldos (si aplica)',
+            'Pruebas funcionales de operación',
+        ],
+        'quantitative' => [],
+        'electrical_safety' => [
+            ['param' => 'Tensión de red',      'expected' => '220V',     'tolerance' => '±10%'],
+            ['param' => 'Resistencia a tierra', 'expected' => '≤ 0.2 Ω', 'tolerance' => 'Normativo'],
+            ['param' => 'Corriente de fuga',    'expected' => '≤ 0.5 mA', 'tolerance' => 'Normativo'],
+        ],
+    ],
 ];
 
 /**
@@ -443,15 +477,53 @@ function getChecklistTemplate(string $key): ?array
 }
 
 /**
- * Listar todas las plantillas disponibles (para el <select>).
+ * Listar todas las familias únicas.
+ * @return array
+ */
+function listTemplateFamilies(): array
+{
+    global $checklist_templates;
+    $families = [];
+    foreach ($checklist_templates as $tpl) {
+        if (!in_array($tpl['family'], $families)) {
+            $families[] = $tpl['family'];
+        }
+    }
+    sort($families);
+    return $families;
+}
+
+/**
+ * Listar plantillas filtradas por familia o todas.
+ * @param string|null $family
  * @return array [key => label]
  */
-function listChecklistTemplates(): array
+function listChecklistTemplates(?string $family = null): array
 {
     global $checklist_templates;
     $list = [];
     foreach ($checklist_templates as $key => $tpl) {
-        $list[$key] = $tpl['label'] . ' (' . $tpl['version'] . ')';
+        if ($family === null || $tpl['family'] === $family) {
+            $list[$key] = $tpl['label'] . ' (' . $tpl['version'] . ')';
+        }
     }
     return $list;
+}
+
+/**
+ * Obtener todas las plantillas como JSON para Alpine.js
+ */
+function getTemplatesJson(): string
+{
+    global $checklist_templates;
+    $data = [];
+    foreach ($checklist_templates as $key => $tpl) {
+        $data[] = [
+            'id' => $key,
+            'label' => $tpl['label'],
+            'family' => $tpl['family'],
+            'version' => $tpl['version']
+        ];
+    }
+    return json_encode($data);
 }

@@ -2,25 +2,26 @@
 // pages/inventory.php
 
 // ── Backend Provider ──
-require_once __DIR__ . '/../backend/providers/AssetProvider.php';
+require_once __DIR__ . '/../Backend/Providers/AssetProvider.php';
+
+// --- DELETE LOGIC ---
+if (isset($_GET['delete_id']) && canModify()) {
+    $deleteId = $_GET['delete_id'];
+    if (deleteAsset($deleteId)) {
+        echo "<script>
+    alert('Activo dado de baja correctamente.');
+    window.location.href = '?page=inventory';
+</script>";
+        exit;
+    }
+}
 
 // --- FILTERING LOGIC ---
 $searchTerm = $_GET['search'] ?? '';
 $statusFilter = $_GET['status'] ?? 'ALL';
 
-// --- ACTION HANDLER ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    if ($_POST['action'] === 'decommission' && isset($_POST['asset_id'])) {
-        if (decommissionAsset($_POST['asset_id'])) {
-            header("Location: ?page=inventory&decommissioned=1");
-            exit;
-        }
-    }
-}
-
 $filteredAssets = searchAssets($searchTerm, $statusFilter);
-$assets = getAllAssets(); // Para el conteo total
-
+$assets = getAllAssets();
 ?>
 
 <div class="space-y-10">
@@ -29,8 +30,7 @@ $assets = getAllAssets(); // Para el conteo total
         <div>
             <h1 class="text-4xl font-bold tracking-tight text-white flex items-center gap-4">
                 <?= SIDEBAR_INVENTORY ?>
-                <span class="text-medical-blue font-light text-2xl tracking-normal opacity-60">(Activos
-                    Biomédicos)</span>
+                <span class="text-medical-blue font-light text-2xl tracking-normal opacity-60">(Activos Biomédicos v1.1)</span>
             </h1>
             <p class="text-slate-400 mt-2 text-lg">Gestión centralizada de equipamiento clínico y soporte de vida.</p>
         </div>
@@ -85,7 +85,6 @@ $assets = getAllAssets(); // Para el conteo total
                     <option value="<?= STATUS_MAINTENANCE ?>" <?= $statusFilter === STATUS_MAINTENANCE ? 'selected' : '' ?>>En Mantención</option>
                     <option value="<?= STATUS_OPERATIVE_WITH_OBS ?>" <?= $statusFilter === STATUS_OPERATIVE_WITH_OBS ? 'selected' : '' ?>>Operativo con Obs.</option>
                     <option value="<?= STATUS_OUT_OF_SERVICE ?>" <?= $statusFilter === STATUS_OUT_OF_SERVICE ? 'selected' : '' ?>>Fuera de Servicio</option>
-                    <option value="<?= STATUS_DECOMMISSIONED ?>" <?= $statusFilter === STATUS_DECOMMISSIONED ? 'selected' : '' ?>>Dados de Baja</option>
                 </select>
             </div>
             <div class="lg:col-span-2">
@@ -112,6 +111,7 @@ $assets = getAllAssets(); // Para el conteo total
                     <tr class="bg-white/5 border-b border-slate-700/50">
                         <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">Activo /
                             Modelo</th>
+                        <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">N° de Serie</th>
                         <th
                             class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-center">
                             Criticidad</th>
@@ -142,7 +142,7 @@ $assets = getAllAssets(); // Para el conteo total
                 <tbody class="divide-y divide-slate-700/50">
                     <?php if (empty($filteredAssets)): ?>
                         <tr>
-                            <td colspan="9" class="px-8 py-10 text-center text-slate-500">No se encontraron activos.</td>
+                            <td colspan="10" class="px-8 py-10 text-center text-slate-500">No se encontraron activos.</td>
                         </tr>
                     <?php endif; ?>
 
@@ -167,6 +167,9 @@ $assets = getAllAssets(); // Para el conteo total
                                     </div>
                                 </div>
                             </td>
+                            <td class="px-6 py-6">
+                                <div class="font-mono text-xs text-medical-blue font-bold"><?= $asset['serial_number'] ?? '-' ?></div>
+                            </td>
                             <td class="px-6 py-6 text-center">
                                 <span
                                     class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[10px] font-black uppercase border <?= $asset['criticality'] === 'CRITICAL' ? 'bg-danger/10 text-danger border-danger/30' : 'bg-medical-blue/10 text-medical-blue border-medical-blue/30' ?>">
@@ -178,7 +181,8 @@ $assets = getAllAssets(); // Para el conteo total
                             <td class="px-6 py-6">
                                 <div class="font-bold text-slate-200 text-sm"><?= $asset['location'] ?></div>
                                 <div class="text-[10px] text-slate-500 uppercase mt-0.5 font-bold">
-                                    <?= $asset['sub_location'] ?? '-' ?></div>
+                                    <?= $asset['sub_location'] ?? '-' ?>
+                                </div>
                             </td>
                             <td class="px-6 py-6">
                                 <div class="font-bold text-slate-200 text-xs"><?= $asset['vendor'] ?? '-' ?></div>
@@ -211,17 +215,12 @@ $assets = getAllAssets(); // Para el conteo total
                                     STATUS_MAINTENANCE => 'bg-amber-500/10 text-amber-500 border-amber-500/30',
                                     STATUS_OPERATIVE_WITH_OBS => 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30',
                                     STATUS_NO_OPERATIVE => 'bg-red-500/10 text-red-500 border-red-500/30',
-                                    STATUS_DECOMMISSIONED => 'bg-slate-500/10 text-slate-400 border-slate-500/30',
                                     default => 'bg-slate-700/10 text-slate-500 border-slate-700/30'
                                 };
                                 ?>
                                 <span
                                     class="px-4 py-1.5 rounded-xl text-xs font-black inline-flex items-center gap-2 uppercase tracking-wide border <?= $statusClass ?>">
-                                    <?= match ($asset['status']) {
-                                        STATUS_OPERATIVE => 'Operativo',
-                                        STATUS_DECOMMISSIONED => 'BAJA',
-                                        default => $asset['status']
-                                    } ?>
+                                    <?= $asset['status'] === STATUS_OPERATIVE ? 'Operativo' : $asset['status'] ?>
                                 </span>
                             </td>
                             <td class="px-6 py-6">
@@ -246,38 +245,12 @@ $assets = getAllAssets(); // Para el conteo total
                                         <span class="material-symbols-outlined text-sm">history</span>
                                         Historial
                                     </a>
-
-                                    <?php if (canModify()): ?>
-                                        <div x-data="{ open: false }" class="relative">
-                                            <button @click="open = !open" @click.away="open = false"
-                                                class="p-2 text-slate-500 hover:text-white hover:bg-white/5 rounded-xl border border-transparent hover:border-slate-700/50 transition-all">
-                                                <span class="material-symbols-outlined text-xl">more_vert</span>
-                                            </button>
-
-                                            <div x-show="open"
-                                                class="absolute right-0 mt-2 w-48 bg-medical-surface border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden"
-                                                x-transition:enter="transition ease-out duration-100"
-                                                x-transition:enter-start="transform opacity-0 scale-95"
-                                                x-transition:enter-end="transform opacity-100 scale-100">
-
-                                                <div class="py-1">
-                                                    <a href="?page=asset&id=<?= $asset['id'] ?>" class="flex items-center gap-3 px-4 py-2 text-xs text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
-                                                        <span class="material-symbols-outlined text-lg">edit</span>
-                                                        Editar Activo
-                                                    </a>
-                                                    <div class="border-t border-slate-700/50 my-1"></div>
-                                                    <form method="POST" onsubmit="return confirm('¿Está seguro de dar de baja este activo? Esta acción no se puede deshacer.')">
-                                                        <input type="hidden" name="action" value="decommission">
-                                                        <input type="hidden" name="asset_id" value="<?= $asset['id'] ?>">
-                                                        <button type="submit" class="w-full flex items-center gap-3 px-4 py-2 text-xs text-rose-400 hover:bg-rose-500/10 transition-colors text-left">
-                                                            <span class="material-symbols-outlined text-lg">delete_sweep</span>
-                                                            Dar de Baja
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <?php endif; ?>
+                                    <a href="?page=inventory&delete_id=<?= $asset['id'] ?>"
+                                        onclick="return confirm('¿Está seguro de que desea dar de baja este equipo?')"
+                                        class="p-2 text-slate-500 hover:text-red-500 hover:bg-red-500/10 rounded-xl border border-transparent hover:border-red-500/30 transition-all shadow-lg"
+                                        title="Dar de Baja">
+                                        <span class="material-symbols-outlined text-xl">delete_sweep</span>
+                                    </a>
                                 </div>
                             </td>
                         </tr>

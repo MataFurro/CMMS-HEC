@@ -1,10 +1,13 @@
 <?php
 // pages/service_request_review.php - Engineer view to process solicitudes
 
-if ($_SESSION['user_role'] !== 'Ingeniero') {
-    echo "<div class='p-8 text-center'><h1 class='text-2xl font-bold text-red-500'>Acceso Denegado</h1></div>";
+if (!canModify()) {
+    echo "<div class='p-8 text-center text-red-500 font-bold'>Acceso Denegado</div>";
     return;
 }
+
+// ── Backend Provider ──
+require_once __DIR__ . '/../Backend/Providers/WorkOrderProvider.php';
 
 // Mock Data for Requests
 $requests = [
@@ -15,7 +18,8 @@ $requests = [
         'client' => 'Dr. Solicitante',
         'problem' => 'Pantalla parpadea y se apaga aleatoriamente durante el uso.',
         'date' => '2026-02-11 14:10',
-        'priority' => 'Alta'
+        'priority' => 'Alta',
+        'tech_suggested' => 'Mario Gómez (Senior)'
     ],
     [
         'id' => 'SOL-2026-0042',
@@ -24,14 +28,30 @@ $requests = [
         'client' => 'Enf. Unidades Críticas',
         'problem' => 'Error de oclusión persistente sin obstrucción visible.',
         'date' => '2026-02-11 09:30',
-        'priority' => 'Media'
+        'priority' => 'Media',
+        'tech_suggested' => 'Pablo Rojas (Especialista)'
     ]
 ];
 
-// Mock Success
-$converted = false;
-if (isset($_GET['action']) && $_GET['action'] === 'convert') {
-    $converted = true;
+// Mock Success & Execution Plan
+$convertedId = '';
+if (isset($_POST['action']) && $_POST['action'] === 'convert' && isset($_POST['req_id'])) {
+    $reqId = $_POST['req_id'];
+
+    // Buscar la solicitud para extraer datos
+    foreach ($requests as $req) {
+        if ($req['id'] === $reqId) {
+            $convertedId = createWorkOrderFromRequest([
+                'asset_id' => $req['asset_id'],
+                'asset_name' => $req['asset_name'],
+                'problem' => $_POST['diagnosis'] ?? $req['problem'],
+                'priority' => $req['priority'],
+                'tech' => $_POST['tech'] ?? $req['tech_suggested'],
+                'type' => $_POST['intervention_type'] ?? 'Mantenimiento Correctivo'
+            ]);
+            break;
+        }
+    }
 }
 ?>
 

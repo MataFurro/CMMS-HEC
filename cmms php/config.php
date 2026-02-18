@@ -1,71 +1,56 @@
 <?php
-// config.php - Configuration file
+// config.php
+require_once __DIR__ . '/Backend/autoloader.php';
+require_once 'includes/constants.php';
+session_start();
 
-// Database Credentials (Placeholder)
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'biocmms_db');
+// --- Migrador de Roles de Sesión (Previene bucles por datos antiguos) ---
+if (isset($_SESSION['user_role'])) {
+    $current_role = $_SESSION['user_role'];
+    $role_map = [
+        'Ingeniero' => ROLE_CHIEF_ENGINEER,
+        'Técnico'   => ROLE_TECHNICIAN,
+        'Auditor'   => ROLE_AUDITOR,
+        'Usuario'   => ROLE_USER,
+        'chief_engineer' => ROLE_CHIEF_ENGINEER,
+        'engineer'       => ROLE_ENGINEER,
+        'technician'    => ROLE_TECHNICIAN,
+        'auditor'       => ROLE_AUDITOR,
+        'user'          => ROLE_USER
+    ];
+    if (isset($role_map[$current_role])) {
+        $_SESSION['user_role'] = $role_map[$current_role];
+    }
+}
 
-// App Constants
-define('APP_NAME', 'BioCMMS v4.2 Pro');
-define('APP_VERSION', '4.2.0');
+// --- Soporte para Variables de Entorno (.env) ---
+function loadEnv($path)
+{
+    if (!file_exists($path))
+        return;
+    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0)
+            continue;
+        list($name, $value) = explode('=', $line, 2);
+        $_ENV[trim($name)] = trim($value);
+    }
+}
+loadEnv(__DIR__ . '/.env');
 
-// Labels (UI)
-define('SIDEBAR_DASHBOARD', 'Dashboard');
-define('SIDEBAR_CALENDAR', 'Agenda Técnica');
-define('SIDEBAR_ORDERS', 'Órdenes');
-define('SIDEBAR_INVENTORY', 'Inventario');
-define('SIDEBAR_FAMILY_ANALYSIS', 'Análisis por Familia');
+// Parámetros de Base de Datos (Prioridad: .env > Constantes locales)
+define('DB_HOST', $_ENV['DB_HOST'] ?? 'localhost');
+define('DB_NAME', $_ENV['DB_NAME'] ?? 'biocmms');
+define('DB_USER', $_ENV['DB_USER'] ?? 'biocmms_user');
+define('DB_PASS', $_ENV['DB_PASS'] ?? 'BioPass2026');
+
+// Modo Demo - Activar para auditoría (Desconecta la DB)
+define('USE_MOCK_DATA', isset($_ENV['USE_MOCK_DATA']) ? ($_ENV['USE_MOCK_DATA'] === 'true') : false);
+
 define('SIDEBAR_MESSENGER', 'SMS OT');
 
-define('BTN_NEW_ASSET', 'Nuevo Activo');
-define('BTN_UPLOAD_EXCEL', 'Cargar Excel');
-define('BTN_DOWNLOAD_EXCEL', 'Descargar Excel');
-
-// Status Constants
-define('STATUS_OPERATIVE', 'OPERATIVE');
-define('STATUS_MAINTENANCE', 'MAINTENANCE');
-define('STATUS_OUT_OF_SERVICE', 'OUT_OF_SERVICE');
-define('STATUS_OPERATIVE_WITH_OBS', 'OPERATIVE_WITH_OBS');
-define('STATUS_NO_OPERATIVE', 'NO_OPERATIVE'); // No Operativo
-define('STATUS_DECOMMISSIONED', 'DECOMMISSIONED'); // Dado de Baja
-
-// Helper functions para verificación de permisos
-function canModify()
-{
-    return !in_array($_SESSION['user_role'] ?? '', ['Técnico', 'Auditor']);
-}
-
-function canExecuteWorkOrder()
-{
-    return in_array($_SESSION['user_role'] ?? '', ['Técnico', 'Ingeniero', 'Admin']);
-}
-
-function canCompleteWorkOrder()
-{
-    return !in_array($_SESSION['user_role'] ?? '', ['Técnico', 'Auditor']);
-}
-
-function isReadOnly()
-{
-    return ($_SESSION['user_role'] ?? '') === 'Auditor';
-}
-
-function canViewDashboard()
-{
-    // Técnico y Usuario NO pueden ver el dashboard
-    return !in_array($_SESSION['user_role'] ?? '', ['Técnico', 'Usuario']);
-}
-
-function canRequestService()
-{
-    // Todos los roles pueden solicitar servicio
-    return !empty($_SESSION['user_role']);
-}
-
-// Error Reporting (Enable for Dev)
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-session_start();
+// ── Factores de Cálculo (Dynamicization) ──
+define('MAINTENANCE_COST_FACTOR', 0.08); // 8% anual
+define('REPLACEMENT_COST_FACTOR', 1.25); // 25% extra por IPC/Tecnología
+define('RESIDUAL_VALUE_FACTOR', 0.15);    // 15% al final de vida
+define('UPTIME_GOAL', 98.5);              // Meta institucional

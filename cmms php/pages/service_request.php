@@ -15,10 +15,12 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // ── Backend Logic ──
-require_once __DIR__ . '/../backend/providers/AssetProvider.php';
+require_once __DIR__ . '/../Backend/Providers/AssetProvider.php';
+require_once __DIR__ . '/../Backend/Core/DatabaseService.php';
+
+use Backend\Core\DatabaseService;
 
 // Paths
-$msDbPath = __DIR__ . '/../API Mail/database/messenger.db';
 $uploadDir = __DIR__ . '/../API Mail/uploads/';
 
 // Ensure Upload Directory Exists
@@ -39,15 +41,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $serial = $_POST['serial_number'] ?? '';
     $description = $_POST['description'] ?? '';
 
-    // Map Location Value to Readable Name (Optional, or store as is)
-    // For now, storing the value as selected.
-
     // 2. File Upload Handling
     $imagePath = null;
     if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
         $fileTmpPath = $_FILES['photo']['tmp_name'];
         $fileName = $_FILES['photo']['name'];
-        $fileSize = $_FILES['photo']['size'];
         $fileType = $_FILES['photo']['type'];
 
         $allowedFileTypes = ['image/jpeg', 'image/png', 'image/gif'];
@@ -66,26 +64,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // 3. Database Insertion
+    // 3. Database Insertion (MySQL)
     if (!$error) {
         try {
-            if (!file_exists($msDbPath)) {
-                throw new Exception("Error crítico: Base de datos no encontrada.");
-            }
+            $db = DatabaseService::getInstance();
 
-            $db = new PDO('sqlite:' . $msDbPath);
-            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            // Schema: table 'reports'
-            // Columns: id, email, serie, equipo, servicio, texto, imagen_path, status, created_at
-
-            $stmt = $db->prepare("INSERT INTO reports (email, serie, equipo, servicio, texto, imagen_path, status, created_at) VALUES (:email, :serie, :equipo, :servicio, :texto, :imagen, 'Pendiente', DATETIME('now'))");
+            // Schema: table 'messenger_reports' (MySQL)
+            // Connector: asset_id (from serial_number input, now acting as ID)
+            $stmt = $db->prepare("INSERT INTO messenger_reports (email, asset_id, asset_name, texto, imagen_path, status, created_at) VALUES (:email, :asset_id, :asset_name, :texto, :imagen, 'Pendiente', NOW())");
 
             $stmt->execute([
                 ':email' => $email,
-                ':serie' => $serial,
-                ':equipo' => $equipment,
-                ':servicio' => $location,
+                ':asset_id' => $serial, // El ID/Serie es el conector
+                ':asset_name' => $equipment, // El nombre del equipo para referencia rápida
                 ':texto' => $description,
                 ':imagen' => $imagePath
             ]);
@@ -95,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Clear inputs on success
             $email = $location = $equipment = $serial = $description = '';
         } catch (Exception $e) {
-            $error = "Error de base de datos: " . $e->getMessage();
+            $error = "Error de base de datos MySQL: " . $e->getMessage();
         }
     }
 } else {
@@ -181,10 +172,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- Header Section -->
         <div class="p-8 border-b border-slate-100 dark:border-slate-800">
             <div class="flex items-center gap-3 mb-6">
-                <!-- Back Button for context if needed, though stand-alone usually doesn't have one -->
-                <button onclick="window.history.back()" class="w-10 h-10 rounded-lg hover:bg-white/5 flex items-center justify-center text-slate-400 trasition-colors" title="Volver">
+                <!-- Back Button intelligent routing -->
+                <?php
+                $backUrl = ($_SESSION['user_role'] ?? '') === ROLE_USER ? '?page=login&action=logout' : '?page=dashboard';
+                $backTitle = ($_SESSION['user_role'] ?? '') === ROLE_USER ? 'Cerrar Sesión' : 'Volver al Dashboard';
+                ?>
+                <a href="<?= $backUrl ?>" class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95" title="<?= $backTitle ?>">
                     <span class="material-icons">arrow_back</span>
-                </button>
+                </a>
 
                 <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white">
                     <span class="material-icons text-2xl">build</span>
