@@ -170,7 +170,7 @@ $formula_tinc = "Veq = Vo - [Pu + (At * Pt) + (At * Pm) + (At * Pv) + Ps + Pi]";
                     <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Pérdida por
                         Inactividad Acumulada</p>
                     <h4 class="text-4xl font-black text-white">$<?= number_format($downtime['total_loss']) ?></h4>
-                    <p class="text-xs font-bold text-red-500 mt-1"><?= $downtime['total_loss'] > 0 ? '+12%' : '0%' ?> vs periodo anterior</p>
+                    <p class="text-xs font-bold text-red-500 mt-1"><?= ($downtime['total_loss'] ?? 0) > 0 ? '+12%' : '0%' ?> vs periodo anterior</p>
                 </div>
 
                 <div class="space-y-4">
@@ -182,7 +182,7 @@ $formula_tinc = "Veq = Vo - [Pu + (At * Pt) + (At * Pm) + (At * Pv) + Ps + Pi]";
                             <p class="text-[10px] text-slate-600 font-bold uppercase text-center py-4">Sin datos de falla registrados</p>
                         <?php else: ?>
                             <?php foreach ($downtime['areas'] as $area):
-                                $pct = $downtime['total_loss'] > 0 ? ($area['loss'] / $downtime['total_loss']) * 100 : 0;
+                                $pct = ($downtime['total_loss'] ?? 0) > 0 ? ($area['loss'] / $downtime['total_loss']) * 100 : 0;
                             ?>
                                 <div class="space-y-1">
                                     <div class="flex justify-between text-xs font-bold mb-1">

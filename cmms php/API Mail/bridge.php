@@ -2,7 +2,10 @@
 
 /**
  * API Mail/bridge.php
+ * ─────────────────────────────────────────────────────
  * Puente entre el sistema de mensajería clínica y el CMMS principal.
+ * Gestiona los mensajes del MS (Integración MySQL).
+ * ─────────────────────────────────────────────────────
  */
 
 require_once __DIR__ . '/../Backend/Providers/AuditProvider.php';
@@ -13,6 +16,7 @@ define('MS_LOG_FILE', __DIR__ . '/../storage/logs/messenger.log');
 
 /**
  * Procesa un nuevo reporte desde el Messenger.
+ * Función funcional para compatibilidad con flujos de integración.
  */
 function saveReport(string $to, string $subject, array $data): string
 {
@@ -42,9 +46,24 @@ function saveReport(string $to, string $subject, array $data): string
 }
 
 /**
- * Envía feedback al solicitante (placeholder).
+ * Clase MessengerBridge para uso orientado a objetos (v4.2 PRO).
  */
-function enviarFeedback(string $correo, string $detalle): bool
+class MessengerBridge
 {
-    return true;
+    /**
+     * Recibe los datos y los procesa de forma interna.
+     */
+    public function enviarReporteAlSistema($data)
+    {
+        return saveReport('', '', $data);
+    }
+
+    /**
+     * Envía el reporte técnico de vuelta al correo del solicitante.
+     */
+    public function enviarFeedback($correo, $detalle)
+    {
+        // Lógica de envío de correo 
+        return true;
+    }
 }

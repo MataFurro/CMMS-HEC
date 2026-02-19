@@ -1,16 +1,13 @@
 <?php
 // includes/sidebar.php
-require_once 'backend/providers/UserProvider.php';
+require_once __DIR__ . '/../Backend/Providers/UserProvider.php'; // Standardized Path
 $menuItems = getSidebarMenu($_SESSION['user_role'] ?? '');
 ?>
-<aside
-    class="fixed lg:sticky top-0 left-0 flex flex-col w-20 lg:w-72 bg-medical-surface border-r border-slate-700/50 h-screen shrink-0 z-50 transition-all duration-300">
+<aside class="fixed lg:sticky top-0 left-0 flex flex-col w-20 lg:w-72 bg-medical-surface border-r border-slate-700/50 h-screen shrink-0 z-50 transition-all duration-300">
     <div class="p-4 lg:p-8 flex flex-col items-center lg:items-start overflow-y-auto custom-scrollbar">
         <div class="flex items-center gap-3 mb-10 lg:mb-12">
-            <div
-                class="bg-medical-blue rounded-lg w-10 h-10 lg:w-12 lg:h-12 flex items-center justify-center shadow-lg shadow-medical-blue/20">
-                <span
-                    class="material-symbols-outlined text-white text-2xl lg:text-3xl font-variation-fill">engineering</span>
+            <div class="bg-medical-blue rounded-lg w-10 h-10 lg:w-12 lg:h-12 flex items-center justify-center shadow-lg shadow-medical-blue/20">
+                <span class="material-symbols-outlined text-white text-2xl lg:text-3xl font-variation-fill">engineering</span>
             </div>
             <div class="hidden lg:block">
                 <h2 class="text-sm font-black tracking-tight text-white leading-none uppercase">BioCMMS</h2>
@@ -37,8 +34,7 @@ $menuItems = getSidebarMenu($_SESSION['user_role'] ?? '');
 
     <div class="mt-auto p-4 lg:p-8 border-t border-slate-700/50 w-full bg-medical-surface/50 backdrop-blur-md">
         <div class="flex items-center gap-4">
-            <div
-                class="size-10 rounded-full bg-slate-700 flex items-center justify-center shrink-0 overflow-hidden border border-slate-600 shadow-inner">
+            <div class="size-10 rounded-full bg-slate-700 flex items-center justify-center shrink-0 overflow-hidden border border-slate-600 shadow-inner">
                 <img src="<?= $_SESSION['user']['avatar'] ?? 'https://i.pravatar.cc/150' ?>" class="w-full h-full object-cover" alt="User">
             </div>
             <div class="hidden lg:block overflow-hidden flex-1">

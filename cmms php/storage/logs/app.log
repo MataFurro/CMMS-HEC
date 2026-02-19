@@ -137,6 +137,7 @@
 {"timestamp":"2026-02-14 01:09:18","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":2,"ip":"127.0.0.1"}
 {"timestamp":"2026-02-14 01:09:29","level":"ERROR","message":"Error en AssetRepository::search","context":{"query":"","error":"SQLSTATE[HY093]: Invalid parameter number"},"user":2,"ip":"127.0.0.1"}
 {"timestamp":"2026-02-14 01:09:29","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":2,"ip":"127.0.0.1"}
+<<<<<<< HEAD
 {"timestamp":"2026-02-17 12:42:29","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":2,"ip":"::1"}
 {"timestamp":"2026-02-17 12:42:29","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":2,"ip":"::1"}
 {"timestamp":"2026-02-17 12:42:29","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":2,"ip":"::1"}
@@ -725,3 +726,5 @@
 {"timestamp":"2026-02-18 20:37:02","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
 {"timestamp":"2026-02-18 20:37:02","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
 {"timestamp":"2026-02-18 20:37:02","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+=======
+>>>>>>> origin/main

@@ -1,0 +1,16 @@
+# Logs
+storage/logs/*.log
+cmms php/storage/logs/*.log
+*.log
+
+# Sensitive data
+.env
+config.php (if it contains real secrets, though user asked not to)
+
+# OS Files
+Thumbs.db
+Desktop.ini
+
+# Vendor
+vendor/
+node_modules/

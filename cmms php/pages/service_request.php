@@ -4,8 +4,6 @@
 // Security Check
 if (!defined('APP_NAME')) {
     // If accessed directly, verify session or define app name to prevent errors if config not included
-    // But since this is included via index.php, APP_NAME should be defined.
-    // If standalone access is needed, we'd need require_once '../config.php';
 }
 
 // Session Check (Must be logged in)

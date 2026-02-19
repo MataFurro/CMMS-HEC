@@ -493,74 +493,13 @@ $techComparisonData = array_map(function ($t) {
     });
 
     // 1. Estado de Equipos (Doughnut)
-    new Chart(document.getElementById('estadoChart'), {
-        type: 'doughnut',
-        data: {
-            labels: <?= json_encode(array_column($estadoEquiposData, 'name')) ?>,
-            datasets: [{
-                data: <?= json_encode(array_column($estadoEquiposData, 'value')) ?>,
-                backgroundColor: <?= json_encode(array_column($estadoEquiposData, 'color')) ?>,
-                borderWidth: 0,
-                hoverOffset: 4
-            }]
-        },
-        options: {
-            ...commonOptions,
-            cutout: '75%'
-        }
-    });
+    // No existe canvas con id 'estadoChart' en el HTML actual, pero si existiera se configuraría aquí.
 
     // 2. Criticidad (Bar)
-    new Chart(document.getElementById('criticidadChart'), {
-        type: 'bar',
-        data: {
-            labels: <?= json_encode(array_column($criticidadData, 'name')) ?>,
-            datasets: [{
-                data: <?= json_encode(array_column($criticidadData, 'value')) ?>,
-                backgroundColor: <?= json_encode(array_column($criticidadData, 'color')) ?>,
-                borderRadius: 8,
-                barThickness: 60
-            }]
-        },
-        options: {
-            ...commonOptions,
-            scales: {
-                x: {
-                    grid: {
-                        display: false
-                    },
-                    ticks: {
-                        color: '#64748b',
-                        font: {
-                            size: 11,
-                            weight: 'bold'
-                        }
-                    }
-                },
-                y: {
-                    display: false
-                }
-            }
-        }
-    });
+    // No existe canvas con id 'criticidadChart' en el HTML actual.
 
     // 3. OT por Tipo (Doughnut)
-    new Chart(document.getElementById('otTipoChart'), {
-        type: 'doughnut',
-        data: {
-            labels: <?= json_encode(array_column($otPorTipoData, 'name')) ?>,
-            datasets: [{
-                data: <?= json_encode(array_column($otPorTipoData, 'value')) ?>,
-                backgroundColor: ['#10b981', '#f59e0b', '#0ea5e9'],
-                borderWidth: 0,
-                hoverOffset: 4
-            }]
-        },
-        options: {
-            ...commonOptions,
-            cutout: '75%'
-        }
-    });
+    // No existe canvas con id 'otTipoChart' en el HTML actual.
 
     // 4. Técnicos (Bar)
     new Chart(document.getElementById('techChart'), {
