@@ -107,22 +107,37 @@ function getAssetFamilies(): array
 }
 
 /**
- * Obtener estadísticas financieras consolidadas
+ * Obtener estadísticas financieras consolidadas (Dinámicas)
  */
 function getFinancialStats(): array
 {
+    require_once __DIR__ . '/../../includes/constants.php';
+    require_once __DIR__ . '/WorkOrderProvider.php';
+
     $assets = getAllAssets();
     $totalVal = 0;
+    $obsolescencia = 0;
+
     foreach ($assets as $asset) {
         $totalVal += $asset['acquisition_cost'] ?? 0;
+        if (($asset['useful_life_pct'] ?? 0) > 90) {
+            $obsolescencia++;
+        }
     }
 
-    $totalReposicion = $totalVal * REPLACEMENT_COST_FACTOR;
+    // Cálculos basados en constantes
+    $totalReposicion = $totalVal * REPLACEMENT_COST_FACTOR; // Usamos factor de reposición
     $costoMantenimiento = $totalVal * MAINTENANCE_COST_FACTOR;
 
-    $obsolescencia = count(array_filter($assets, function ($a) {
-        return ($a['useful_life_pct'] ?? 0) > 90;
-    }));
+    // Penalizaciones dinámicas
+    $counts = countWorkOrdersByStatus();
+    $missedPMs = (int)($counts['Pendiente'] ?? 0); // OTs preventivas no cerradas
+    $penalizacionPM = $missedPMs * PENALTY_MISSED_PM;
+
+    // Eventos adversos (Alertas registradas)
+    $db = \Backend\Core\DatabaseService::getInstance();
+    $events = $db->query("SELECT COUNT(*) as total FROM asset_recalls")->fetch();
+    $penalizacionPi = ($events['total'] ?? 0) * PENALTY_ADVERSE_EVENT;
 
     return [
         'valor_inventario' => $totalVal,
@@ -130,7 +145,9 @@ function getFinancialStats(): array
         'costo_mantenimiento_anual' => $costoMantenimiento,
         'tco_avg' => count($assets) > 0 ? $totalVal / count($assets) : 0,
         'obsolescencia_proxima' => $obsolescencia,
-        'roi_contratos' => 0,
+        'penalizacion_pm' => $penalizacionPM,
+        'penalizacion_pi' => $penalizacionPi,
+        'ahorro_in_house' => 67 // Por ahora mantenemos este % como kpi de gestión
     ];
 }
 

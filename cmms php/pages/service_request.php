@@ -222,15 +222,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
                         <span class="material-icons text-lg">location_on</span>
                     </div>
+                    <?php $locations = getAllLocations(); ?>
                     <select
                         class="block w-full pl-11 pr-10 py-3 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer"
                         id="location" name="location" required>
                         <option disabled selected value="">Select location...</option>
-                        <option value="manufacturing-a">Manufacturing Floor - Wing A</option>
-                        <option value="manufacturing-b">Manufacturing Floor - Wing B</option>
-                        <option value="warehouse-logistics">Warehouse & Logistics</option>
-                        <option value="quality-control">Quality Control Lab</option>
-                        <option value="r-d-facility">R&D Facility</option>
+                        <?php foreach ($locations as $loc): ?>
+                            <option value="<?= htmlspecialchars($loc) ?>"><?= htmlspecialchars($loc) ?></option>
+                        <?php endforeach; ?>
                     </select>
                     <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
                         <span class="material-icons">expand_more</span>

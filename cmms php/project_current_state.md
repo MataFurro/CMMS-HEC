@@ -1,4 +1,4 @@
-# HEC CMMS Project Current State (2026)
+# HEC CMMS Project Current State (2026 - v4.3)
 
 ## Overview
 The current project is a custom-built CMMS (Computerized Maintenance Management System) for HEC, implemented in PHP with a MySQL/MariaDB backend. It has evolved from the 2020 SaaS proposal into a full-stack local application.

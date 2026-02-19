@@ -171,7 +171,7 @@ function createWorkOrderFromRequest(array $data): string
 /**
  * Finalizar una OT y enviar notificación si aplica (Feedback Loop)
  */
-function completeWorkOrder(string $otId): bool
+function completeWorkOrder(string $otId, array $executionData = []): bool
 {
     $repo = new WorkOrderRepository();
     $order = $repo->findById($otId);
@@ -180,10 +180,27 @@ function completeWorkOrder(string $otId): bool
         return false;
     }
 
-    $success = $repo->updateStatus($otId, 'Terminada');
+    // Preparar datos para actualización parcial de la OT
+    $updateData = [
+        'status' => 'Terminada',
+        'completed_date' => date('Y-m-d'),
+        'failure_code' => $executionData['failure_code'] ?? null,
+        'service_warranty_date' => $executionData['service_warranty_date'] ?? null,
+        'final_asset_status' => $executionData['final_asset_status'] ?? 'OPERATIVE',
+        'duration_hours' => $executionData['duration_hours'] ?? 0,
+        'observations' => $executionData['observations'] ?? ($order->observations ?? '')
+    ];
+
+    $success = $repo->partialUpdate($otId, $updateData);
 
     if ($success) {
-        \Backend\Core\LoggerService::info("Orden de Trabajo finalizada", ['id' => $otId]);
+        \Backend\Core\LoggerService::info("Orden de Trabajo finalizada con datos extendidos", ['id' => $otId]);
+
+        // Sincronización automática de estado del Activo si se proporcionó un estado final
+        if (!empty($executionData['final_asset_status'])) {
+            require_once __DIR__ . '/AssetProvider.php';
+            updateAssetInfo($order->assetId, ['status' => $executionData['final_asset_status']]);
+        }
 
         if ($order instanceof \Backend\Models\WorkOrderEntity && $order->msRequestId) {
             try {
@@ -200,4 +217,51 @@ function completeWorkOrder(string $otId): bool
     }
 
     return $success;
+}
+/**
+ * Calcular el impacto financiero del downtime por área técnica
+ */
+function getDowntimeImpact(): array
+{
+    require_once __DIR__ . '/../../includes/constants.php';
+    $repo = new WorkOrderRepository();
+    $db = \Backend\Core\DatabaseService::getInstance();
+
+    // Query para obtener suma de horas por ubicación de activos
+    $query = "
+        SELECT a.location, SUM(wo.duration_hours) as total_hours
+        FROM work_orders wo
+        JOIN assets a ON wo.asset_id = a.id
+        WHERE wo.status = 'Terminada' AND wo.type = 'Correctiva'
+        GROUP BY a.location
+    ";
+
+    $stmt = $db->query($query);
+    $results = $stmt->fetchAll();
+
+    $impacts = [];
+    $totalLoss = 0;
+
+    foreach ($results as $row) {
+        $location = $row['location'] ?? 'Default';
+        $hours = (float)$row['total_hours'];
+        $rate = AREA_COST_HOURS[$location] ?? AREA_COST_HOURS['Default'];
+
+        $loss = $hours * $rate;
+        $totalLoss += $loss;
+
+        $impacts[] = [
+            'area' => $location,
+            'hours' => $hours,
+            'loss' => $loss
+        ];
+    }
+
+    // Ordenar por pérdida de mayor a menor
+    usort($impacts, fn($a, $b) => $b['loss'] <=> $a['loss']);
+
+    return [
+        'total_loss' => $totalLoss,
+        'areas' => array_slice($impacts, 0, 5) // Top 5 áreas
+    ];
 }

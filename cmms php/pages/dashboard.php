@@ -307,7 +307,7 @@ $techComparisonData = array_map(function ($t) {
             <div class="flex items-center justify-between mb-8">
                 <div>
                     <h3 class="text-sm font-black text-white uppercase tracking-[0.2em] italic flex items-center gap-3">
-                        <span class="size-2 bg-医-blue rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]"></span>
+                        <span class="size-2 bg-medical-blue rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]"></span>
                         Carga de Trabajo del Equipo
                     </h3>
                     <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-1">Análisis de capacidad
@@ -326,7 +326,7 @@ $techComparisonData = array_map(function ($t) {
                     $techCapacity = $tech['capacity'] ?? 0;
                     $statusColor = $techCapacity > 90 ? 'text-red-500' : ($techCapacity > 70 ? 'text-amber-500' : 'text-emerald-400');
                     $progressBarColor = $techCapacity > 90 ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]' : ($techCapacity > 70 ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]');
-                    ?>
+                ?>
                     <div
                         class="relative hover:bg-white/5 p-5 rounded-2xl transition-all border border-white/5 hover:border-white/10 bg-white/[0.02]">
                         <div class="flex items-center justify-between mb-4">
@@ -466,7 +466,7 @@ $techComparisonData = array_map(function ($t) {
                     },
                     ticks: {
                         color: '#64748b',
-                        callback: function (value) {
+                        callback: function(value) {
                             return value + '%'
                         }
                     },
@@ -483,7 +483,7 @@ $techComparisonData = array_map(function ($t) {
             plugins: {
                 tooltip: {
                     callbacks: {
-                        label: function (context) {
+                        label: function(context) {
                             return 'Riesgo de Falla: ' + context.parsed.y + '%';
                         }
                     }

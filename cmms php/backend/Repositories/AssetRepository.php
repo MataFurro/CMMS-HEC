@@ -109,11 +109,12 @@ class AssetRepository
     }
 
     /**
-     * Obtener ubicaciones únicas
+     * Obtener ubicaciones únicas (Servicios Hospitalarios Oficiales)
      */
     public function getUniqueLocations(): array
     {
-        $stmt = $this->db->query("SELECT DISTINCT location FROM assets WHERE location IS NOT NULL ORDER BY location ASC");
+        // Ahora consultamos la tabla maestra de servicios en lugar de los strings en assets
+        $stmt = $this->db->query("SELECT name FROM hospital_services ORDER BY name ASC");
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 

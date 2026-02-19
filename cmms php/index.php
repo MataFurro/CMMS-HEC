@@ -98,6 +98,10 @@ if ($page === 'login' || $page === 'service_request') {
                         "medical-surface": "<?= COLOR_BG_DARK ?>",
                         "panel-dark": "<?= COLOR_PANEL_DARK ?>",
                         "border-dark": "<?= COLOR_SLATE_700 ?>",
+                        "primary": "<?= COLOR_MEDICAL_BLUE ?>",
+                        "success": "#10b981",
+                        "danger": "#ef4444",
+                        "excel-green": "#16a34a",
                     }
                 }
             }

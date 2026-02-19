@@ -46,11 +46,3 @@ define('DB_PASS', $_ENV['DB_PASS'] ?? 'BioPass2026');
 
 // Modo Demo - Activar para auditoría (Desconecta la DB)
 define('USE_MOCK_DATA', isset($_ENV['USE_MOCK_DATA']) ? ($_ENV['USE_MOCK_DATA'] === 'true') : false);
-
-define('SIDEBAR_MESSENGER', 'SMS OT');
-
-// ── Factores de Cálculo (Dynamicization) ──
-define('MAINTENANCE_COST_FACTOR', 0.08); // 8% anual
-define('REPLACEMENT_COST_FACTOR', 1.25); // 25% extra por IPC/Tecnología
-define('RESIDUAL_VALUE_FACTOR', 0.15);    // 15% al final de vida
-define('UPTIME_GOAL', 98.5);              // Meta institucional

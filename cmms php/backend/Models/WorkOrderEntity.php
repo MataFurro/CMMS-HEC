@@ -24,7 +24,11 @@ readonly class WorkOrderEntity
         public ?string $observations = null,
         public ?string $msRequestId = null,
         public ?string $msEmail = null,
-        public ?string $checklistTemplate = null
+        public ?string $checklistTemplate = null,
+        public ?float $durationHours = 0.0,
+        public ?string $failureCode = null,
+        public ?DateTime $serviceWarrantyDate = null,
+        public ?string $finalAssetStatus = null
     ) {}
 
     public static function fromArray(array $data): self
@@ -43,7 +47,11 @@ readonly class WorkOrderEntity
             observations: $data['observations'] ?? null,
             msRequestId: $data['ms_request_id'] ?? null,
             msEmail: $data['ms_email'] ?? null,
-            checklistTemplate: $data['checklist_template'] ?? null
+            checklistTemplate: $data['checklist_template'] ?? null,
+            durationHours: isset($data['duration_hours']) ? (float)$data['duration_hours'] : 0.0,
+            failureCode: $data['failure_code'] ?? null,
+            serviceWarrantyDate: isset($data['service_warranty_date']) ? new DateTime($data['service_warranty_date']) : null,
+            finalAssetStatus: $data['final_asset_status'] ?? null
         );
     }
 
@@ -67,6 +75,10 @@ readonly class WorkOrderEntity
             'ms_request_id' => $this->msRequestId,
             'ms_email' => $this->msEmail,
             'checklist_template' => $this->checklistTemplate,
+            'duration_hours' => $this->durationHours,
+            'failure_code' => $this->failureCode,
+            'service_warranty_date' => $this->serviceWarrantyDate?->format('Y-m-d'),
+            'final_asset_status' => $this->finalAssetStatus,
             'asset' => $this->assetName, // Legacy
             'tech' => $this->assignedTechName ?? 'Sin Asignar', // Real
             'date' => $this->createdDate?->format('Y-m-d') // Legacy compatibility

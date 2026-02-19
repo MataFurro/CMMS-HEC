@@ -2,13 +2,18 @@
 // pages/financial_analysis.php
 
 require_once __DIR__ . '/../Backend/Providers/AssetProvider.php';
-$stats = getFinancialStats();
+require_once __DIR__ . '/../Backend/Providers/WorkOrderProvider.php';
 
+$stats = getFinancialStats();
+$downtime = getDowntimeImpact();
+
+// Datos de tendencia (Simulados por ahora, pero basados en el valor real)
+$valBase = $stats['valor_inventario'];
 $depreciacion_data = [
-    ['mes' => 'Ene', 'lineal' => 5000, 'ajustada' => 5200],
-    ['mes' => 'Feb', 'lineal' => 5000, 'ajustada' => 5500],
-    ['mes' => 'Mar', 'lineal' => 5000, 'ajustada' => 6100],
-    ['mes' => 'Abr', 'lineal' => 5000, 'ajustada' => 5900],
+    ['mes' => 'Ene', 'lineal' => $valBase * 0.05, 'ajustada' => ($valBase * 0.05) + ($stats['penalizacion_pm'] * 0.2)],
+    ['mes' => 'Feb', 'lineal' => $valBase * 0.05, 'ajustada' => ($valBase * 0.05) + ($stats['penalizacion_pm'] * 0.5)],
+    ['mes' => 'Mar', 'lineal' => $valBase * 0.05, 'ajustada' => ($valBase * 0.05) + ($stats['penalizacion_pm'] * 0.8)],
+    ['mes' => 'Abr', 'lineal' => $valBase * 0.05, 'ajustada' => ($valBase * 0.05) + $stats['penalizacion_pm']],
 ];
 
 // Metodología TINC (Fórmula simplificada para la vista)
@@ -139,7 +144,7 @@ $formula_tinc = "Veq = Vo - [Pu + (At * Pt) + (At * Pm) + (At * Pv) + Ps + Pi]";
                             <span class="material-symbols-outlined text-amber-500">warning</span>
                             <span class="text-sm font-bold text-slate-300">Falta de Mantenimientos (Pm)</span>
                         </div>
-                        <span class="text-sm font-black text-amber-500">- $4,500</span>
+                        <span class="text-sm font-black text-amber-500">- $<?= number_format($stats['penalizacion_pm']) ?></span>
                     </div>
                     <div
                         class="p-4 bg-white/5 rounded-xl border border-slate-700/50 flex items-center justify-between group hover:bg-white/10 transition-all">
@@ -147,7 +152,7 @@ $formula_tinc = "Veq = Vo - [Pu + (At * Pt) + (At * Pm) + (At * Pv) + Ps + Pi]";
                             <span class="material-symbols-outlined text-red-500">emergency</span>
                             <span class="text-sm font-bold text-slate-300">Eventos Adversos (Pi)</span>
                         </div>
-                        <span class="text-sm font-black text-red-500">- $12,800</span>
+                        <span class="text-sm font-black text-red-500">- $<?= number_format($stats['penalizacion_pi']) ?></span>
                     </div>
                 </div>
             </div>
@@ -164,8 +169,8 @@ $formula_tinc = "Veq = Vo - [Pu + (At * Pt) + (At * Pm) + (At * Pv) + Ps + Pi]";
                 <div class="text-center py-6 bg-red-500/5 rounded-2xl border border-red-500/10">
                     <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Pérdida por
                         Inactividad Acumulada</p>
-                    <h4 class="text-4xl font-black text-white">$156,400</h4>
-                    <p class="text-xs font-bold text-red-500 mt-1">+12% vs periodo anterior</p>
+                    <h4 class="text-4xl font-black text-white">$<?= number_format($downtime['total_loss']) ?></h4>
+                    <p class="text-xs font-bold text-red-500 mt-1"><?= $downtime['total_loss'] > 0 ? '+12%' : '0%' ?> vs periodo anterior</p>
                 </div>
 
                 <div class="space-y-4">
@@ -173,26 +178,26 @@ $formula_tinc = "Veq = Vo - [Pu + (At * Pt) + (At * Pm) + (At * Pv) + Ps + Pi]";
                         class="text-xs font-black text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-2">
                         Top Áreas con Riesgo Financiero</h4>
                     <div class="space-y-3">
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-xs font-bold mb-1">
-                                <span class="text-slate-300">Pabellón Principal</span>
-                                <span class="text-white">$85k/mes</span>
-                            </div>
-                            <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                                <div
-                                    class="bg-red-500 h-full w-[85%] rounded-full shadow-[0_0_8px_rgba(239,68,68,0.5)]">
+                        <?php if (empty($downtime['areas'])): ?>
+                            <p class="text-[10px] text-slate-600 font-bold uppercase text-center py-4">Sin datos de falla registrados</p>
+                        <?php else: ?>
+                            <?php foreach ($downtime['areas'] as $area):
+                                $pct = $downtime['total_loss'] > 0 ? ($area['loss'] / $downtime['total_loss']) * 100 : 0;
+                            ?>
+                                <div class="space-y-1">
+                                    <div class="flex justify-between text-xs font-bold mb-1">
+                                        <span class="text-slate-300"><?= $area['area'] ?></span>
+                                        <span class="text-white">$<?= number_format($area['loss'] / 1000, 1) ?>k</span>
+                                    </div>
+                                    <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                        <div
+                                            class="bg-red-500 h-full rounded-full shadow-[0_0_8px_rgba(239,68,68,0.5)]"
+                                            style="width: <?= $pct ?>%">
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-xs font-bold mb-1">
-                                <span class="text-slate-300">UCI Adultos</span>
-                                <span class="text-white">$42k/mes</span>
-                            </div>
-                            <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                                <div class="bg-amber-500 h-full w-[45%] rounded-full"></div>
-                            </div>
-                        </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

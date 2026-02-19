@@ -23,8 +23,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
     }
 
-    // 2. Finalizar OT
-    if (completeWorkOrder($id)) {
+    // 2. Finalizar OT con datos enriquecidos
+    $executionData = [
+        'failure_code' => $_POST['failure_code'] ?? null,
+        'service_warranty_date' => !empty($_POST['service_warranty_date']) ? $_POST['service_warranty_date'] : null,
+        'final_asset_status' => $_POST['final_asset_status'] ?? 'OPERATIVE',
+        'duration_hours' => $_POST['duration_hours'] ?? 0,
+        'observations' => $_POST['final_observations'] ?? ''
+    ];
+
+    if (completeWorkOrder($id, $executionData)) {
         // Redirigir con JS para evitar error de headers
         echo "<script>window.location.href='?page=work_order_execution&id=$id&completed=1';</script>";
         exit;
@@ -411,16 +419,14 @@ $templateVersion = $template['version'] ?? 'V1';
                         class="p-6 bg-slate-900/50 border border-slate-700/50 rounded-2xl text-sm text-slate-300 leading-relaxed italic relative">
                         <span
                             class="material-symbols-outlined absolute -top-3 -left-3 text-medical-blue text-4xl opacity-20">format_quote</span>
-                        "Se realiza mantenimiento preventivo anual según cronograma institucional. Se verifican parámetros
-                        de seguridad eléctrica bajo norma IEC 62353 con resultados satisfactorios. Se procede a la
-                        recalibración de sensores de flujo y reemplazo de kits de mantenimiento semestral. El equipo se
-                        entrega en condiciones óptimas de operación a cargo de la jefatura de UCI."
+                        <?= htmlspecialchars($ot['observations'] ?? 'Sin observaciones registradas.') ?>
                     </div>
                 <?php else: ?>
                     <textarea
+                        name="final_observations"
                         class="w-full bg-slate-900 border border-slate-700/50 rounded-2xl p-6 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all min-h-[180px] text-slate-300 placeholder:text-slate-700 font-medium"
                         placeholder="Describa el trabajo realizado, hallazgos técnicos, repuestos reemplazados y observaciones finales..."
-                        <?= isReadOnly() ? 'readonly' : '' ?>></textarea>
+                        <?= isReadOnly() ? 'readonly' : '' ?>><?= htmlspecialchars($ot['observations'] ?? '') ?></textarea>
                 <?php endif; ?>
             </div>
         </div>
@@ -469,7 +475,15 @@ $templateVersion = $template['version'] ?? 'V1';
                     </div>
                     <div class="flex flex-col gap-1 p-3 bg-white/5 rounded-xl border border-slate-700/30 group focus-within:border-medical-blue/30 transition-all">
                         <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest group-focus-within:text-medical-blue">Servicio / Ubicación</label>
-                        <input type="text" name="location" value="<?= htmlspecialchars($orderData['location'] ?? '') ?>" placeholder="Ej: UCI Adultos, Piso 3..." class="bg-transparent text-xs font-bold text-white outline-none placeholder:text-slate-600" <?= isReadOnly() ? 'readonly' : '' ?>>
+                        <?php $locations = getAllLocations(); ?>
+                        <select name="location" class="bg-transparent text-xs font-bold text-white outline-none appearance-none cursor-pointer" <?= isReadOnly() ? 'disabled' : '' ?>>
+                            <option value="" disabled>Seleccione ubicación...</option>
+                            <?php foreach ($locations as $loc): ?>
+                                <option value="<?= htmlspecialchars($loc) ?>" <?= ($ot['location'] ?? '') === $loc ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($loc) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -494,32 +508,71 @@ $templateVersion = $template['version'] ?? 'V1';
                         </div>
                     </div>
 
-                    <!-- Equipo Operativo -->
+                    <!-- Codificación de Falla (Solo Correctivas) -->
+                    <?php if (($ot['type'] ?? '') === 'Correctiva'): ?>
+                        <div class="p-5 bg-white/5 rounded-2xl border border-slate-700/50">
+                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Código de Falla (RCA)</p>
+                            <?php if ($isCompleted): ?>
+                                <div class="text-sm font-bold text-medical-blue"><?= htmlspecialchars($ot['failure_code'] ?? 'Sin especificar') ?></div>
+                            <?php else: ?>
+                                <select name="failure_code" class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-2 text-xs font-bold text-white outline-none focus:border-medical-blue transition-all" required>
+                                    <option value="" disabled selected>Seleccione causa raíz...</option>
+                                    <option value="Error de Usuario">Error de Usuario / Operación</option>
+                                    <option value="Falla Electrónica">Falla Electrónica / Hardware</option>
+                                    <option value="Desgaste Natural">Desgaste Natural (Vida Útil)</option>
+                                    <option value="Falla de Software">Falla de Software / Red</option>
+                                    <option value="Factores Externos">Factores Externos (Energía/Gases)</option>
+                                    <option value="Otro">Otro (Especificar en obs.)</option>
+                                </select>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- Estado Final del Activo -->
                     <div class="p-5 bg-white/5 rounded-2xl border border-slate-700/50">
-                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">¿Equipo
-                            Operativo al Cierre?</p>
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Estado Final del Activo</p>
                         <?php if ($isCompleted): ?>
-                            <div class="flex items-center gap-2 text-emerald-500">
-                                <span class="material-symbols-outlined">check_circle</span>
-                                <span class="text-sm font-bold">SÍ — Operativo</span>
+                            <div class="flex items-center gap-2 <?= ($ot['final_asset_status'] ?? '') === 'OPERATIVE' ? 'text-emerald-500' : 'text-red-500' ?>">
+                                <span class="material-symbols-outlined"><?= ($ot['final_asset_status'] ?? '') === 'OPERATIVE' ? 'check_circle' : 'cancel' ?></span>
+                                <span class="text-sm font-bold"><?= ($ot['final_asset_status'] ?? '') === 'OPERATIVE' ? 'Operativo' : 'Fuera de Servicio' ?></span>
                             </div>
                         <?php else: ?>
                             <div class="flex gap-3">
                                 <label class="flex-1 cursor-pointer">
-                                    <input type="radio" name="equipo_operativo" value="si" class="hidden peer">
-                                    <div
-                                        class="p-3 text-center rounded-xl border border-slate-700/50 text-slate-600 text-xs font-black uppercase tracking-widest peer-checked:bg-emerald-500/10 peer-checked:text-emerald-500 peer-checked:border-emerald-500/30 transition-all hover:border-emerald-500/30">
-                                        SÍ</div>
+                                    <input type="radio" name="final_asset_status" value="OPERATIVE" class="hidden peer" required>
+                                    <div class="p-3 text-center rounded-xl border border-slate-700/50 text-slate-600 text-[10px] font-black uppercase tracking-widest peer-checked:bg-emerald-500/10 peer-checked:text-emerald-500 peer-checked:border-emerald-500/30 transition-all hover:border-emerald-500/30">OPERATIVO</div>
                                 </label>
                                 <label class="flex-1 cursor-pointer">
-                                    <input type="radio" name="equipo_operativo" value="no" class="hidden peer">
-                                    <div
-                                        class="p-3 text-center rounded-xl border border-slate-700/50 text-slate-600 text-xs font-black uppercase tracking-widest peer-checked:bg-red-500/10 peer-checked:text-red-500 peer-checked:border-red-500/30 transition-all hover:border-red-500/30">
-                                        NO</div>
+                                    <input type="radio" name="final_asset_status" value="NO_OPERATIVE" class="hidden peer">
+                                    <div class="p-3 text-center rounded-xl border border-slate-700/50 text-slate-600 text-[10px] font-black uppercase tracking-widest peer-checked:bg-red-500/10 peer-checked:text-red-500 peer-checked:border-red-500/30 transition-all hover:border-red-500/30">Baja / F.S</div>
                                 </label>
                             </div>
                         <?php endif; ?>
                     </div>
+
+                    <!-- Garantía del Servicio -->
+                    <div class="p-5 bg-white/5 rounded-2xl border border-slate-700/50">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Garantía del Servicio</p>
+                        <?php if ($isCompleted): ?>
+                            <div class="text-xs font-bold text-slate-300">
+                                <?= $ot['service_warranty_date'] ? 'Vence: ' . $ot['service_warranty_date'] : 'Sin garantía' ?>
+                            </div>
+                        <?php else: ?>
+                            <input type="date" name="service_warranty_date" class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-2 text-xs font-bold text-white outline-none focus:border-medical-blue transition-all">
+                            <p class="text-[9px] text-slate-600 mt-2 font-bold uppercase tracking-wider">Dejar vacío si no aplica</p>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Duración del Trabajo -->
+                    <?php if (!$isCompleted): ?>
+                        <div class="p-5 bg-white/5 rounded-2xl border border-slate-700/50">
+                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Tiempo Invertido</p>
+                            <div class="flex items-center gap-3">
+                                <input type="number" step="0.5" name="duration_hours" placeholder="Horas" class="w-24 bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-2 text-sm font-bold text-white outline-none focus:border-medical-blue transition-all" required>
+                                <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Horas Hombre</span>
+                            </div>
+                        </div>
+                    <?php endif; ?>
 
                     <?php if ($isCompleted): ?>
                         <div class="space-y-4">
