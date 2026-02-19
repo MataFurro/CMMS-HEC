@@ -8,20 +8,59 @@ $id = $_GET['id'] ?? 'OT-2024-UNKNOWN';
 
 // Handle Completion Action
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'complete_ot') {
-    if (completeWorkOrder($id)) {
-        // Redirigir para refrescar estado
-        header("Location: ?page=work_order_execution&id=$id&completed=1");
+    // 1. Actualizar Datos del Activo si se proporcionan
+    if (isset($_POST['asset_id'])) {
+        require_once __DIR__ . '/../Backend/Providers/AssetProvider.php';
+        $assetUpdateData = [];
+        if (!empty($_POST['brand'])) $assetUpdateData['brand'] = $_POST['brand'];
+        if (!empty($_POST['model'])) $assetUpdateData['model'] = $_POST['model'];
+        if (!empty($_POST['serial_number'])) $assetUpdateData['serial_number'] = $_POST['serial_number'];
+        if (!empty($_POST['location'])) $assetUpdateData['location'] = $_POST['location'];
+        if (!empty($_POST['asset_name'])) $assetUpdateData['name'] = $_POST['asset_name'];
+
+        if (!empty($assetUpdateData)) {
+            updateAssetInfo($_POST['asset_id'], $assetUpdateData);
+        }
+    }
+
+    // 2. Finalizar OT con datos enriquecidos
+    $executionData = [
+        'failure_code' => $_POST['failure_code'] ?? null,
+        'service_warranty_date' => !empty($_POST['service_warranty_date']) ? $_POST['service_warranty_date'] : null,
+        'final_asset_status' => $_POST['final_asset_status'] ?? 'OPERATIVE',
+        'duration_hours' => $_POST['duration_hours'] ?? 0,
+        'observations' => $_POST['final_observations'] ?? ''
+    ];
+
+    if (completeWorkOrder($id, $executionData)) {
+        // Redirigir con JS para evitar error de headers
+        echo "<script>window.location.href='?page=work_order_execution&id=$id&completed=1';</script>";
         exit;
     }
 }
 
-$orderData = getWorkOrderById($id);
+// 1. Cargar datos de la OT
+$ot = getWorkOrderById($id);
+if (!$ot) {
+    echo "<div class='p-8 text-center text-red-500 font-bold'>Orden no encontrada</div>";
+    return;
+}
 
-$isCompleted = ($orderData['status'] ?? '') === 'COMPLETED';
+$isCompleted = ($ot['status'] ?? '') === 'Terminada';
 
-// Mock: Determinar qué plantilla usar (en prod vendría de la DB vinculada a la OT)
-$templateKey = $_GET['tpl'] ?? 'monitor_signos_vitales';
+// 2. Determinar qué plantilla usar
+// Prioridad: 1. Plantilla guardada en DB | 2. Parámetro tpl en URL | 3. Default
+$templateKey = $ot['checklist_template'] ?? ($_GET['tpl'] ?? 'formato_general');
 $template = getChecklistTemplate($templateKey);
+
+if (!$template) {
+    // Si la plantilla fallida no existe, usar formato_general por seguridad
+    $template = getChecklistTemplate('formato_general');
+}
+
+// asset details from OT
+require_once __DIR__ . '/../Backend/Providers/AssetProvider.php';
+$asset = getAssetById($ot['asset_id']);
 
 $attachments = [
     ['name' => 'Protocolo_Seguridad_Electrica_IEC62353.pdf', 'type' => 'pdf', 'size' => '1.2 MB', 'date' => '11/02/2026'],
@@ -91,7 +130,10 @@ $templateVersion = $template['version'] ?? 'V1';
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+    <form method="POST" id="executionForm" class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <!-- Hidden Asset ID for updates -->
+        <input type="hidden" name="asset_id" value="<?= $orderData['asset_id'] ?? '' ?>">
+
         <div class="lg:col-span-8 space-y-8">
 
             <!-- ═══════════════════════════════════════════════════════ -->
@@ -134,7 +176,7 @@ $templateVersion = $template['version'] ?? 'V1';
                             <?php if (!$isCompleted && canExecuteWorkOrder()): ?>
                                 <div class="flex items-center gap-2">
                                     <label class="flex items-center gap-1 cursor-pointer">
-                                        <input type="radio" name="q_<?= $idx ?>" value="pass" class="hidden peer">
+                                        <input type="radio" name="q_<?= $idx ?>" value="pass" class="hidden peer" required>
                                         <span
                                             class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border border-slate-700/50 text-slate-600 peer-checked:bg-emerald-500/10 peer-checked:text-emerald-500 peer-checked:border-emerald-500/30 transition-all hover:border-emerald-500/30 cursor-pointer">Aprueba</span>
                                     </label>
@@ -182,55 +224,65 @@ $templateVersion = $template['version'] ?? 'V1';
 
                     <div class="space-y-6">
                         <?php foreach ($quantitativeGroups as $gIdx => $group): ?>
-                            <div class="p-5 bg-white/[0.02] border border-slate-700/50 rounded-2xl space-y-4">
+                            <div class="p-5 bg-white/[0.02] border border-slate-700/50 rounded-2xl space-y-4" x-data="{ groupNA: false }">
                                 <div class="flex items-center justify-between">
-                                    <h4 class="text-sm font-black text-white uppercase tracking-wider"><?= $group['group'] ?>
-                                    </h4>
+                                    <div class="flex items-center gap-3">
+                                        <h4 class="text-sm font-black text-white uppercase tracking-wider" :class="groupNA ? 'opacity-30' : ''"><?= $group['group'] ?></h4>
+                                        <?php if (!$isCompleted): ?>
+                                            <label class="flex items-center gap-2 cursor-pointer bg-slate-800 px-2 py-1 rounded-lg border border-slate-700">
+                                                <input type="checkbox" x-model="groupNA" name="group_na_<?= $gIdx ?>" class="rounded bg-slate-900 border-slate-700 text-medical-blue focus:ring-medical-blue/20">
+                                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">No Aplica</span>
+                                            </label>
+                                        <?php endif; ?>
+                                    </div>
                                     <span
-                                        class="px-3 py-1 bg-amber-500/10 text-amber-500 border border-amber-500/20 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                                        class="px-3 py-1 bg-amber-500/10 text-amber-500 border border-amber-500/20 rounded-lg text-[9px] font-black uppercase tracking-widest" :class="groupNA ? 'opacity-30' : ''">
                                         Tolerancia: <?= $group['tolerance_label'] ?>
                                     </span>
                                 </div>
 
-                                <!-- Table Header -->
-                                <div
-                                    class="grid grid-cols-3 gap-3 text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">
-                                    <span>Valor Simulado</span>
-                                    <span>Valor Medido</span>
-                                    <span class="text-center">Estado</span>
-                                </div>
+                                <div x-show="!groupNA" x-transition>
 
-                                <!-- Table Rows -->
-                                <?php foreach ($group['points'] as $pIdx => $point): ?>
-                                    <div class="grid grid-cols-3 gap-3 items-center">
-                                        <div
-                                            class="flex items-center gap-2 px-4 py-3 bg-slate-900 border border-slate-700/50 rounded-xl">
-                                            <span class="text-sm font-bold text-medical-blue"><?= $point['simulated'] ?></span>
-                                            <span class="text-[10px] text-slate-500 font-bold"><?= $group['unit'] ?></span>
-                                        </div>
-                                        <?php if ($isCompleted): ?>
+                                    <!-- Table Header -->
+                                    <div
+                                        class="grid grid-cols-3 gap-3 text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">
+                                        <span>Valor Simulado</span>
+                                        <span>Valor Medido</span>
+                                        <span class="text-center">Estado</span>
+                                    </div>
+
+                                    <!-- Table Rows -->
+                                    <?php foreach ($group['points'] as $pIdx => $point): ?>
+                                        <div class="grid grid-cols-3 gap-3 items-center">
                                             <div
-                                                class="flex items-center gap-2 px-4 py-3 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
-                                                <span
-                                                    class="text-sm font-bold text-emerald-400"><?= is_numeric($point['simulated']) ? $point['simulated'] + rand(-1, 1) : $point['simulated'] ?></span>
+                                                class="flex items-center gap-2 px-4 py-3 bg-slate-900 border border-slate-700/50 rounded-xl">
+                                                <span class="text-sm font-bold text-medical-blue"><?= $point['simulated'] ?></span>
                                                 <span class="text-[10px] text-slate-500 font-bold"><?= $group['unit'] ?></span>
                                             </div>
-                                        <?php else: ?>
-                                            <input type="text" name="m_<?= $gIdx ?>_<?= $pIdx ?>" placeholder="—"
-                                                class="px-4 py-3 bg-slate-900 border border-slate-700/50 rounded-xl text-sm text-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all font-bold"
-                                                <?= isReadOnly() ? 'readonly' : '' ?>>
-                                        <?php endif; ?>
-                                        <div class="flex justify-center">
                                             <?php if ($isCompleted): ?>
-                                                <span
-                                                    class="px-3 py-1.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-lg text-[9px] font-black uppercase tracking-widest">Pasa</span>
+                                                <div
+                                                    class="flex items-center gap-2 px-4 py-3 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
+                                                    <span
+                                                        class="text-sm font-bold text-emerald-400"><?= is_numeric($point['simulated']) ? $point['simulated'] + rand(-1, 1) : $point['simulated'] ?></span>
+                                                    <span class="text-[10px] text-slate-500 font-bold"><?= $group['unit'] ?></span>
+                                                </div>
                                             <?php else: ?>
-                                                <span
-                                                    class="px-3 py-1.5 bg-slate-500/10 text-slate-600 border border-slate-700/50 rounded-lg text-[9px] font-black uppercase tracking-widest">Pendiente</span>
+                                                <input type="text" name="m_<?= $gIdx ?>_<?= $pIdx ?>" placeholder="—"
+                                                    class="px-4 py-3 bg-slate-900 border border-slate-700/50 rounded-xl text-sm text-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all font-bold"
+                                                    <?= isReadOnly() ? 'readonly' : '' ?>>
                                             <?php endif; ?>
+                                            <div class="flex justify-center">
+                                                <?php if ($isCompleted): ?>
+                                                    <span
+                                                        class="px-3 py-1.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-lg text-[9px] font-black uppercase tracking-widest">Pasa</span>
+                                                <?php else: ?>
+                                                    <span
+                                                        class="px-3 py-1.5 bg-slate-500/10 text-slate-600 border border-slate-700/50 rounded-lg text-[9px] font-black uppercase tracking-widest">Pendiente</span>
+                                                <?php endif; ?>
+                                            </div>
                                         </div>
-                                    </div>
-                                <?php endforeach; ?>
+                                    <?php endforeach; ?>
+                                </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -367,16 +419,14 @@ $templateVersion = $template['version'] ?? 'V1';
                         class="p-6 bg-slate-900/50 border border-slate-700/50 rounded-2xl text-sm text-slate-300 leading-relaxed italic relative">
                         <span
                             class="material-symbols-outlined absolute -top-3 -left-3 text-medical-blue text-4xl opacity-20">format_quote</span>
-                        "Se realiza mantenimiento preventivo anual según cronograma institucional. Se verifican parámetros
-                        de seguridad eléctrica bajo norma IEC 62353 con resultados satisfactorios. Se procede a la
-                        recalibración de sensores de flujo y reemplazo de kits de mantenimiento semestral. El equipo se
-                        entrega en condiciones óptimas de operación a cargo de la jefatura de UCI."
+                        <?= htmlspecialchars($ot['observations'] ?? 'Sin observaciones registradas.') ?>
                     </div>
                 <?php else: ?>
                     <textarea
+                        name="final_observations"
                         class="w-full bg-slate-900 border border-slate-700/50 rounded-2xl p-6 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all min-h-[180px] text-slate-300 placeholder:text-slate-700 font-medium"
                         placeholder="Describa el trabajo realizado, hallazgos técnicos, repuestos reemplazados y observaciones finales..."
-                        <?= isReadOnly() ? 'readonly' : '' ?>></textarea>
+                        <?= isReadOnly() ? 'readonly' : '' ?>><?= htmlspecialchars($ot['observations'] ?? '') ?></textarea>
                 <?php endif; ?>
             </div>
         </div>
@@ -407,25 +457,33 @@ $templateVersion = $template['version'] ?? 'V1';
             <div class="bg-medical-surface p-6 rounded-3xl border border-slate-700/50 shadow-xl">
                 <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">Datos del Activo</h4>
                 <div class="space-y-4">
-                    <div class="flex justify-between items-center p-3 bg-white/5 rounded-xl">
-                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Nombre</span>
-                        <span class="text-xs font-bold text-white"><?= $templateLabel ?></span>
+                    <div class="flex flex-col gap-1 p-3 bg-white/5 rounded-xl border border-slate-700/30">
+                        <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest group-focus-within:text-medical-blue">Nombre del Equipo</label>
+                        <input type="text" name="asset_name" value="<?= htmlspecialchars($ot['asset_name'] ?? $templateLabel) ?>" placeholder="Nombre del equipo..." class="bg-transparent text-xs font-bold text-white outline-none placeholder:text-slate-600" <?= isReadOnly() ? 'readonly' : '' ?>>
                     </div>
-                    <div class="flex justify-between items-center p-3 bg-white/5 rounded-xl">
-                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Marca</span>
-                        <span class="text-xs font-bold text-slate-300">—</span>
+                    <div class="flex flex-col gap-1 p-3 bg-white/5 rounded-xl border border-slate-700/30 group focus-within:border-medical-blue/30 transition-all">
+                        <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest group-focus-within:text-medical-blue">Marca</label>
+                        <input type="text" name="brand" value="<?= htmlspecialchars($orderData['brand'] ?? '') ?>" placeholder="Completar marca..." class="bg-transparent text-xs font-bold text-white outline-none placeholder:text-slate-600" <?= isReadOnly() ? 'readonly' : '' ?>>
                     </div>
-                    <div class="flex justify-between items-center p-3 bg-white/5 rounded-xl">
-                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Modelo</span>
-                        <span class="text-xs font-bold text-slate-300">—</span>
+                    <div class="flex flex-col gap-1 p-3 bg-white/5 rounded-xl border border-slate-700/30 group focus-within:border-medical-blue/30 transition-all">
+                        <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest group-focus-within:text-medical-blue">Modelo</label>
+                        <input type="text" name="model" value="<?= htmlspecialchars($orderData['model'] ?? '') ?>" placeholder="Completar modelo..." class="bg-transparent text-xs font-bold text-white outline-none placeholder:text-slate-600" <?= isReadOnly() ? 'readonly' : '' ?>>
                     </div>
-                    <div class="flex justify-between items-center p-3 bg-white/5 rounded-xl">
-                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Serie</span>
-                        <span class="text-xs font-bold text-slate-300">—</span>
+                    <div class="flex flex-col gap-1 p-3 bg-white/5 rounded-xl border border-slate-700/30 group focus-within:border-medical-blue/30 transition-all">
+                        <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest group-focus-within:text-medical-blue">Serie / Placa</label>
+                        <input type="text" name="serial_number" value="<?= htmlspecialchars($orderData['serial_number'] ?? '') ?>" placeholder="S/N o Inventario..." class="bg-transparent text-xs font-bold text-white outline-none placeholder:text-slate-600" <?= isReadOnly() ? 'readonly' : '' ?>>
                     </div>
-                    <div class="flex justify-between items-center p-3 bg-white/5 rounded-xl">
-                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Servicio</span>
-                        <span class="text-xs font-bold text-slate-300">—</span>
+                    <div class="flex flex-col gap-1 p-3 bg-white/5 rounded-xl border border-slate-700/30 group focus-within:border-medical-blue/30 transition-all">
+                        <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest group-focus-within:text-medical-blue">Servicio / Ubicación</label>
+                        <?php $locations = getAllLocations(); ?>
+                        <select name="location" class="bg-transparent text-xs font-bold text-white outline-none appearance-none cursor-pointer" <?= isReadOnly() ? 'disabled' : '' ?>>
+                            <option value="" disabled>Seleccione ubicación...</option>
+                            <?php foreach ($locations as $loc): ?>
+                                <option value="<?= htmlspecialchars($loc) ?>" <?= ($ot['location'] ?? '') === $loc ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($loc) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -450,32 +508,71 @@ $templateVersion = $template['version'] ?? 'V1';
                         </div>
                     </div>
 
-                    <!-- Equipo Operativo -->
+                    <!-- Codificación de Falla (Solo Correctivas) -->
+                    <?php if (($ot['type'] ?? '') === 'Correctiva'): ?>
+                        <div class="p-5 bg-white/5 rounded-2xl border border-slate-700/50">
+                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Código de Falla (RCA)</p>
+                            <?php if ($isCompleted): ?>
+                                <div class="text-sm font-bold text-medical-blue"><?= htmlspecialchars($ot['failure_code'] ?? 'Sin especificar') ?></div>
+                            <?php else: ?>
+                                <select name="failure_code" class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-2 text-xs font-bold text-white outline-none focus:border-medical-blue transition-all" required>
+                                    <option value="" disabled selected>Seleccione causa raíz...</option>
+                                    <option value="Error de Usuario">Error de Usuario / Operación</option>
+                                    <option value="Falla Electrónica">Falla Electrónica / Hardware</option>
+                                    <option value="Desgaste Natural">Desgaste Natural (Vida Útil)</option>
+                                    <option value="Falla de Software">Falla de Software / Red</option>
+                                    <option value="Factores Externos">Factores Externos (Energía/Gases)</option>
+                                    <option value="Otro">Otro (Especificar en obs.)</option>
+                                </select>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- Estado Final del Activo -->
                     <div class="p-5 bg-white/5 rounded-2xl border border-slate-700/50">
-                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">¿Equipo
-                            Operativo al Cierre?</p>
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Estado Final del Activo</p>
                         <?php if ($isCompleted): ?>
-                            <div class="flex items-center gap-2 text-emerald-500">
-                                <span class="material-symbols-outlined">check_circle</span>
-                                <span class="text-sm font-bold">SÍ — Operativo</span>
+                            <div class="flex items-center gap-2 <?= ($ot['final_asset_status'] ?? '') === 'OPERATIVE' ? 'text-emerald-500' : 'text-red-500' ?>">
+                                <span class="material-symbols-outlined"><?= ($ot['final_asset_status'] ?? '') === 'OPERATIVE' ? 'check_circle' : 'cancel' ?></span>
+                                <span class="text-sm font-bold"><?= ($ot['final_asset_status'] ?? '') === 'OPERATIVE' ? 'Operativo' : 'Fuera de Servicio' ?></span>
                             </div>
                         <?php else: ?>
                             <div class="flex gap-3">
                                 <label class="flex-1 cursor-pointer">
-                                    <input type="radio" name="equipo_operativo" value="si" class="hidden peer">
-                                    <div
-                                        class="p-3 text-center rounded-xl border border-slate-700/50 text-slate-600 text-xs font-black uppercase tracking-widest peer-checked:bg-emerald-500/10 peer-checked:text-emerald-500 peer-checked:border-emerald-500/30 transition-all hover:border-emerald-500/30">
-                                        SÍ</div>
+                                    <input type="radio" name="final_asset_status" value="OPERATIVE" class="hidden peer" required>
+                                    <div class="p-3 text-center rounded-xl border border-slate-700/50 text-slate-600 text-[10px] font-black uppercase tracking-widest peer-checked:bg-emerald-500/10 peer-checked:text-emerald-500 peer-checked:border-emerald-500/30 transition-all hover:border-emerald-500/30">OPERATIVO</div>
                                 </label>
                                 <label class="flex-1 cursor-pointer">
-                                    <input type="radio" name="equipo_operativo" value="no" class="hidden peer">
-                                    <div
-                                        class="p-3 text-center rounded-xl border border-slate-700/50 text-slate-600 text-xs font-black uppercase tracking-widest peer-checked:bg-red-500/10 peer-checked:text-red-500 peer-checked:border-red-500/30 transition-all hover:border-red-500/30">
-                                        NO</div>
+                                    <input type="radio" name="final_asset_status" value="NO_OPERATIVE" class="hidden peer">
+                                    <div class="p-3 text-center rounded-xl border border-slate-700/50 text-slate-600 text-[10px] font-black uppercase tracking-widest peer-checked:bg-red-500/10 peer-checked:text-red-500 peer-checked:border-red-500/30 transition-all hover:border-red-500/30">Baja / F.S</div>
                                 </label>
                             </div>
                         <?php endif; ?>
                     </div>
+
+                    <!-- Garantía del Servicio -->
+                    <div class="p-5 bg-white/5 rounded-2xl border border-slate-700/50">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Garantía del Servicio</p>
+                        <?php if ($isCompleted): ?>
+                            <div class="text-xs font-bold text-slate-300">
+                                <?= $ot['service_warranty_date'] ? 'Vence: ' . $ot['service_warranty_date'] : 'Sin garantía' ?>
+                            </div>
+                        <?php else: ?>
+                            <input type="date" name="service_warranty_date" class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-2 text-xs font-bold text-white outline-none focus:border-medical-blue transition-all">
+                            <p class="text-[9px] text-slate-600 mt-2 font-bold uppercase tracking-wider">Dejar vacío si no aplica</p>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Duración del Trabajo -->
+                    <?php if (!$isCompleted): ?>
+                        <div class="p-5 bg-white/5 rounded-2xl border border-slate-700/50">
+                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Tiempo Invertido</p>
+                            <div class="flex items-center gap-3">
+                                <input type="number" step="0.5" name="duration_hours" placeholder="Horas" class="w-24 bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-2 text-sm font-bold text-white outline-none focus:border-medical-blue transition-all" required>
+                                <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Horas Hombre</span>
+                            </div>
+                        </div>
+                    <?php endif; ?>
 
                     <?php if ($isCompleted): ?>
                         <div class="space-y-4">
@@ -494,14 +591,12 @@ $templateVersion = $template['version'] ?? 'V1';
                     <?php else: ?>
                         <div class="space-y-4">
                             <?php if (canCompleteWorkOrder()): ?>
-                                <form method="POST">
-                                    <input type="hidden" name="action" value="complete_ot">
-                                    <button type="submit"
-                                        class="w-full py-4 bg-emerald-500 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 hover:bg-emerald-500/90 transition-all flex items-center justify-center gap-3 text-xs">
-                                        <span class="material-symbols-outlined text-xl">verified</span>
-                                        <span>Finalizar e Informar</span>
-                                    </button>
-                                </form>
+                                <input type="hidden" name="action" value="complete_ot">
+                                <button type="submit"
+                                    class="w-full py-4 bg-emerald-500 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 hover:bg-emerald-500/90 transition-all flex items-center justify-center gap-3 text-xs">
+                                    <span class="material-symbols-outlined text-xl">verified</span>
+                                    <span>Finalizar e Informar</span>
+                                </button>
                             <?php endif; ?>
                             <?php if (canExecuteWorkOrder()): ?>
                                 <button
@@ -516,79 +611,80 @@ $templateVersion = $template['version'] ?? 'V1';
                 </div>
             </div>
         </aside>
-    </div>
+    </form>
+</div>
 
-    <!-- Modal de Firma Electrónica (Compliance 21 CFR Part 11) -->
-    <template x-if="showSignatureModal">
-        <div
-            class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-medical-dark/95 backdrop-blur-sm animate-in fade-in duration-300">
-            <div @click.away="showSignatureModal = false"
-                class="max-w-md w-full bg-medical-surface border border-slate-700/50 rounded-3xl p-8 shadow-2xl space-y-8">
-                <div class="text-center">
-                    <div
-                        class="size-16 rounded-2xl bg-medical-blue/10 text-medical-blue border border-medical-blue/20 flex items-center justify-center mx-auto mb-6">
-                        <span class="material-symbols-outlined text-3xl">draw</span>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">Firma de Conformidad</h2>
-                    <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-2">Cierre de Orden y
-                        Certificación Técnica</p>
+<!-- Modal de Firma Electrónica (Compliance 21 CFR Part 11) -->
+<template x-if="showSignatureModal">
+    <div
+        class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-medical-dark/95 backdrop-blur-sm animate-in fade-in duration-300">
+        <div @click.away="showSignatureModal = false"
+            class="max-w-md w-full bg-medical-surface border border-slate-700/50 rounded-3xl p-8 shadow-2xl space-y-8">
+            <div class="text-center">
+                <div
+                    class="size-16 rounded-2xl bg-medical-blue/10 text-medical-blue border border-medical-blue/20 flex items-center justify-center mx-auto mb-6">
+                    <span class="material-symbols-outlined text-3xl">draw</span>
                 </div>
-
-                <div class="space-y-4">
-                    <div class="p-4 bg-white/5 rounded-2xl border border-slate-700/50">
-                        <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Declaración de
-                            Responsabilidad</p>
-                        <p class="text-[11px] text-slate-400 italic leading-relaxed">
-                            "Certifico que el equipo ha sido intervenido siguiendo los protocolos del fabricante y
-                            cumple con los estándares de seguridad vigentes."
-                        </p>
-                    </div>
-
-                    <!-- Firmas: Técnico Ejecutante, Técnico HEC, Jefe de Servicio -->
-                    <div class="space-y-3">
-                        <div
-                            class="p-3 bg-white/5 rounded-xl border border-slate-700/50 flex items-center justify-between">
-                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Técnico
-                                Ejecutante</span>
-                            <span class="text-xs font-bold text-medical-blue">Ana Muñoz</span>
-                        </div>
-                        <div
-                            class="p-3 bg-white/5 rounded-xl border border-slate-700/50 flex items-center justify-between">
-                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Técnico
-                                HEC</span>
-                            <span class="text-xs text-slate-600">Pendiente</span>
-                        </div>
-                        <div
-                            class="p-3 bg-white/5 rounded-xl border border-slate-700/50 flex items-center justify-between">
-                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Jefe de
-                                Servicio</span>
-                            <span class="text-xs text-slate-600">Pendiente</span>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Confirmar
-                            Identidad (PIN/ID)</label>
-                        <input type="password" placeholder="••••"
-                            class="w-full h-14 bg-slate-900 border border-slate-700/50 rounded-2xl px-6 text-xl tracking-[1em] text-center focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all">
-                    </div>
-                </div>
-
-                <div class="flex gap-4 pt-4">
-                    <button @click="showSignatureModal = false"
-                        class="flex-1 py-4 border border-slate-700/50 text-slate-500 font-black uppercase tracking-widest rounded-2xl hover:bg-white/5 transition-all text-xs">Cancelar</button>
-                    <button onclick="window.location.href='?page=work_orders'"
-                        class="flex-1 py-4 bg-medical-blue text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-medical-blue/20 hover:bg-medical-blue/90 transition-all text-xs">Sellar
-                        OT</button>
-                </div>
-
-                <p class="text-[9px] text-slate-600 text-center font-bold uppercase leading-relaxed">
-                    Esta acción genera un registro inalterable en la pista de auditoría (Log #<?= uniqid() ?>) bajo la
-                    normativa FDA 21 CFR Part 11.
-                </p>
+                <h2 class="text-2xl font-bold text-white tracking-tight">Firma de Conformidad</h2>
+                <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-2">Cierre de Orden y
+                    Certificación Técnica</p>
             </div>
+
+            <div class="space-y-4">
+                <div class="p-4 bg-white/5 rounded-2xl border border-slate-700/50">
+                    <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Declaración de
+                        Responsabilidad</p>
+                    <p class="text-[11px] text-slate-400 italic leading-relaxed">
+                        "Certifico que el equipo ha sido intervenido siguiendo los protocolos del fabricante y
+                        cumple con los estándares de seguridad vigentes."
+                    </p>
+                </div>
+
+                <!-- Firmas: Técnico Ejecutante, Técnico HEC, Jefe de Servicio -->
+                <div class="space-y-3">
+                    <div
+                        class="p-3 bg-white/5 rounded-xl border border-slate-700/50 flex items-center justify-between">
+                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Técnico
+                            Ejecutante</span>
+                        <span class="text-xs font-bold text-medical-blue">Ana Muñoz</span>
+                    </div>
+                    <div
+                        class="p-3 bg-white/5 rounded-xl border border-slate-700/50 flex items-center justify-between">
+                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Técnico
+                            HEC</span>
+                        <span class="text-xs text-slate-600">Pendiente</span>
+                    </div>
+                    <div
+                        class="p-3 bg-white/5 rounded-xl border border-slate-700/50 flex items-center justify-between">
+                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Jefe de
+                            Servicio</span>
+                        <span class="text-xs text-slate-600">Pendiente</span>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Confirmar
+                        Identidad (PIN/ID)</label>
+                    <input type="password" placeholder="••••"
+                        class="w-full h-14 bg-slate-900 border border-slate-700/50 rounded-2xl px-6 text-xl tracking-[1em] text-center focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all">
+                </div>
+            </div>
+
+            <div class="flex gap-4 pt-4">
+                <button @click="showSignatureModal = false"
+                    class="flex-1 py-4 border border-slate-700/50 text-slate-500 font-black uppercase tracking-widest rounded-2xl hover:bg-white/5 transition-all text-xs">Cancelar</button>
+                <button onclick="window.location.href='?page=work_orders'"
+                    class="flex-1 py-4 bg-medical-blue text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-medical-blue/20 hover:bg-medical-blue/90 transition-all text-xs">Sellar
+                    OT</button>
+            </div>
+
+            <p class="text-[9px] text-slate-600 text-center font-bold uppercase leading-relaxed">
+                Esta acción genera un registro inalterable en la pista de auditoría (Log #<?= uniqid() ?>) bajo la
+                normativa FDA 21 CFR Part 11.
+            </p>
         </div>
-    </template>
+    </div>
+</template>
 </div>
 
 <script>

@@ -26,9 +26,20 @@ readonly class AssetEntity
         public ?int $yearsRemaining = null,
         public int $usefulLifePct = 0,
         public ?string $imageUrl = null,
+<<<<<<< HEAD:cmms php/backend/Models/AssetEntity.php
+        public ?string $observations = null,
+        public ?string $vendor = null,
+        public ?string $ownership = null,
+        public ?string $warrantyExpiration = null,
+        public bool $underMaintenancePlan = false,
+        public ?int $purchasedYear = null,
+        public ?int $totalUsefulLife = null
+    ) {}
+=======
         public ?string $observations = null
     ) {
     }
+>>>>>>> origin/main:cmms php/Backend/Models/AssetEntity.php
 
     /**
      * Mapear desde array de base de datos
@@ -50,7 +61,17 @@ readonly class AssetEntity
             yearsRemaining: isset($data['years_remaining']) ? (int) $data['years_remaining'] : null,
             usefulLifePct: (int) ($data['useful_life_pct'] ?? 0),
             imageUrl: $data['image_url'] ?? null,
+<<<<<<< HEAD:cmms php/backend/Models/AssetEntity.php
+            observations: $data['observations'] ?? null,
+            vendor: $data['vendor'] ?? null,
+            ownership: $data['ownership'] ?? null,
+            warrantyExpiration: $data['warranty_expiration'] ?? null,
+            underMaintenancePlan: (bool) ($data['under_maintenance_plan'] ?? false),
+            purchasedYear: isset($data['purchased_year']) ? (int) $data['purchased_year'] : null,
+            totalUsefulLife: isset($data['total_useful_life']) ? (int) $data['total_useful_life'] : null
+=======
             observations: $data['observations'] ?? null
+>>>>>>> origin/main:cmms php/Backend/Models/AssetEntity.php
         );
     }
 
@@ -74,7 +95,17 @@ readonly class AssetEntity
             'years_remaining' => $this->yearsRemaining,
             'useful_life_pct' => $this->usefulLifePct,
             'image_url' => $this->imageUrl,
+<<<<<<< HEAD:cmms php/backend/Models/AssetEntity.php
+            'observations' => $this->observations,
+            'vendor' => $this->vendor,
+            'ownership' => $this->ownership,
+            'warranty_expiration' => $this->warrantyExpiration,
+            'under_maintenance_plan' => $this->underMaintenancePlan,
+            'purchased_year' => $this->purchasedYear,
+            'total_useful_life' => $this->totalUsefulLife
+=======
             'observations' => $this->observations
+>>>>>>> origin/main:cmms php/Backend/Models/AssetEntity.php
         ];
     }
 }

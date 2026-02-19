@@ -205,6 +205,12 @@ $stats = getWorkOrderStats();
                     </th>
                     <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-500">
                         <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">event</span>
+                            Fecha
+                        </div>
+                    </th>
+                    <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-500">
+                        <div class="flex items-center gap-2">
                             <span class="material-symbols-outlined text-sm">precision_manufacturing</span>
                             Activo
                         </div>
@@ -242,6 +248,7 @@ $stats = getWorkOrderStats();
                     <tr class="ot-row hover:bg-white/5 transition-colors" data-tipo="<?= $ot['type'] ?>"
                         data-estado="<?= $ot['status'] ?>" data-fecha="<?= $ot['date'] ?>">
                         <td class="px-6 py-4 font-mono text-sm text-medical-blue font-bold"><?= $ot['id'] ?></td>
+                        <td class="px-6 py-4 text-xs font-bold text-slate-400"><?= date('d/m/Y', strtotime($ot['date'])) ?></td>
                         <td class="px-6 py-4 text-sm font-bold text-white"><?= $ot['asset'] ?></td>
                         <td class="px-6 py-4 text-xs font-bold text-slate-300 uppercase"><?= $ot['type'] ?></td>
                         <td class="px-6 py-4 text-center">

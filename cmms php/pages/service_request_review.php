@@ -1,8 +1,8 @@
 <?php
 // pages/service_request_review.php - Engineer view to process solicitudes
 
-if ($_SESSION['user_role'] !== 'Ingeniero') {
-    echo "<div class='p-8 text-center'><h1 class='text-2xl font-bold text-red-500'>Acceso Denegado</h1></div>";
+if (!canModify()) {
+    echo "<div class='p-8 text-center text-red-500 font-bold'>Acceso Denegado</div>";
     return;
 }
 

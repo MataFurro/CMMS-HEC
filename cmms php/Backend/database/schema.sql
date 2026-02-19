@@ -18,7 +18,7 @@ CREATE TABLE users (
     name            VARCHAR(120) NOT NULL,
     email           VARCHAR(180) NOT NULL UNIQUE,
     password_hash   VARCHAR(255) NOT NULL,
-    role            ENUM('Auditor','Tecnico','Ingeniero','Admin') NOT NULL DEFAULT 'Tecnico',
+    role            ENUM('AUDITOR','TECHNICIAN','ENGINEER','CHIEF_ENGINEER','USER') NOT NULL DEFAULT 'TECHNICIAN',
     avatar_url      VARCHAR(500) NULL,
     active          TINYINT(1) NOT NULL DEFAULT 1,
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -221,10 +221,11 @@ CREATE TABLE asset_recalls (
 
 -- Usuarios de prueba
 INSERT INTO users (id, name, email, password_hash, role, avatar_url) VALUES
-(1, 'Lic. Auditor',      'auditor@biocmms.com', '$2y$10$placeholder_hash', 'Auditor',    'https://i.pravatar.cc/150?u=auditor'),
-(2, 'Ing. Roberto Jefe', 'jefe@biocmms.com',    '$2y$10$placeholder_hash', 'Ingeniero',  'https://i.pravatar.cc/150?u=chief'),
-(3, 'Ing. Laura',        'ing@biocmms.com',     '$2y$10$placeholder_hash', 'Ingeniero',  'https://i.pravatar.cc/150?u=eng'),
-(4, 'Téc. Mario',        'tec@biocmms.com',     '$2y$10$placeholder_hash', 'Tecnico',    'https://i.pravatar.cc/150?u=tech');
+(1, 'Lic. Auditor',      'auditor@biocmms.com', '$2y$10$placeholder_hash', 'AUDITOR',    'https://i.pravatar.cc/150?u=auditor'),
+(2, 'Ing. Roberto Jefe', 'jefe@biocmms.com',    '$2y$10$placeholder_hash', 'CHIEF_ENGINEER',  'https://i.pravatar.cc/150?u=chief'),
+(3, 'Ing. Laura',        'ing@biocmms.com',     '$2y$10$placeholder_hash', 'ENGINEER',  'https://i.pravatar.cc/150?u=eng'),
+(4, 'Téc. Mario',        'tec@biocmms.com',     '$2y$10$placeholder_hash', 'TECHNICIAN',    'https://i.pravatar.cc/150?u=tech'),
+(5, 'Dr. Clínico Demo',  'demo@biocmms.com',    '$2y$10$placeholder_hash', 'USER',    'https://i.pravatar.cc/150?u=demo');
 
 -- Técnicos
 INSERT INTO technicians (user_id, specialty, active_ots, completed_ots, capacity_pct) VALUES

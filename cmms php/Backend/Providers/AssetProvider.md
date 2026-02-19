@@ -5,7 +5,6 @@
  * ─────────────────────────────────────────────────────
  * Interfaz de acceso a datos de Activos Biomédicos.
  * El frontend (pages/) SOLO usa estas funciones.
- * Acceso directo a MySQL (Repositorios).
  * ─────────────────────────────────────────────────────
  */
 
@@ -15,7 +14,7 @@ require_once __DIR__ . '/../Repositories/AssetRepository.php';
 use Backend\Repositories\AssetRepository;
 
 /**
- * Obtener todos los activos usando Generadores internos
+ * Obtener todos los activos
  */
 function getAllAssets(): array
 {
@@ -31,7 +30,7 @@ function getAllAssets(): array
 }
 
 /**
- * Obtener un activo por ID (retorna array para compatibilidad)
+ * Obtener un activo por ID
  */
 function getAssetById(string $id): ?array
 {
@@ -41,7 +40,7 @@ function getAssetById(string $id): ?array
 }
 
 /**
- * Buscar activos con filtros usando Generadores
+ * Buscar activos con filtros
  */
 function searchAssets(string $search = '', string $statusFilter = 'ALL'): array
 {
@@ -113,47 +112,22 @@ function getAssetFamilies(): array
 }
 
 /**
- * Obtener estadísticas financieras consolidadas (Dinámicas)
+ * Obtener estadísticas financieras consolidadas
  */
 function getFinancialStats(): array
 {
-    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
-        return [
-            'valor_inventario' => 0,
-            'valor_reposicion' => 0,
-            'costo_mantenimiento_anual' => 0,
-            'tco_avg' => 0,
-            'obsolescencia_proxima' => 0,
-            'penalizacion_pm' => 0,
-            'penalizacion_pi' => 0,
-            'ahorro_in_house' => 0
-        ];
-    }
-
-    require_once __DIR__ . '/../../includes/constants.php';
-    require_once __DIR__ . '/WorkOrderProvider.php';
-
     $assets = getAllAssets();
     $totalVal = 0;
-    $obsolescencia = 0;
-
     foreach ($assets as $asset) {
         $totalVal += $asset['acquisition_cost'] ?? 0;
-        if (($asset['useful_life_pct'] ?? 0) > 90) {
-            $obsolescencia++;
-        }
     }
 
     $totalReposicion = $totalVal * REPLACEMENT_COST_FACTOR;
     $costoMantenimiento = $totalVal * MAINTENANCE_COST_FACTOR;
 
-    $counts = countWorkOrdersByStatus();
-    $missedPMs = (int)($counts['Pendiente'] ?? 0);
-    $penalizacionPM = $missedPMs * PENALTY_MISSED_PM;
-
-    $db = \Backend\Core\DatabaseService::getInstance();
-    $events = $db->query("SELECT COUNT(*) as total FROM asset_recalls")->fetch();
-    $penalizacionPi = ($events['total'] ?? 0) * PENALTY_ADVERSE_EVENT;
+    $obsolescencia = count(array_filter($assets, function ($a) {
+        return ($a['useful_life_pct'] ?? 0) > 90;
+    }));
 
     return [
         'valor_inventario' => $totalVal,
@@ -161,9 +135,7 @@ function getFinancialStats(): array
         'costo_mantenimiento_anual' => $costoMantenimiento,
         'tco_avg' => count($assets) > 0 ? $totalVal / count($assets) : 0,
         'obsolescencia_proxima' => $obsolescencia,
-        'penalizacion_pm' => $penalizacionPM,
-        'penalizacion_pi' => $penalizacionPi,
-        'ahorro_in_house' => 67
+        'roi_contratos' => 0, // Limpiado (Antes 28%)
     ];
 }
 
@@ -237,18 +209,8 @@ function getAllLocations(): array
  */
 function getAssetObservations(string $asset_id): array
 {
-    $asset = getAssetById($asset_id);
-    if (!$asset || empty($asset['observations'])) {
-        return [];
-    }
-
     return [
-        [
-            'date' => $asset['updated_at'] ?? date('Y-m-d H:i'),
-            'author' => 'Sistema BioCMMS',
-            'text' => $asset['observations'],
-            'type' => 'normal'
-        ],
+        ['date' => date('Y-m-d H:i'), 'author' => 'Sistema BioCMMS', 'text' => 'Métrica de confiabilidad actualizada automáticamente.', 'type' => 'normal'],
     ];
 }
 
@@ -257,19 +219,19 @@ function getAssetObservations(string $asset_id): array
  */
 function getAssetDocuments(string $asset_id): array
 {
-    return [];
+    return [
+        ['name' => 'Ficha_Tecnica.pdf', 'type' => 'Ficha Técnica', 'size' => '3.1 MB', 'date' => date('Y-m-d', strtotime('-1 year'))],
+    ];
 }
 
 /**
- * Obtener métricas de rendimiento específicas de un activo
+ * Obtener métricas de rendimiento
  */
 function getAssetPerformanceMetrics(string $asset_id): array
 {
     $asset = getAssetById($asset_id);
     if (!$asset) return [];
-
     $acquisition = $asset['acquisition_cost'] ?? 0;
-
     return [
         'uptime' => UPTIME_GOAL,
         'depreciacion_anual' => $acquisition / ($asset['total_useful_life'] ?: 1),
@@ -283,15 +245,20 @@ function getAssetPerformanceMetrics(string $asset_id): array
  */
 function saveAsset(array $data): bool
 {
+    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+        return true;
+    }
     $repo = new AssetRepository();
     return $repo->create($data);
 }
-
 /**
  * Actualizar información técnica de un activo (Marca, Modelo, Serie, etc.)
  */
 function updateAssetInfo(string $id, array $data): bool
 {
+    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+        return true;
+    }
     $repo = new AssetRepository();
     return $repo->partialUpdate($id, $data);
 }
@@ -301,6 +268,9 @@ function updateAssetInfo(string $id, array $data): bool
  */
 function deleteAsset(string $id): bool
 {
+    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+        return true;
+    }
     $repo = new AssetRepository();
     return $repo->delete($id);
 }

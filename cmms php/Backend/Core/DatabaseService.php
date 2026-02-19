@@ -6,7 +6,7 @@ use PDO;
 use Exception;
 
 /**
- * core/DatabaseService.php
+ * Backend/Core/DatabaseService.php
  * ─────────────────────────────────────────────────────
  * Servicio Singleton para la conexión a Base de Datos.
  * Gestiona una instancia única de PDO.
@@ -27,8 +27,8 @@ class DatabaseService
 
         if (self::$instance === null) {
             try {
-                // Configuración de conexión (usando dinámicos o constantes)
-                $host = defined('DB_HOST') ? DB_HOST : 'localhost';
+                // Configuración de conexión flexible
+                $host = defined('DB_HOST') ? DB_HOST : '127.0.0.1';
                 $db = defined('DB_NAME') ? DB_NAME : 'biocmms';
                 $user = defined('DB_USER') ? DB_USER : 'root';
                 $pass = defined('DB_PASS') ? DB_PASS : '';
@@ -56,13 +56,7 @@ class DatabaseService
     /**
      * Evitar clonación del Singleton
      */
-    private function __clone()
-    {
-    }
-    public function __wakeup()
-    {
-    }
-    private function __construct()
-    {
-    }
+    private function __clone() {}
+    public function __wakeup() {}
+    private function __construct() {}
 }

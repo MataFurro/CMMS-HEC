@@ -22,9 +22,20 @@ readonly class WorkOrderEntity
         public ?string $assetName = null,
         public ?string $location = null,
         public ?string $observations = null,
+<<<<<<< HEAD:cmms php/backend/Models/WorkOrderEntity.php
+        public ?string $msRequestId = null,
+        public ?string $msEmail = null,
+        public ?string $checklistTemplate = null,
+        public ?float $durationHours = 0.0,
+        public ?string $failureCode = null,
+        public ?DateTime $serviceWarrantyDate = null,
+        public ?string $finalAssetStatus = null
+    ) {}
+=======
         public ?string $msRequestId = null
     ) {
     }
+>>>>>>> origin/main:cmms php/Backend/Models/WorkOrderEntity.php
 
     public static function fromArray(array $data): self
     {
@@ -40,7 +51,17 @@ readonly class WorkOrderEntity
             assetName: $data['asset_name'] ?? null,
             location: $data['location'] ?? null,
             observations: $data['observations'] ?? null,
+<<<<<<< HEAD:cmms php/backend/Models/WorkOrderEntity.php
+            msRequestId: $data['ms_request_id'] ?? null,
+            msEmail: $data['ms_email'] ?? null,
+            checklistTemplate: $data['checklist_template'] ?? null,
+            durationHours: isset($data['duration_hours']) ? (float)$data['duration_hours'] : 0.0,
+            failureCode: $data['failure_code'] ?? null,
+            serviceWarrantyDate: isset($data['service_warranty_date']) ? new DateTime($data['service_warranty_date']) : null,
+            finalAssetStatus: $data['final_asset_status'] ?? null
+=======
             msRequestId: $data['ms_request_id'] ?? null
+>>>>>>> origin/main:cmms php/Backend/Models/WorkOrderEntity.php
         );
     }
 
@@ -62,8 +83,19 @@ readonly class WorkOrderEntity
             'location' => $this->location,
             'observations' => $this->observations,
             'ms_request_id' => $this->msRequestId,
+<<<<<<< HEAD:cmms php/backend/Models/WorkOrderEntity.php
+            'ms_email' => $this->msEmail,
+            'checklist_template' => $this->checklistTemplate,
+            'duration_hours' => $this->durationHours,
+            'failure_code' => $this->failureCode,
+            'service_warranty_date' => $this->serviceWarrantyDate?->format('Y-m-d'),
+            'final_asset_status' => $this->finalAssetStatus,
+            'asset' => $this->assetName, // Legacy
+            'tech' => $this->assignedTechName ?? 'Sin Asignar', // Real
+=======
             'asset' => $this->assetName, // Legacy
             'tech' => $this->techName ?? 'Sin Asignar', // Real
+>>>>>>> origin/main:cmms php/Backend/Models/WorkOrderEntity.php
             'date' => $this->createdDate?->format('Y-m-d') // Legacy compatibility
         ];
     }

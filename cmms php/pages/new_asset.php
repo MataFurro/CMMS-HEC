@@ -10,17 +10,17 @@ if (!canModify()) {
 
 // Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Doble verificación de permisos en backend
     if (!canModify()) {
         die('Acceso denegado. Solo Ingeniero/Admin puede crear activos.');
     }
 
-    // In a real app, sanitize and save to DB
-    // $data = $_POST;
-    // saveAsset($data);
+    $result = saveAsset($_POST);
 
-    // Simulate success
-    echo "<script>alert('Activo registrado exitosamente (Simulado)'); window.location.href='?page=inventory';</script>";
+    if ($result) {
+        echo "<script>alert('Activo registrado exitosamente.'); window.location.href='?page=inventory';</script>";
+    } else {
+        $error = "Error al guardar el activo en la base de datos.";
+    }
 }
 ?>
 
@@ -77,6 +77,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </div>
 
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">N° de Serie</label>
+                        <input required name="serial_number" placeholder="Ej: SN-992031-B"
+                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pertenencia</label>
+                        <select name="ownership"
+                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white appearance-none">
+                            <option value="Propio">Propio</option>
+                            <option value="Comodato">Comodato</option>
+                            <option value="Arriendo">Arriendo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Costo Adquisición</label>
+                        <input type="number" step="0.01" name="acquisition_cost" placeholder="0.00"
+                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Año de Compra</label>
+                        <input type="number" name="purchased_year" value="<?= date('Y') ?>"
+                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                    </div>
+                </div>
+
                 <div class="space-y-2">
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Bajo Plan de
                         Mantenimiento</label>
@@ -101,54 +131,103 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     class="text-[10px] font-black uppercase tracking-[0.2em] text-medical-blue border-b border-medical-blue/20 pb-2">
                     Especificaciones Técnicas</h3>
 
-                <div class="space-y-2">
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Ubicación</label>
-                    <select required name="location"
-                        class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white appearance-none">
-                        <option value="">Seleccionar Ubicación</option>
-                        <?php foreach (getAllLocations() as $loc): ?>
-                            <option value="<?= $loc ?>"><?= $loc ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <div class="space-y-2">
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Criticidad</label>
-                    <select required name="criticality"
-                        class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white appearance-none">
-                        <option value="CRITICAL">CRITICAL</option>
-                        <option value="RELEVANT" selected>RELEVANT</option>
-                        <option value="LOW">LOW</option>
-                        <option value="NA">NA</option>
-                    </select>
-                </div>
-
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Garantía
-                            (Proveedor)</label>
-                        <input name="warranty" placeholder="Ej: Medtronic Chile"
-                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Ubicación</label>
+                        <select required name="location"
+                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white appearance-none">
+                            <option value="">Seleccionar Ubicación</option>
+                            <?php foreach (getAllLocations() as $loc): ?>
+                                <option value="<?= $loc ?>"><?= $loc ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Vencimiento
-                            Garantía</label>
-                        <input type="date" name="warrantyExpiration"
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Sub-Ubicación</label>
+                        <input name="sub_location" placeholder="Ej: Box 04 / Cama 4"
                             class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Vida Útil (%)</label>
-                        <input type="number" name="usefulLife" value="100"
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Criticidad</label>
+                        <select required name="criticality"
+                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white appearance-none">
+                            <option value="CRITICAL">CRITICAL</option>
+                            <option value="RELEVANT" selected>RELEVANT</option>
+                            <option value="LOW">LOW</option>
+                            <option value="NA">NA (No Aplica)</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Riesgo GE</label>
+                        <input name="riesgo_ge" placeholder="Ej: Life Support"
+                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Código UMDNS (Opcional/NA)</label>
+                        <input name="codigo_umdns" placeholder="Ej: 17-429"
+                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Fecha Instalación</label>
+                        <input type="date" name="fecha_instalacion"
+                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Proveedor</label>
+                        <input name="vendor" placeholder="Ej: Draeger Medical"
+                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Vencimiento Garantía</label>
+                        <input type="date" name="warranty_expiration"
+                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Vida Útil Total (Años)</label>
+                        <input type="number" name="total_useful_life" value="10"
                             class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
                     </div>
                     <div class="space-y-2">
                         <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Años Restantes</label>
-                        <input type="number" name="yearsRemaining" value="10"
+                        <input type="number" name="years_remaining" value="10"
                             class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
                     </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Estado Inicial</label>
+                        <select name="status"
+                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white appearance-none">
+                            <option value="OPERATIVE">OPERATIVO</option>
+                            <option value="MAINTENANCE">EN MANTENCIÓN</option>
+                            <option value="NO_OPERATIVE">FUERA DE SERVICIO</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">URL Imagen (Opcional)</label>
+                        <input name="image_url" placeholder="https://..."
+                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                    </div>
+                </div>
+
+                <!-- Observations Field Additions -->
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Observaciones Generales</label>
+                    <textarea name="observations" rows="2"
+                        class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white resize-none"></textarea>
                 </div>
             </div>
         </div>

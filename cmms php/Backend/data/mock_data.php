@@ -19,7 +19,7 @@ $MOCK_USERS = [
         'name' => 'Lic. Auditor',
         'email' => 'auditor@biocmms.com',
         'password_hash' => '$2y$10$placeholder_hash', // Inyectado para auditoría
-        'role' => 'Auditor',
+        'role' => 'AUDITOR',
         'avatar_url' => 'https://i.pravatar.cc/150?u=auditor',
         'desc' => 'Solo Observación'
     ],
@@ -28,7 +28,7 @@ $MOCK_USERS = [
         'name' => 'Ing. Roberto Jefe',
         'email' => 'jefe@biocmms.com',
         'password_hash' => '$2y$10$UDu6jaXTX58LN8QjD.Q1beWvAqf9eEqgpzGJrl8jN3hGPfEuMhEQq',
-        'role' => 'Ingeniero',
+        'role' => 'CHIEF_ENGINEER',
         'avatar_url' => 'https://i.pravatar.cc/150?u=chief',
         'desc' => 'Gestión y Reportes'
     ],
@@ -37,7 +37,7 @@ $MOCK_USERS = [
         'name' => 'Ing. Laura',
         'email' => 'ing@biocmms.com',
         'password_hash' => '$2y$10$UDu6jaXTX58LN8QjD.Q1beWvAqf9eEqgpzGJrl8jN3hGPfEuMhEQq',
-        'role' => 'Ingeniero',
+        'role' => 'ENGINEER',
         'avatar_url' => 'https://i.pravatar.cc/150?u=eng',
         'desc' => 'Supervisión Técnica'
     ],
@@ -46,7 +46,7 @@ $MOCK_USERS = [
         'name' => 'Téc. Mario',
         'email' => 'tec@biocmms.com',
         'password_hash' => '$2y$10$placeholder_hash',
-        'role' => 'Técnico',
+        'role' => 'TECHNICIAN',
         'avatar_url' => 'https://i.pravatar.cc/150?u=tech',
         'desc' => 'Ejecución de OTs'
     ],
@@ -55,7 +55,7 @@ $MOCK_USERS = [
         'name' => 'Usuario Clínico',
         'email' => 'user@biocmms.com',
         'password_hash' => '$2y$10$placeholder_hash',
-        'role' => 'Usuario',
+        'role' => 'USER',
         'avatar_url' => 'https://i.pravatar.cc/150?u=user',
         'desc' => 'Solicitud de Servicios'
     ],
@@ -64,7 +64,7 @@ $MOCK_USERS = [
         'name' => 'Usuario Demo',
         'email' => 'demo@biocmms.com',
         'password_hash' => '$2y$10$placeholder_hash',
-        'role' => 'Usuario', // Comparte privilegios de 'Usuario'
+        'role' => 'USER', // Comparte privilegios de 'Usuario'
         'avatar_url' => 'https://i.pravatar.cc/150?u=demo',
         'desc' => 'Cuenta de Demostración'
     ],

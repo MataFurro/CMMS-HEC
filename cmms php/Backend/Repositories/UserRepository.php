@@ -32,6 +32,35 @@ class UserRepository
     }
 
     /**
+     * Crear un nuevo usuario
+     */
+    public function create(array $data): int
+    {
+        $sql = "INSERT INTO users (name, email, password_hash, role, active) 
+                VALUES (:name, :email, :password_hash, :role, 1)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            'name'          => $data['name'],
+            'email'         => $data['email'],
+            'password_hash' => password_hash($data['password'] ?? 'BioPass2026', PASSWORD_DEFAULT),
+            'role'          => $data['role']
+        ]);
+        return (int)$this->db->lastInsertId();
+    }
+
+    /**
+     * Vincular datos técnicos a un usuario
+     */
+    public function createTechnician(int $userId, string $specialty = 'General'): bool
+    {
+        $sql = "INSERT INTO technicians (user_id, specialty) VALUES (:user_id, :specialty)";
+        return $this->db->prepare($sql)->execute([
+            'user_id'   => $userId,
+            'specialty' => $specialty
+        ]);
+    }
+
+    /**
      * Obtener técnicos con métricas
      */
     public function findAllTechnicians(): array

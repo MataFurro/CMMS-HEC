@@ -3,6 +3,19 @@
 
 // Handle Logout
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+    $_SESSION = [];
+    if (ini_get("session.use_cookies")) {
+        $params = session_get_cookie_params();
+        setcookie(
+            session_name(),
+            '',
+            time() - 42000,
+            $params["path"],
+            $params["domain"],
+            $params["secure"],
+            $params["httponly"]
+        );
+    }
     session_destroy();
     header('Location: ?page=login');
     exit;
@@ -22,8 +35,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['user_name'] = $user['name'];
         $_SESSION['user_role'] = $user['role'];
         $_SESSION['user_avatar'] = $user['avatar'];
-        // Técnico no tiene acceso al dashboard
-        $redirect = ($user['role'] === 'Técnico') ? 'work_orders' : 'dashboard';
+        $_SESSION['user'] = $user; // Store full object for helpers
+
+        $redirect = 'dashboard';
+        if ($user['role'] === ROLE_TECHNICIAN) $redirect = 'work_orders';
+        if ($user['role'] === ROLE_USER) $redirect = 'service_request';
+        if ($user['role'] === ROLE_AUDITOR) $redirect = 'inventory';
+
         header('Location: ?page=' . $redirect);
         exit;
     } else {
@@ -87,11 +105,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </button>
                 <button type="button" onclick="fillLogin('jefe@biocmms.com')" class="text-left p-2 hover:bg-white/5 rounded-lg transition-colors group">
                     <div class="text-xs font-bold text-white group-hover:text-medical-blue">Ing. Jefe</div>
-                    <div class="text-[9px] text-slate-500">Gestión</div>
+                    <div class="text-[9px] text-slate-500">Admin Total</div>
                 </button>
                 <button type="button" onclick="fillLogin('ing@biocmms.com')" class="text-left p-2 hover:bg-white/5 rounded-lg transition-colors group">
                     <div class="text-xs font-bold text-white group-hover:text-medical-blue">Ing. Biomédico</div>
-                    <div class="text-[9px] text-slate-500">Supervisión</div>
+                    <div class="text-[9px] text-slate-500">Gestión</div>
                 </button>
                 <button type="button" onclick="fillLogin('tec@biocmms.com')" class="text-left p-2 hover:bg-white/5 rounded-lg transition-colors group">
                     <div class="text-xs font-bold text-white group-hover:text-medical-blue">Técnico</div>
@@ -99,9 +117,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </button>
                 <button type="button" onclick="fillLogin('demo@biocmms.com')" class="text-left p-2 hover:bg-white/5 rounded-lg transition-colors group col-span-2 border border-dashed border-slate-700 hover:border-medical-blue/50">
                     <div class="text-xs font-bold text-white group-hover:text-medical-blue flex items-center gap-2">
-                        <span class="material-symbols-outlined text-xs">science</span> Usuario Clínico (Demo)
+                        <span class="material-symbols-outlined text-xs">clinical_notes</span> Usuario Clínico (Demo)
                     </div>
-                    <div class="text-[9px] text-slate-500">Solicitud de Servicios</div>
+                    <div class="text-[9px] text-slate-500">Petición de Soporte</div>
                 </button>
             </div>
         </div>
