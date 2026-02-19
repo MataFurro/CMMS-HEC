@@ -194,6 +194,11 @@ function completeWorkOrder(string $otId, array $executionData = []): bool
     $success = $repo->partialUpdate($otId, $updateData);
 
     if ($success) {
+        // Auditoría base
+        logAuditAction('OT_COMPLETED', 'WORK_ORDER', $otId, "Cierre manual por técnico. Estado final: " . ($executionData['final_asset_status'] ?? 'OPERATIVE'), [
+            'duration' => $executionData['duration_hours'] ?? 0,
+            'failure_code' => $updateData['failure_code']
+        ]);
         \Backend\Core\LoggerService::info("Orden de Trabajo finalizada con datos extendidos", ['id' => $otId]);
 
         // Sincronización automática de estado del Activo si se proporcionó un estado final
@@ -214,9 +219,64 @@ function completeWorkOrder(string $otId, array $executionData = []): bool
                 \Backend\Core\LoggerService::error("ERROR FEEDBACK LOOP", ['error' => $e->getMessage()]);
             }
         }
+
+        // ── AGENTIC FEATURE: Silent Cascading Closure ──
+        // Si es correctiva y duró más de 4 horas, cerramos preventivas pendientes automáticamente.
+        if (($order->type ?? '') === 'Correctiva' && (float)($updateData['duration_hours'] ?? 0) >= 4.0) {
+            cascadeClosePreventives($order->assetId, $otId);
+        }
     }
 
     return $success;
+}
+
+/**
+ * AGENTIC LOGIC: Cierre automático de preventivas por intervención mayor.
+ */
+function cascadeClosePreventives(string $assetId, string $triggerOtId): void
+{
+    try {
+        $db = \Backend\Core\DatabaseService::getInstance();
+
+        // 1. Buscar OTs preventivas pendientes para este equipo
+        $stmt = $db->prepare("
+            SELECT id FROM work_orders 
+            WHERE asset_id = :asset_id 
+              AND type = 'Preventiva' 
+              AND status = 'Pendiente'
+        ");
+        $stmt->execute([':asset_id' => $assetId]);
+        $pendings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (empty($pendings)) return;
+
+        // 2. Cerrar cada una con observación técnica
+        $closeStmt = $db->prepare("
+            UPDATE work_orders 
+            SET status = 'Terminada', 
+                completed_date = CURRENT_DATE,
+                observations = CONCAT(IFNULL(observations,''), '\n\n[SISTEMA AGÉNTICO]: OT cerrada automáticamente por intervención correctiva mayor (OT Origen: ', :trigger_id, '). Verificación realizada durante reparación.'),
+                updated_at = NOW()
+            WHERE id = :id
+        ");
+
+        foreach ($pendings as $p) {
+            $closeStmt->execute([
+                ':id' => $p['id'],
+                ':trigger_id' => $triggerOtId
+            ]);
+
+            // Auditoría de la cascada
+            logAuditAction('AUTO_CASCADE_CLOSURE', 'WORK_ORDER', $p['id'], "Cierre preventivo automático gatillado por OT Correctiva mayor ($triggerOtId).", [
+                'trigger_ot' => $triggerOtId,
+                'asset_id' => $assetId
+            ]);
+
+            \Backend\Core\LoggerService::info("CASCADA AGÉNTICA: OT Preventiva cerrada automáticamente", ['id' => $p['id'], 'trigger' => $triggerOtId]);
+        }
+    } catch (Exception $e) {
+        \Backend\Core\LoggerService::error("ERROR EN CASCADA AGÉNTICA", ['asset' => $assetId, 'error' => $e->getMessage()]);
+    }
 }
 /**
  * Calcular el impacto financiero del downtime por área técnica
