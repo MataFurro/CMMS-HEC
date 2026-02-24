@@ -14,15 +14,15 @@ $stats = getWorkOrderStats();
             <nav class="flex items-center gap-2 mb-4">
                 <span
                     class="text-[10px] font-black uppercase tracking-[0.2em] text-medical-blue bg-medical-blue/10 px-2 py-0.5 rounded">Operaciones</span>
-                <span class="material-symbols-outlined text-xs text-slate-600">chevron_right</span>
-                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Gestión de
+                <span class="material-symbols-outlined text-xs text-text-muted/60">chevron_right</span>
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">Gestión de
                     Mantenimiento</span>
             </nav>
-            <h1 class="text-4xl font-black text-white tracking-tight flex items-center gap-4">
+            <h1 class="text-4xl font-black text-[var(--text-main)] tracking-tight flex items-center gap-4">
                 Órdenes de Trabajo
                 <span class="text-medical-blue material-symbols-outlined text-3xl font-variation-fill">task_alt</span>
             </h1>
-            <p class="text-slate-400 mt-2 text-lg font-medium italic opacity-80">Seguimiento y ejecución de
+            <p class="text-[var(--text-muted)] mt-2 text-lg font-medium italic opacity-80">Seguimiento y ejecución de
                 intervenciones técnicas en tiempo real.</p>
         </div>
         <?php if (canModify()): ?>
@@ -38,9 +38,9 @@ $stats = getWorkOrderStats();
     <div class="card-glass p-4 mb-6 space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Tipo</label>
+                <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2 block">Tipo</label>
                 <select id="filter-tipo"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-medical-blue">
+                    class="w-full bg-medical-surface border border-border-dark rounded-lg px-3 py-2 text-sm text-[var(--text-main)] focus:outline-none focus:border-medical-blue">
                     <option value="">Todos</option>
                     <option value="Preventiva">Preventiva</option>
                     <option value="Correctiva">Correctiva</option>
@@ -63,9 +63,9 @@ $stats = getWorkOrderStats();
                     class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-medical-blue">
             </div>
             <div>
-                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Hasta</label>
+                <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2 block">Hasta</label>
                 <input type="date" id="filter-hasta"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-medical-blue">
+                    class="w-full bg-medical-surface border border-border-dark rounded-lg px-3 py-2 text-sm text-[var(--text-main)] focus:outline-none focus:border-medical-blue">
             </div>
         </div>
         <div class="flex gap-2">
@@ -89,14 +89,14 @@ $stats = getWorkOrderStats();
                     <span class="material-symbols-outlined text-3xl">pending_actions</span>
                 </div>
                 <div>
-                    <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest">Pendientes</p>
-                    <p class="text-3xl font-black text-white mt-1">
+                    <p class="text-[10px] text-text-muted font-black uppercase tracking-widest">Pendientes</p>
+                    <p class="text-3xl font-black text-text-main mt-1">
                         <?= str_pad($stats['Pendiente'] ?? 0, 2, '0', STR_PAD_LEFT) ?> <span
-                            class="text-[10px] font-medium text-slate-600">unids</span>
+                            class="text-[10px] font-medium text-text-muted">unids</span>
                     </p>
                 </div>
             </div>
-            <div class="h-1 w-full bg-slate-800">
+            <div class="h-1 w-full bg-panel-dark">
                 <div class="h-full bg-blue-500 w-[20%] shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div>
             </div>
         </div>
@@ -108,14 +108,14 @@ $stats = getWorkOrderStats();
                     <span class="material-symbols-outlined text-3xl">engineering</span>
                 </div>
                 <div>
-                    <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest">En Proceso</p>
-                    <p class="text-3xl font-black text-white mt-1">
+                    <p class="text-[10px] text-text-muted font-black uppercase tracking-widest">En Proceso</p>
+                    <p class="text-3xl font-black text-text-main mt-1">
                         <?= str_pad($stats['En Proceso'] ?? 0, 2, '0', STR_PAD_LEFT) ?> <span
-                            class="text-[10px] font-medium text-slate-600">unids</span>
+                            class="text-[10px] font-medium text-text-muted">unids</span>
                     </p>
                 </div>
             </div>
-            <div class="h-1 w-full bg-slate-800">
+            <div class="h-1 w-full bg-panel-dark">
                 <div class="h-full bg-amber-500 w-[10%] shadow-[0_0_10px_rgba(245,158,11,0.5)]"></div>
             </div>
         </div>
@@ -127,14 +127,14 @@ $stats = getWorkOrderStats();
                     <span class="material-symbols-outlined text-3xl">check_circle</span>
                 </div>
                 <div>
-                    <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest">Terminadas</p>
-                    <p class="text-3xl font-black text-white mt-1">
+                    <p class="text-[10px] text-text-muted font-black uppercase tracking-widest">Terminadas</p>
+                    <p class="text-3xl font-black text-text-main mt-1">
                         <?= str_pad($stats['Terminada'] ?? 0, 2, '0', STR_PAD_LEFT) ?> <span
-                            class="text-[10px] font-medium text-slate-600">unids</span>
+                            class="text-[10px] font-medium text-text-muted">unids</span>
                     </p>
                 </div>
             </div>
-            <div class="h-1 w-full bg-slate-800">
+            <div class="h-1 w-full bg-panel-dark">
                 <div class="h-full bg-emerald-500 w-[70%] shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
             </div>
         </div>
@@ -146,14 +146,14 @@ $stats = getWorkOrderStats();
                     <span class="material-symbols-outlined text-3xl">emergency_home</span>
                 </div>
                 <div>
-                    <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest">Críticas Hoy</p>
-                    <p class="text-3xl font-black text-white mt-1">
+                    <p class="text-[10px] text-text-muted font-black uppercase tracking-widest">Críticas Hoy</p>
+                    <p class="text-3xl font-black text-text-main mt-1">
                         <?= str_pad($stats['CRITICAL_TODAY'] ?? 0, 2, '0', STR_PAD_LEFT) ?> <span
-                            class="text-[10px] font-medium text-slate-600">unids</span>
+                            class="text-[10px] font-medium text-text-muted">unids</span>
                     </p>
                 </div>
             </div>
-            <div class="h-1 w-full bg-slate-800">
+            <div class="h-1 w-full bg-panel-dark">
                 <div class="h-full bg-red-500 w-[5%] shadow-[0_0_10px_rgba(239,68,68,0.5)]"></div>
             </div>
         </div>
@@ -196,8 +196,8 @@ $stats = getWorkOrderStats();
     <div class="card-glass overflow-hidden shadow-xl">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="bg-white/5 border-b border-slate-700/50">
-                    <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-500">
+                <tr class="bg-slate-200/50 dark:bg-white/5 border-b border-border-dark">
+                    <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-[var(--text-muted)]">
                         <div class="flex items-center gap-2">
                             <span class="material-symbols-outlined text-sm">fingerprint</span>
                             ID Orden
@@ -243,20 +243,20 @@ $stats = getWorkOrderStats();
                     </th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-slate-700/50">
+            <tbody class="divide-y divide-border-dark/30">
                 <?php foreach ($orders as $ot): ?>
-                    <tr class="ot-row hover:bg-white/5 transition-colors" data-tipo="<?= $ot['type'] ?>"
+                    <tr class="ot-row hover:bg-medical-blue/5 transition-colors" data-tipo="<?= $ot['type'] ?>"
                         data-estado="<?= $ot['status'] ?>" data-fecha="<?= $ot['date'] ?>">
                         <td class="px-6 py-4 font-mono text-sm text-medical-blue font-bold"><?= $ot['id'] ?></td>
-                        <td class="px-6 py-4 text-xs font-bold text-slate-400"><?= date('d/m/Y', strtotime($ot['date'])) ?></td>
-                        <td class="px-6 py-4 text-sm font-bold text-white"><?= $ot['asset'] ?></td>
-                        <td class="px-6 py-4 text-xs font-bold text-slate-300 uppercase"><?= $ot['type'] ?></td>
+                        <td class="px-6 py-4 text-xs font-bold text-text-muted"><?= date('d/m/Y', strtotime($ot['date'])) ?></td>
+                        <td class="px-6 py-4 text-sm font-bold text-text-main"><?= $ot['asset'] ?></td>
+                        <td class="px-6 py-4 text-xs font-bold text-text-muted uppercase"><?= $ot['type'] ?></td>
                         <td class="px-6 py-4 text-center">
                             <?php
                             $prioClass = match ($ot['priority']) {
-                                'Alta' => 'text-red-500 bg-red-500/10 border-red-500/20',
+                                'Alta' => 'text-danger bg-danger/10 border-danger/20',
                                 'Media' => 'text-amber-500 bg-amber-500/10 border-amber-500/20',
-                                default => 'text-slate-400 bg-slate-500/10 border-slate-500/20'
+                                default => 'text-text-muted bg-panel-dark/50 border-border-dark/50'
                             };
                             ?>
                             <span class="px-2 py-1 rounded text-[10px] font-black uppercase border <?= $prioClass ?>">
@@ -268,7 +268,7 @@ $stats = getWorkOrderStats();
                             $statusClass = match ($ot['status']) {
                                 'Terminada' => 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
                                 'En Proceso' => 'text-blue-500 bg-blue-500/10 border-blue-500/20',
-                                'Pendiente' => 'text-slate-400 bg-slate-500/10 border-slate-500/20',
+                                'Pendiente' => 'text-text-muted bg-panel-dark/50 border-border-dark/50',
                                 default => ''
                             };
                             ?>
@@ -279,14 +279,14 @@ $stats = getWorkOrderStats();
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
-                                <span class="material-symbols-outlined text-slate-500 text-sm">person</span>
-                                <span class="text-xs text-slate-300 font-bold"><?= $ot['tech'] ?></span>
+                                <span class="material-symbols-outlined text-text-muted text-sm">person</span>
+                                <span class="text-xs text-text-main font-bold"><?= $ot['tech'] ?></span>
                             </div>
                         </td>
                         <td class="px-6 py-4 text-right">
                             <div class="flex items-center justify-end gap-2">
                                 <a href="?page=work_order_execution&id=<?= $ot['id'] ?>"
-                                    class="p-2 bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-all border border-slate-700/50"
+                                    class="p-2 bg-panel-dark text-text-muted hover:text-text-main hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-all border border-border-dark/50"
                                     title="Ver Detalles">
                                     <span class="material-symbols-outlined text-lg">visibility</span>
                                 </a>

@@ -1,9 +1,10 @@
 <?php
 
 /**
- * Backend/providers/UserProvider.php
+ * Backend/Providers/UserProvider.php
  * ─────────────────────────────────────────────────────
  * Interfaz de acceso a datos de Usuarios y Técnicos.
+ * Acceso directo a MySQL (Repositorios).
  * ─────────────────────────────────────────────────────
  */
 
@@ -13,80 +14,168 @@ require_once __DIR__ . '/../Repositories/UserRepository.php';
 use Backend\Repositories\UserRepository;
 
 /**
- * Autenticar usuario por email y contraseña
+ * Autenticar Usuario por Email (Demo simplified)
  */
-function authenticateUser(string $email, string $password = ''): ?array
+function authenticateUser(string $email): ?array
 {
-    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
-        global $mock_users;
-        foreach ($mock_users as $user) {
-            // Simplified mock auth: allow any mock user for demo
-            return $user;
-        }
-    }
+    $user = getUserByEmail($email);
+    if (!$user) return null;
 
-    $repo = new UserRepository();
-    $user = $repo->findByEmail($email);
-
-    if ($user) {
-        // En modo demo v4.2 Pro, permitimos login simplificado si la pass es placeholder
-        if ($user['password_hash'] === '$2y$10$placeholder_hash' || password_verify($password, $user['password_hash'])) {
-            return $user;
-        }
-    }
-
-    return null;
+    return [
+        'id' => $user['id'],
+        'name' => $user['name'],
+        'email' => $user['email'],
+        'role' => $user['role'],
+        'avatar' => $user['avatar_url'] ?? 'https://i.pravatar.cc/150?u=' . $user['id']
+    ];
 }
 
 /**
- * Obtener todos los técnicos con métricas de trabajo
+ * Obtener items del sidebar filtrados por rol
  */
-function getAllTechnicians(): array
+function getSidebarMenu(string $userRole): array
 {
-    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
-        global $technicians;
-        $mock_techs = [];
-        foreach ($technicians as $t) {
-            $mock_techs[] = [
-                'name' => $t['name'] ?? '',
-                'role' => $t['role'] ?? '',
-                'initial' => $t['initial'] ?? '?',
-                'ot_terminadas' => $t['stats']['done'] ?? 0,
-                'ot_progreso' => $t['stats']['progress'] ?? 0,
-                'ot_pendientes' => $t['stats']['pending'] ?? 0,
-                'total_ot' => $t['total'] ?? 0,
-                'capacity_pct' => $t['capacity'] ?? 0,
-                'active' => $t['stats']['progress'] ?? 0,
-                'completed' => $t['stats']['done'] ?? 0,
-                'capacity' => $t['capacity'] ?? 0
-            ];
-        }
-        return $mock_techs;
-    }
+    $allMenuItems = [
+        ['name' => SIDEBAR_DASHBOARD, 'path' => 'dashboard', 'icon' => 'dashboard', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER]],
+        ['name' => SIDEBAR_CALENDAR, 'path' => 'calendar', 'icon' => 'calendar_month', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN]],
+        ['name' => SIDEBAR_WORK_ORDERS, 'path' => 'work_orders', 'icon' => 'assignment', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN]],
+        ['name' => SIDEBAR_INVENTORY, 'path' => 'inventory', 'icon' => 'precision_manufacturing', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN, ROLE_AUDITOR]],
+        ['name' => SIDEBAR_FAMILY_ANALYSIS, 'path' => 'family_analysis', 'icon' => 'analytics', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_AUDITOR]],
+        ['name' => SIDEBAR_MESSENGER, 'path' => 'messenger_requests', 'icon' => 'mail', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER]],
+        ['name' => 'Análisis Financiero', 'path' => 'financial_analysis', 'icon' => 'payments', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER]],
+        ['name' => 'Acreditación', 'path' => 'accreditation_dashboard', 'icon' => 'verified', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_AUDITOR]],
+    ];
 
-    $repo = new UserRepository();
-    $techs = $repo->findAllTechnicians();
-
-    return array_map(function ($t) {
-        $t['initial'] = !empty($t['name']) ? strtoupper(substr($t['name'], 0, 1)) : '?';
-        return $t;
-    }, $techs);
+    return array_filter($allMenuItems, function ($item) use ($userRole) {
+        return in_array($userRole, $item['roles']);
+    });
 }
 
 /**
- * Obtener técnicos ordenados por carga de trabajo/productividad
+ * Verificar permisos de acceso a una página
+ */
+function userHasPermission(string $userRole, string $page): bool
+{
+    $page_permissions = [
+        'dashboard' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER],
+        'calendar' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN],
+        'work_orders' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN],
+        'inventory' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN, ROLE_AUDITOR],
+        'family_analysis' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_AUDITOR],
+        'messenger_requests' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER],
+        'financial_analysis' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER],
+        'service_request' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_USER],
+        'accreditation_dashboard' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_AUDITOR],
+    ];
+
+    if (!isset($page_permissions[$page])) return true;
+    return in_array($userRole, $page_permissions[$page]);
+}
+
+/**
+ * Helper: Can current user modify assets/orders?
+ */
+function canModify(): bool
+{
+    $role = $_SESSION['user_role'] ?? '';
+    return in_array($role, [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER]);
+}
+
+/**
+ * Helper: Can current user execute work orders?
+ */
+function canExecuteWorkOrder(): bool
+{
+    $role = $_SESSION['user_role'] ?? '';
+    return in_array($role, [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN]);
+}
+
+/**
+ * Helper: Is the current user restricted to read-only access for execution data?
+ */
+function isReadOnly(): bool
+{
+    $role = $_SESSION['user_role'] ?? '';
+    // Solo técnicos e ingenieros pueden editar datos de ejecución
+    return !in_array($role, [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN]);
+}
+
+/**
+ * Helper: Can current user finalize/complete the work order?
+ */
+function canCompleteWorkOrder(): bool
+{
+    $role = $_SESSION['user_role'] ?? '';
+    return in_array($role, [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN]);
+}
+
+/**
+ * Helper: Can current user view administrative dashboards?
+ */
+function canViewDashboard(): bool
+{
+    $role = $_SESSION['user_role'] ?? '';
+    return in_array($role, [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_AUDITOR]);
+}
+
+/**
+ * Obtener todos los técnicos activos
+ */
+function getActiveTechnicians(): array
+{
+    try {
+        $repo = new UserRepository();
+        return $repo->findAllTechnicians();
+    } catch (Exception $e) {
+        error_log("UserProvider::getActiveTechnicians Error: " . $e->getMessage());
+        return [];
+    }
+}
+
+/**
+ * Obtener técnicos por productividad para el dashboard (MySQL Real)
  */
 function getTechnicianProductivity(): array
 {
-    $techs = getAllTechnicians();
-    usort($techs, fn($a, $b) => $b['ot_terminadas'] - $a['ot_terminadas']);
-    return $techs;
+    try {
+        $repo = new UserRepository();
+        return $repo->getTechniciansByProductivity();
+    } catch (Exception $e) {
+        error_log("UserProvider::getTechnicianProductivity Error: " . $e->getMessage());
+        return [];
+    }
 }
 
 /**
- * Obtener datos de carga de trabajo de técnicos
+ * Buscar un usuario por email (para login/perfil)
  */
-function getTechnicianWorkload(): array
+function getUserByEmail(string $email): ?array
 {
-    return getAllTechnicians();
+    try {
+        $repo = new UserRepository();
+        return $repo->findByEmail($email);
+    } catch (Exception $e) {
+        error_log("UserProvider::getUserByEmail Error: " . $e->getMessage());
+        return null;
+    }
+}
+
+/**
+ * Registrar un nuevo usuario y vincular perfil técnico si aplica
+ */
+function registerNewUser(array $userData, string $specialty = 'General Biomédico'): ?int
+{
+    try {
+        $repo = new UserRepository();
+        $userId = $repo->create($userData);
+
+        if ($userId && $userData['role'] === ROLE_TECHNICIAN) {
+            $repo->createTechnician($userId, $specialty);
+        }
+
+        return $userId;
+    } catch (Exception $e) {
+        error_log("UserProvider::registerNewUser Error: " . $e->getMessage());
+        return null;
+    }
 }

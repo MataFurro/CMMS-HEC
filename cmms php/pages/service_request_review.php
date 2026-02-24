@@ -58,13 +58,13 @@ if (isset($_POST['action']) && $_POST['action'] === 'convert' && isset($_POST['r
 <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
     <div class="flex items-center justify-between">
         <div>
-            <h1 class="text-3xl font-black text-white tracking-tight">Revisión de Solicitudes</h1>
-            <p class="text-slate-400 font-medium">Validación técnica y conversión a Órdenes de Trabajo.</p>
+            <h1 class="text-3xl font-black text-text-main tracking-tight">Revisión de Solicitudes</h1>
+            <p class="text-text-muted font-medium">Validación técnica y conversión a Órdenes de Trabajo.</p>
         </div>
         <div class="flex gap-4">
             <div class="card-glass px-4 py-2 flex items-center gap-3">
                 <span class="text-2xl font-black text-medical-blue"><?= count($requests) ?></span>
-                <span class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Pendientes</span>
+                <span class="text-[10px] font-black uppercase text-text-muted tracking-widest">Pendientes</span>
             </div>
         </div>
     </div>
@@ -87,27 +87,27 @@ if (isset($_POST['action']) && $_POST['action'] === 'convert' && isset($_POST['r
                     <!-- Basic Info -->
                     <div class="md:w-1/3 space-y-4">
                         <div class="flex items-center gap-3">
-                            <span class="px-2 py-0.5 bg-slate-800 text-slate-500 text-[10px] font-black rounded uppercase border border-slate-700/50"><?= $req['id'] ?></span>
-                            <span class="text-xs text-slate-500 font-bold"><?= $req['date'] ?></span>
+                            <span class="px-2 py-0.5 bg-panel-dark text-text-muted text-[10px] font-black rounded uppercase border border-border-dark/50"><?= $req['id'] ?></span>
+                            <span class="text-xs text-text-muted font-bold"><?= $req['date'] ?></span>
                         </div>
                         <div>
-                            <h3 class="text-xl font-black text-white"><?= $req['asset_name'] ?></h3>
+                            <h3 class="text-xl font-black text-text-main"><?= $req['asset_name'] ?></h3>
                             <p class="text-xs text-medical-blue font-bold tracking-widest uppercase mt-1"><?= $req['asset_id'] ?></p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <img src="https://i.pravatar.cc/150?u=doc" class="size-6 rounded-full border border-slate-700" alt="Client">
-                            <p class="text-xs text-slate-400 font-semibold"><?= $req['client'] ?></p>
+                            <img src="https://i.pravatar.cc/150?u=doc" class="size-6 rounded-full border border-border-dark" alt="Client">
+                            <p class="text-xs text-text-muted font-semibold"><?= $req['client'] ?></p>
                         </div>
                     </div>
 
                     <!-- Problem Description -->
-                    <div class="flex-1 bg-slate-900/40 rounded-2xl p-6 border border-slate-800/50">
-                        <label class="text-[10px] font-black uppercase text-slate-600 tracking-widest mb-3 block">Problema Reportado</label>
-                        <p class="text-sm text-slate-300 leading-relaxed font-medium italic">"<?= $req['problem'] ?>"</p>
+                    <div class="flex-1 bg-medical-dark/20 rounded-2xl p-6 border border-border-dark/30">
+                        <label class="text-[10px] font-black uppercase text-text-muted/60 tracking-widest mb-3 block">Problema Reportado</label>
+                        <p class="text-sm text-text-main/80 leading-relaxed font-medium italic">"<?= $req['problem'] ?>"</p>
 
                         <!-- Priority Badge -->
                         <div class="mt-4">
-                            <?php $pClass = $req['priority'] === 'Alta' ? 'text-red-500 bg-red-500/10 border-red-500/20' : 'text-amber-500 bg-amber-500/10 border-amber-500/20'; ?>
+                            <?php $pClass = $req['priority'] === 'Alta' ? 'text-danger bg-danger/10 border-danger/20' : 'text-amber-500 bg-amber-500/10 border-amber-500/20'; ?>
                             <span class="px-2 py-1 rounded text-[9px] font-black uppercase border <?= $pClass ?>">Urgencia: <?= $req['priority'] ?></span>
                         </div>
                     </div>
@@ -122,31 +122,31 @@ if (isset($_POST['action']) && $_POST['action'] === 'convert' && isset($_POST['r
                 </div>
 
                 <!-- Simulation Modal (Hidden by default) -->
-                <div id="modal-<?= $req['id'] ?>" class="hidden bg-slate-950/80 backdrop-blur-md p-8 border-t border-slate-800 animate-in fade-in duration-300">
+                <div id="modal-<?= $req['id'] ?>" class="hidden bg-medical-surface/90 backdrop-blur-md p-8 border-t border-border-dark animate-in fade-in duration-300">
                     <form method="POST" class="max-w-2xl mx-auto space-y-6">
                         <input type="hidden" name="action" value="convert">
                         <input type="hidden" name="req_id" value="<?= $req['id'] ?>">
-                        <h4 class="text-lg font-black text-white uppercase tracking-tight flex items-center gap-3">
+                        <h4 class="text-lg font-black text-text-main uppercase tracking-tight flex items-center gap-3">
                             <span class="material-symbols-outlined text-medical-blue">engineering</span>
                             Análisis Técnico Sugerido
                         </h4>
                         <div class="space-y-4">
                             <div>
-                                <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2 block">Antecedentes y Diagnóstico Preliminar</label>
-                                <textarea name="diagnosis" placeholder="Ingeniero: Agregue antecedentes técnicos aquí..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-medical-blue h-24 resize-none"></textarea>
+                                <label class="text-[10px] font-black uppercase text-text-muted tracking-widest mb-2 block">Antecedentes y Diagnóstico Preliminar</label>
+                                <textarea name="diagnosis" placeholder="Ingeniero: Agregue antecedentes técnicos aquí..." class="w-full bg-medical-dark/50 border border-border-dark rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:border-medical-blue h-24 resize-none"></textarea>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2 block">Asignar Técnico</label>
-                                    <select name="tech" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-medical-blue">
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-black uppercase text-text-muted tracking-widest mb-2 block">Asignar Técnico</label>
+                                    <select name="tech" class="w-full bg-medical-dark/50 border border-border-dark rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:border-medical-blue appearance-none">
                                         <option>Mario Gómez (Senior)</option>
                                         <option>Pablo Rojas (Especialista)</option>
                                         <option>Ana Muñoz (Calibración)</option>
                                     </select>
                                 </div>
-                                <div>
-                                    <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2 block">Tipo de Intervención</label>
-                                    <select name="intervention_type" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-medical-blue">
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-black uppercase text-text-muted tracking-widest mb-2 block">Tipo de Intervención</label>
+                                    <select name="intervention_type" class="w-full bg-medical-dark/50 border border-border-dark rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:border-medical-blue appearance-none">
                                         <option>Mantenimiento Correctivo</option>
                                         <option>Revisión Técnica</option>
                                         <option>Validación Operativa</option>
@@ -155,8 +155,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'convert' && isset($_POST['r
                             </div>
                         </div>
                         <div class="flex justify-end gap-3 pt-4">
-                            <button type="button" onclick="document.getElementById('modal-<?= $req['id'] ?>').classList.add('hidden')" class="px-6 py-2.5 text-xs font-black text-slate-500 uppercase tracking-widest">Cancelar</button>
-                            <button type="submit" class="px-8 py-2.5 bg-emerald-500 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-emerald-600 shadow-lg shadow-emerald-500/20">
+                            <button type="button" onclick="document.getElementById('modal-<?= $req['id'] ?>').classList.add('hidden')" class="px-6 py-2.5 text-xs font-black text-text-muted uppercase tracking-widest hover:text-text-main transition-all">Cancelar</button>
+                            <button type="submit" class="px-8 py-2.5 bg-emerald-500 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20">
                                 Emitir Orden de Trabajo
                             </button>
                         </div>

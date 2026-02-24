@@ -95,8 +95,8 @@ class WorkOrderRepository
      */
     public function create(array $data): string
     {
-        $sql = "INSERT INTO work_orders (id, asset_id, type, status, assigned_tech_id, created_date, priority, observations, ms_request_id, ms_email, checklist_template, duration_hours, failure_code, service_warranty_date, final_asset_status, created_at) 
-                VALUES (:id, :asset_id, :type, :status, :tech_id, :created_date, :priority, :observations, :ms_request_id, :ms_email, :checklist_template, :duration_hours, :failure_code, :service_warranty_date, :final_asset_status, NOW())";
+        $sql = "INSERT INTO work_orders (id, asset_id, type, status, assigned_tech_id, created_date, priority, observations, ms_request_id, ms_email, checklist_template, checklist_data, duration_hours, failure_code, service_warranty_date, final_asset_status, created_at) 
+                VALUES (:id, :asset_id, :type, :status, :tech_id, :created_date, :priority, :observations, :ms_request_id, :ms_email, :checklist_template, :checklist_data, :duration_hours, :failure_code, :service_warranty_date, :final_asset_status, NOW())";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
@@ -111,6 +111,7 @@ class WorkOrderRepository
             ':ms_request_id' => $data['ms_request_id'] ?? null,
             ':ms_email' => $data['ms_email'] ?? null,
             ':checklist_template' => $data['checklist_template'] ?? null,
+            ':checklist_data' => isset($data['checklist_data']) ? json_encode($data['checklist_data']) : null,
             ':duration_hours' => $data['duration_hours'] ?? 0,
             ':failure_code' => $data['failure_code'] ?? null,
             ':service_warranty_date' => $data['service_warranty_date'] ?? null,
@@ -129,11 +130,11 @@ class WorkOrderRepository
             $fields = [];
             $params = [':id' => $id];
 
-            $allowedFields = ['status', 'completed_date', 'duration_hours', 'failure_code', 'service_warranty_date', 'final_asset_status', 'observations'];
+            $allowedFields = ['status', 'completed_date', 'duration_hours', 'failure_code', 'service_warranty_date', 'final_asset_status', 'observations', 'checklist_data'];
             foreach ($allowedFields as $field) {
                 if (isset($data[$field])) {
                     $fields[] = "$field = :$field";
-                    $params[":$field"] = $data[$field];
+                    $params[":$field"] = ($field === 'checklist_data') ? json_encode($data[$field]) : $data[$field];
                 }
             }
 

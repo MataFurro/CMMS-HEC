@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es">
 
 <head>
     <meta charset="utf-8" />
@@ -109,11 +109,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#137fec",
-                        "background-light": "#f6f7f8",
-                        "background-dark": "#0a0f14",
+                        "primary": "#025082", // Unified medical-blue
+                        "background-light": "#f1f5f9",
+                        "background-dark": "#0f172a",
                         "medical-dark": "#0f172a",
                         "medical-surface": "#1e293b",
+                        "text-main": {
+                            light: "#0f172a",
+                            dark: "#f1f5f9"
+                        }
                     },
                     fontFamily: {
                         "display": ["Inter", "sans-serif"]
@@ -121,6 +125,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 },
             },
         }
+
+        const applyTheme = (theme) => {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        };
+        applyTheme(localStorage.getItem('theme') || 'dark');
     </script>
     <style>
         body {
@@ -153,42 +166,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center p-4 md:p-8 font-display">
 
     <!-- Main Card Container -->
-    <div class="max-w-2xl w-full bg-white dark:bg-medical-surface rounded-xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden relative">
+    <div class="max-w-2xl w-full bg-medical-surface rounded-xl shadow-xl border border-border-dark overflow-hidden relative">
 
         <!-- Logic Feedback Overlays (Simple Toast Injection) -->
         <?php if ($success): ?>
-            <div class="absolute top-0 left-0 w-full bg-green-500 text-white p-3 text-center text-sm font-bold z-50 animate-pulse">
+            <div class="absolute top-0 left-0 w-full bg-excel-green text-white p-3 text-center text-sm font-bold z-50 animate-pulse">
                 ✓ Reporte enviado exitosamente a mantenimiento.
             </div>
         <?php endif; ?>
         <?php if ($error): ?>
-            <div class="absolute top-0 left-0 w-full bg-red-500 text-white p-3 text-center text-sm font-bold z-50">
+            <div class="absolute top-0 left-0 w-full bg-danger text-white p-3 text-center text-sm font-bold z-50">
                 ⚠ <?= htmlspecialchars($error) ?>
             </div>
         <?php endif; ?>
 
         <!-- Header Section -->
-        <div class="p-8 border-b border-slate-100 dark:border-slate-800">
+        <div class="p-8 border-b border-border-dark">
             <div class="flex items-center gap-3 mb-6">
                 <!-- Back Button intelligent routing -->
                 <?php
                 $backUrl = ($_SESSION['user_role'] ?? '') === ROLE_USER ? '?page=login&action=logout' : '?page=dashboard';
                 $backTitle = ($_SESSION['user_role'] ?? '') === ROLE_USER ? 'Cerrar Sesión' : 'Volver al Dashboard';
                 ?>
-                <a href="<?= $backUrl ?>" class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95" title="<?= $backTitle ?>">
+                <a href="<?= $backUrl ?>" class="w-10 h-10 rounded-lg bg-panel-dark flex items-center justify-center text-text-muted hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95" title="<?= $backTitle ?>">
                     <span class="material-icons">arrow_back</span>
                 </a>
 
-                <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white">
+                <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
                     <span class="material-icons text-2xl">build</span>
                 </div>
                 <div class="flex flex-col">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Industrial Ops</span>
-                    <span class="text-lg font-bold text-slate-900 dark:text-white leading-none">Global Network</span>
+                    <span class="text-xs font-bold uppercase tracking-wider text-text-muted">Industrial Ops</span>
+                    <span class="text-lg font-bold text-text-main leading-none">Global Network</span>
                 </div>
             </div>
-            <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-2">Quick Incident Report</h1>
-            <p class="text-slate-500 dark:text-slate-400 leading-relaxed">
+            <h1 class="text-3xl font-bold text-text-main mb-2">Quick Incident Report</h1>
+            <p class="text-text-muted leading-relaxed">
                 Por favor provea detalles sobre la falla del equipo. Mantenimiento será notificado inmediatamente.
             </p>
         </div>
@@ -198,38 +211,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <!-- Email Input -->
             <div class="space-y-2">
-                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300" for="email">
+                <label class="block text-sm font-semibold text-text-muted" for="email">
                     Reporter Email <span class="text-primary">*</span>
                 </label>
                 <div class="relative group">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-text-muted/60 group-focus-within:text-primary transition-colors">
                         <span class="material-icons text-lg">alternate_email</span>
                     </div>
                     <input
-                        class="block w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-slate-400"
+                        class="block w-full pl-11 pr-4 py-3 bg-medical-dark border-border-dark rounded-lg text-text-main focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-text-muted/40"
                         id="email" name="email" placeholder="name@company.com" required type="email" value="<?= htmlspecialchars($email ?? '') ?>" />
                 </div>
             </div>
 
             <!-- Location Dropdown -->
             <div class="space-y-2">
-                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300" for="location">
+                <label class="block text-sm font-semibold text-text-muted" for="location">
                     Location / Department <span class="text-primary">*</span>
                 </label>
                 <div class="relative group">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-text-muted/60 group-focus-within:text-primary transition-colors">
                         <span class="material-icons text-lg">location_on</span>
                     </div>
                     <?php $locations = getAllLocations(); ?>
                     <select
-                        class="block w-full pl-11 pr-10 py-3 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer"
+                        class="block w-full pl-11 pr-10 py-3 bg-medical-dark border-border-dark rounded-lg text-text-main focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer"
                         id="location" name="location" required>
                         <option disabled selected value="">Select location...</option>
                         <?php foreach ($locations as $loc): ?>
                             <option value="<?= htmlspecialchars($loc) ?>"><?= htmlspecialchars($loc) ?></option>
                         <?php endforeach; ?>
                     </select>
-                    <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
+                    <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-text-muted/60">
                         <span class="material-icons">expand_more</span>
                     </div>
                 </div>
@@ -237,58 +250,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <!-- Equipment Field -->
             <div class="space-y-2">
-                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300" for="equipment">
+                <label class="block text-sm font-semibold text-text-muted" for="equipment">
                     Equipo
                 </label>
                 <div class="relative group">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-text-muted/60 group-focus-within:text-primary transition-colors">
                         <span class="material-icons text-lg">medical_services</span>
                     </div>
                     <input
-                        class="block w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-slate-400"
+                        class="block w-full pl-11 pr-4 py-3 bg-medical-dark border-border-dark rounded-lg text-text-main focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-text-muted/40"
                         id="equipment" name="equipment" placeholder="Nombre del equipo (Ej. Ventilador Mecánico)" type="text" value="<?= htmlspecialchars($equipment ?? '') ?>" />
                 </div>
             </div>
 
             <!-- Serial Number Field -->
             <div class="space-y-2">
-                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300" for="serial_number">
+                <label class="block text-sm font-semibold text-text-muted" for="serial_number">
                     N° de Serie <span class="text-primary">*</span>
                 </label>
                 <div class="relative group">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-text-muted/60 group-focus-within:text-primary transition-colors">
                         <span class="material-icons text-lg">qr_code</span>
                     </div>
                     <input
-                        class="block w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-slate-400"
+                        class="block w-full pl-11 pr-4 py-3 bg-medical-dark border-border-dark rounded-lg text-text-main focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-text-muted/40"
                         id="serial_number" name="serial_number" placeholder="Ingrese el número de serie" required type="text" value="<?= htmlspecialchars($serial ?? '') ?>" />
                 </div>
             </div>
 
             <!-- Description Textarea -->
             <div class="space-y-2">
-                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300" for="description">
+                <label class="block text-sm font-semibold text-text-muted" for="description">
                     Description of the Failure <span class="text-primary">*</span>
                 </label>
                 <textarea
-                    class="block w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-slate-400 resize-none"
+                    class="block w-full px-4 py-3 bg-medical-dark border-border-dark rounded-lg text-text-main focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-text-muted/40 resize-none"
                     id="description" name="description" placeholder="Describe error codes, visible damage, or unusual sounds..."
                     required rows="4"><?= htmlspecialchars($description ?? '') ?></textarea>
             </div>
 
             <!-- Upload Zone -->
             <div class="space-y-2">
-                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                <label class="block text-sm font-semibold text-text-muted">
                     Equipment Photos
                 </label>
                 <div class="custom-dashed rounded-lg p-8 flex flex-col items-center justify-center gap-3 bg-primary/5 hover:bg-primary/[0.08] transition-colors cursor-pointer group file-input-wrapper">
                     <input type="file" name="photo" accept="image/*" onchange="document.getElementById('file-label').textContent = this.files[0].name">
-                    <div class="w-12 h-12 bg-white dark:bg-slate-800 rounded-full shadow-sm flex items-center justify-center text-primary transition-transform group-hover:scale-110">
+                    <div class="w-12 h-12 bg-medical-surface rounded-full shadow-sm flex items-center justify-center text-primary transition-transform group-hover:scale-110">
                         <span class="material-icons">photo_camera</span>
                     </div>
                     <div class="text-center pointer-events-none">
-                        <p class="text-sm font-medium text-slate-900 dark:text-white" id="file-label">Click or drag images here</p>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">PNG, JPG up to 10MB</p>
+                        <p class="text-sm font-medium text-text-main" id="file-label">Click or drag images here</p>
+                        <p class="text-xs text-text-muted mt-1">PNG, JPG up to 10MB</p>
                     </div>
                 </div>
             </div>
@@ -303,16 +316,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
 
         <!-- Footer -->
-        <div class="px-8 py-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="px-8 py-6 bg-panel-dark border-t border-border-dark flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-2">
-                <div class="w-2 h-2 rounded-full bg-green-500"></div>
-                <span class="text-[10px] font-mono font-medium text-slate-500 dark:text-slate-400 tracking-tighter uppercase">
+                <div class="w-2 h-2 rounded-full bg-excel-green"></div>
+                <span class="text-[10px] font-mono font-medium text-text-muted tracking-tighter uppercase">
                     SECURE INDUSTRIAL COMMUNICATION PROTOCOL V4.2
                 </span>
             </div>
             <div class="flex items-center gap-6">
-                <a class="text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-primary transition-colors" href="#">Emergency Support</a>
-                <a class="text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-primary transition-colors" href="?page=messenger_requests">Recent Reports</a>
+                <a class="text-xs font-semibold text-text-muted hover:text-primary transition-colors" href="#">Emergency Support</a>
+                <a class="text-xs font-semibold text-text-muted hover:text-primary transition-colors" href="?page=messenger_requests">Recent Reports</a>
             </div>
         </div>
     </div>

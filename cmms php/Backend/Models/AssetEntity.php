@@ -26,20 +26,25 @@ readonly class AssetEntity
         public ?int $yearsRemaining = null,
         public int $usefulLifePct = 0,
         public ?string $imageUrl = null,
-<<<<<<< HEAD:cmms php/backend/Models/AssetEntity.php
         public ?string $observations = null,
         public ?string $vendor = null,
         public ?string $ownership = null,
         public ?string $warrantyExpiration = null,
         public bool $underMaintenancePlan = false,
         public ?int $purchasedYear = null,
-        public ?int $totalUsefulLife = null
+        public ?int $totalUsefulLife = null,
+        public ?int $categoryId = null,
+        public ?string $categoryName = null,
+        public ?string $riesgoGe = null,
+        public ?string $codigoUmdns = null,
+        public int $funcionGeScore = 0,
+        public int $riesgoGeScore = 0,
+        public int $mantenimientoGeScore = 0,
+        public ?string $claseRiesgo = 'I',
+        public ?string $riesgoBiomedico = 'Medio',
+        public float $valorReposicion = 0.0,
+        public int $frecuenciaMpMeses = 6
     ) {}
-=======
-        public ?string $observations = null
-    ) {
-    }
->>>>>>> origin/main:cmms php/Backend/Models/AssetEntity.php
 
     /**
      * Mapear desde array de base de datos
@@ -61,17 +66,24 @@ readonly class AssetEntity
             yearsRemaining: isset($data['years_remaining']) ? (int) $data['years_remaining'] : null,
             usefulLifePct: (int) ($data['useful_life_pct'] ?? 0),
             imageUrl: $data['image_url'] ?? null,
-<<<<<<< HEAD:cmms php/backend/Models/AssetEntity.php
             observations: $data['observations'] ?? null,
             vendor: $data['vendor'] ?? null,
             ownership: $data['ownership'] ?? null,
             warrantyExpiration: $data['warranty_expiration'] ?? null,
             underMaintenancePlan: (bool) ($data['under_maintenance_plan'] ?? false),
             purchasedYear: isset($data['purchased_year']) ? (int) $data['purchased_year'] : null,
-            totalUsefulLife: isset($data['total_useful_life']) ? (int) $data['total_useful_life'] : null
-=======
-            observations: $data['observations'] ?? null
->>>>>>> origin/main:cmms php/Backend/Models/AssetEntity.php
+            totalUsefulLife: isset($data['total_useful_life']) ? (int) $data['total_useful_life'] : null,
+            categoryId: isset($data['category_id']) ? (int) $data['category_id'] : null,
+            categoryName: $data['category_name'] ?? null,
+            riesgoGe: $data['riesgo_ge'] ?? null,
+            codigoUmdns: $data['codigo_umdns'] ?? null,
+            funcionGeScore: (int) ($data['funcion_ge'] ?? 0),
+            riesgoGeScore: (int) ($data['riesgo_ge_score'] ?? 0),
+            mantenimientoGeScore: (int) ($data['mantenimiento_ge'] ?? 0),
+            claseRiesgo: $data['clase_riesgo'] ?? 'I',
+            riesgoBiomedico: $data['riesgo_biomedico'] ?? 'Medio',
+            valorReposicion: (float) ($data['valor_reposicion'] ?? 0.0),
+            frecuenciaMpMeses: (int) ($data['frecuencia_mp_meses'] ?? 6)
         );
     }
 
@@ -95,17 +107,24 @@ readonly class AssetEntity
             'years_remaining' => $this->yearsRemaining,
             'useful_life_pct' => $this->usefulLifePct,
             'image_url' => $this->imageUrl,
-<<<<<<< HEAD:cmms php/backend/Models/AssetEntity.php
             'observations' => $this->observations,
             'vendor' => $this->vendor,
             'ownership' => $this->ownership,
             'warranty_expiration' => $this->warrantyExpiration,
             'under_maintenance_plan' => $this->underMaintenancePlan,
             'purchased_year' => $this->purchasedYear,
-            'total_useful_life' => $this->totalUsefulLife
-=======
-            'observations' => $this->observations
->>>>>>> origin/main:cmms php/Backend/Models/AssetEntity.php
+            'total_useful_life' => $this->totalUsefulLife,
+            'category_id' => $this->categoryId,
+            'category_name' => $this->categoryName,
+            'riesgo_ge' => $this->riesgoGe,
+            'codigo_umdns' => $this->codigoUmdns,
+            'funcion_ge' => $this->funcionGeScore,
+            'riesgo_ge_score' => $this->riesgoGeScore,
+            'mantenimiento_ge' => $this->mantenimientoGeScore,
+            'clase_riesgo' => $this->claseRiesgo,
+            'riesgo_biomedico' => $this->riesgoBiomedico,
+            'valor_reposicion' => $this->valorReposicion,
+            'frecuencia_mp_meses' => $this->frecuenciaMpMeses
         ];
     }
 }

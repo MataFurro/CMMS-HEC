@@ -110,6 +110,7 @@ $MOCK_ASSETS = [
         'family_icon' => 'air',
         'family_color' => '#0ea5e9',
         'hours_used' => 18450,
+        'usage_profile' => 'Operativo',
         'total_failures' => 12,
         'downtime_hours' => 156
     ],
@@ -147,9 +148,7 @@ $MOCK_ASSETS = [
         'riesgo_ge_score' => 4,
         'mantenimiento_ge' => 3,
         'image_url' => 'https://www.bd.com/content/dam/bd/us/en-us/offerings/capabilities/infusion/infusion-pumps/alaris-system/alaris-gh-plus-large.jpg',
-        'family' => 'Infusión',
-        'family_icon' => 'water_drop',
-        'family_color' => '#8b5cf6',
+        'image_url' => 'https://www.bd.com/content/dam/bd/us/en-us/offerings/capabilities/infusion/infusion-pumps/alaris-system/alaris-gh-plus-large.jpg',
         'hours_used' => 28700,
         'total_failures' => 22,
         'downtime_hours' => 187
@@ -185,7 +184,9 @@ $MOCK_ASSETS = [
         'funcion_ge' => 9,
         'riesgo_ge_score' => 4,
         'mantenimiento_ge' => 3,
-        'image_url' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuCuTnaOyhDigSEJ_ZeiC5vlm5VEN4TICv5-Uk95l4oLSa4UlVPj36whZ9nAbcywMbM2UJsZSQQ-ZzoERBXbiyPkVhNiEq5VFx609iR72MDSNS9M15h6Xw71p6PKvEmyUBH3-ICY4Q8NsO7WSOPEdLVGp347QdiBje3dZ088nhjDZqFJQV6q_PMoECxkS3wI4nNpI5j-nZ5BgVzOhP7Uu3mulfvz2PZpBfaq6vbjJh9zaqLzkw9c3G4TgLFD4g_QY0tXEmNI-8-100s'
+        'image_url' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuCuTnaOyhDigSEJ_ZeiC5vlm5VEN4TICv5-Uk95l4oLSa4UlVPj36whZ9nAbcywMbM2UJsZSQQ-ZzoERBXbiyPkVhNiEq5VFx609iR72MDSNS9M15h6Xw71p6PKvEmyUBH3-ICY4Q8NsO7WSOPEdLVGp347QdiBje3dZ088nhjDZqFJQV6q_PMoECxkS3wI4nNpI5j-nZ5BgVzOhP7Uu3mulfvz2PZpBfaq6vbjJh9zaqLzkw9c3G4TgLFD4g_QY0tXEmNI-8-100s',
+        'image_url' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuCuTnaOyhDigSEJ_ZeiC5vlm5VEN4TICv5-Uk95l4oLSa4UlVPj36whZ9nAbcywMbM2UJsZSQQ-ZzoERBXbiyPkVhNiEq5VFx609iR72MDSNS9M15h6Xw71p6PKvEmyUBH3-ICY4Q8NsO7WSOPEdLVGp347QdiBje3dZ088nhjDZqFJQV6q_PMoECxkS3wI4nNpI5j-nZ5BgVzOhP7Uu3mulfvz2PZpBfaq6vbjJh9zaqLzkw9c3G4TgLFD4g_QY0tXEmNI-8-100s',
+        'hours_used' => 4200
     ],
     [
         'id' => 'DF-CU-00210',
@@ -218,7 +219,9 @@ $MOCK_ASSETS = [
         'funcion_ge' => 10,
         'riesgo_ge_score' => 5,
         'mantenimiento_ge' => 3,
-        'image_url' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuCuTnaOyhDigSEJ_ZeiC5vlm5VEN4TICv5-Uk95l4oLSa4UlVPj36whZ9nAbcywMbM2UJsZSQQ-ZzoERBXbiyPkVhNiEq5VFx609iR72MDSNS9M15h6Xw71p6PKvEmyUBH3-ICY4Q8NsO7WSOPEdLVGp347QdiBje3dZ088nhjDZqFJQV6q_PMoECxkS3wI4nNpI5j-nZ5BgVzOhP7Uu3mulfvz2PZpBfaq6vbjJh9zaqLzkw9c3G4TgLFD4g_QY0tXEmNI-8-100s'
+        'image_url' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuCuTnaOyhDigSEJ_ZeiC5vlm5VEN4TICv5-Uk95l4oLSa4UlVPj36whZ9nAbcywMbM2UJsZSQQ-ZzoERBXbiyPkVhNiEq5VFx609iR72MDSNS9M15h6Xw71p6PKvEmyUBH3-ICY4Q8NsO7WSOPEdLVGp347QdiBje3dZ088nhjDZqFJQV6q_PMoECxkS3wI4nNpI5j-nZ5BgVzOhP7Uu3mulfvz2PZpBfaq6vbjJh9zaqLzkw9c3G4TgLFD4g_QY0tXEmNI-8-100s',
+        'image_url' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuCuTnaOyhDigSEJ_ZeiC5vlm5VEN4TICv5-Uk95l4oLSa4UlVPj36whZ9nAbcywMbM2UJsZSQQ-ZzoERBXbiyPkVhNiEq5VFx609iR72MDSNS9M15h6Xw71p6PKvEmyUBH3-ICY4Q8NsO7WSOPEdLVGp347QdiBje3dZ088nhjDZqFJQV6q_PMoECxkS3wI4nNpI5j-nZ5BgVzOhP7Uu3mulfvz2PZpBfaq6vbjJh9zaqLzkw9c3G4TgLFD4g_QY0tXEmNI-8-100s',
+        'hours_used' => 120
     ],
     [
         'id' => 'ECG-2024-001',
@@ -244,7 +247,12 @@ $MOCK_ASSETS = [
         'funcion_ge' => 5,
         'riesgo_ge_score' => 2,
         'mantenimiento_ge' => 3,
-        'image_url' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuArjc0RB-oPKqM3OEkdyKO5qx0pqx3tnnDtgQIHmBy0OPhWndzJRDGmHAcSYe5KMj0OjejmEqQHwFvzj3j49_uv32qOSGRi45_B0VwA769XNTkLdWndUI_FM0j2hmcjFtaudmO_Y7PVvrQYFCicy5r0hOsgef2wmHu8tH4m42rvSfGyQ0ijsJnKLkakgcGce8Iu_LCpMrDOwXVMHGj1pEW6dn2BZOSGHAPH7GUrrvLeB-Sphiq9IgFn8INtJB9-UCwIwvp96rzTMKE'
+        'image_url' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuArjc0RB-oPKqM3OEkdyKO5qx0pqx3tnnDtgQIHmBy0OPhWndzJRDGmHAcSYe5KMj0OjejmEqQHwFvzj3j49_uv32qOSGRi45_B0VwA769XNTkLdWndUI_FM0j2hmcjFtaudmO_Y7PVvrQYFCicy5r0hOsgef2wmHu8tH4m42rvSfGyQ0ijsJnKLkakgcGce8Iu_LCpMrDOwXVMHGj1pEW6dn2BZOSGHAPH7GUrrvLeB-Sphiq9IgFn8INtJB9-UCwIwvp96rzTMKE',
+        'family' => 'Diagnóstico',
+        'family_icon' => 'analytics',
+        'family_color' => '#f59e0b',
+        'hours_used' => 850,
+        'usage_profile' => 'Operativo'
     ]
 ];
 
