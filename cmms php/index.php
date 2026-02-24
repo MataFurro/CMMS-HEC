@@ -1,11 +1,39 @@
 <?php
 // index.php - Main Router
 
+// ── Manejador Global de Excepciones (previene Fatal Error por DB) ──
+set_exception_handler(function (Throwable $e) {
+    $isDbError = str_contains($e->getMessage(), 'MySQL') || str_contains($e->getMessage(), 'conexión') || str_contains($e->getMessage(), 'SQLSTATE') || $e instanceof PDOException;
+    $title   = $isDbError ? 'Base de Datos No Disponible' : 'Error del Sistema';
+    $icon    = $isDbError ? 'storage' : 'bug_report';
+    $detail  = htmlspecialchars($e->getMessage());
+    http_response_code($isDbError ? 503 : 500);
+    echo "<!DOCTYPE html><html lang='es' class='dark'><head>
+        <meta charset='UTF-8'><title>BioCMMS - Error</title>
+        <script src='https://cdn.tailwindcss.com'></script>
+        <link href='https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined' rel='stylesheet'>
+    </head><body class='bg-slate-900 min-h-screen flex items-center justify-center font-sans'>
+        <div class='text-center space-y-6 max-w-lg px-8'>
+            <span class='material-symbols-outlined text-7xl text-red-500'>$icon</span>
+            <h1 class='text-2xl font-black text-white'>$title</h1>
+            <p class='text-slate-400 text-sm'>Ocurrió un error que impidió cargar la aplicación. Por favor verifica el estado del servidor MySQL en el Panel de Control de XAMPP.</p>
+            <details class='text-left bg-slate-800 rounded-xl p-4 text-xs text-red-400 font-mono cursor-pointer'>
+                <summary class='text-slate-500 mb-2'>Ver detalle técnico</summary>
+                $detail
+            </details>
+            <a href='?page=dashboard' class='inline-block mt-4 px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all'>
+                Reintentar
+            </a>
+        </div>
+    </body></html>";
+    exit;
+});
+
 require_once 'config.php';
-if (!defined('APP_NAME')) define('APP_NAME', 'BioCMMS v4.2 Pro');
+if (!defined('APP_NAME')) define('APP_NAME', 'BioCMMS v4.3 Pro');
 
 // 1. Determine target page
-$allowed_pages = ['dashboard', 'inventory', 'calendar', 'work_orders', 'new_asset', 'login', 'asset', 'work_order_execution', 'work_order_opening', 'family_analysis', 'financial_analysis', 'messenger_requests', 'service_request', 'service_request_review', 'audit_trail'];
+$allowed_pages = ['dashboard', 'inventory', 'calendar', 'work_orders', 'new_asset', 'login', 'asset', 'work_order_execution', 'work_order_opening', 'family_analysis', 'financial_analysis', 'messenger_requests', 'service_request', 'service_request_review', 'accreditation_dashboard'];
 
 header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
@@ -87,29 +115,98 @@ if ($page === 'login' || $page === 'service_request') {
             theme: {
                 extend: {
                     colors: {
-                        "medical-blue": "<?= COLOR_MEDICAL_BLUE ?>",
-                        "medical-dark": "<?= COLOR_MEDICAL_DARK ?>",
-                        "medical-surface": "<?= COLOR_BG_DARK ?>",
-                        "panel-dark": "<?= COLOR_PANEL_DARK ?>",
-                        "border-dark": "<?= COLOR_SLATE_700 ?>",
-                        "primary": "<?= COLOR_MEDICAL_BLUE ?>",
-                        "success": "<?= COLOR_EMERALD ?>",
-                        "danger": "<?= COLOR_RED ?>",
+                        "medical-blue": "var(--medical-blue)",
+                        "medical-dark": "var(--medical-dark)",
+                        "medical-surface": "var(--medical-surface)",
+                        "panel-dark": "var(--panel-dark)",
+                        "border-dark": "var(--border-dark)",
+                        "text-main": "var(--text-main)",
+                        "text-muted": "var(--text-muted)",
+                        "success": "#166534",
+                        "danger": "#ef4444",
                         "excel-green": "#16a34a",
                     }
                 }
             }
         }
+
+        const applyTheme = (theme) => {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            localStorage.setItem('theme', theme);
+        };
+        applyTheme(localStorage.getItem('theme') || 'dark');
     </script>
     <style type="text/tailwindcss">
-        @layer components {
-            .card-glass { @apply bg-medical-surface border border-slate-700/50 rounded-xl shadow-lg transition-all duration-300; }
-            .stat-value { @apply text-2xl font-bold text-white; }
-            .stat-label { @apply text-xs font-medium text-slate-400 uppercase tracking-wider; }
+        :root {
+            /* Light Theme: Clinical (Solid & Clear) */
+            --medical-blue: #025082;
+            --medical-dark: #f1f5f9;   /* Slate 100 - Clean Background */
+            --medical-surface: #ffffff;
+            --panel-dark: #e2e8f0;     /* Slate 200 - Sidebar/Header */
+            --border-dark: #cbd5e1;    /* Slate 300 - Borders */
+            --text-main: #0f172a;      /* Slate 900 - Dark Text */
+            --text-muted: #475569;     /* Slate 600 - Visible Labels */
+            --input-bg: #ffffff;
+            --header-bg: #ffffff;
         }
-        body { font-family: 'Inter', sans-serif; background-color: <?= COLOR_MEDICAL_DARK ?>; color: #e2e8f0; }
+
+        .dark {
+            /* Dark Theme: Deep Medical */
+            --medical-blue: #3b82f6;
+            --medical-dark: #0f172a;
+            --medical-surface: #1e293b;
+            --panel-dark: #111827;
+            --border-dark: #334155;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --input-bg: #0f172a;
+            --header-bg: rgba(15, 23, 42, 0.9);
+        }
+
+        .card-glass { 
+            background-color: var(--medical-surface);
+            border: 1px solid var(--border-dark);
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            transition-property: all;
+            transition-duration: 300ms;
+        }
+        .sidebar-link-active {
+            color: var(--medical-blue);
+            background-color: rgba(59, 130, 246, 0.1); /* bg-medical-blue/10 */
+            font-weight: 700;
+            border-right-width: 4px;
+            border-color: var(--medical-blue);
+        }
+        .sidebar-link-inactive {
+            color: var(--text-muted);
+            transition-property: all;
+            transition-duration: 300ms;
+        }
+        .sidebar-link-inactive:hover {
+            color: var(--text-main);
+        }
+        .dark .sidebar-link-inactive:hover {
+            background-color: #1e293b; /* bg-slate-800 */
+        }
+        .sidebar-link-inactive:hover:not(.dark *) {
+            background-color: #e2e8f0; /* bg-slate-200 */
+        }
+        .stat-value { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: var(--text-main); }
+        .stat-label { font-size: 0.75rem; line-height: 1rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--medical-dark); 
+            color: var(--text-main); 
+        }
+        
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: <?= COLOR_MEDICAL_DARK ?>; }
+        ::-webkit-scrollbar-track { background: var(--medical-dark); }
         ::-webkit-scrollbar-thumb { @apply bg-slate-700 rounded-full hover:bg-slate-600; }
         .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
     </style>

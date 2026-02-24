@@ -60,21 +60,67 @@ class AssetRepository
 
     /**
      * Buscar activos con filtros usando Generadores
-     * @return Generator<AssetEntity>
      */
-    public function search(string $query = '', string $status = 'ALL'): Generator
+    public function search(string $query = '', string $status = 'ALL', array $filters = []): Generator
+    {
+        return $this->searchPaginated($query, $status, 0, 0, $filters);
+    }
+
+    /**
+     * Buscar activos con filtros y paginación
+     */
+    public function searchPaginated(string $query = '', string $status = 'ALL', int $limit = 0, int $offset = 0, array $filters = []): Generator
     {
         $sql = "SELECT * FROM assets 
-                WHERE (name LIKE :q OR brand LIKE :q OR id LIKE :q)";
+                WHERE (name LIKE :q1 OR brand LIKE :q2 OR id LIKE :q3 OR serial_number LIKE :q4)";
 
-        $params = [':q' => "%$query%"];
+        $params = [
+            ':q1' => "%$query%",
+            ':q2' => "%$query%",
+            ':q3' => "%$query%",
+            ':q4' => "%$query%"
+        ];
 
         if ($status !== 'ALL') {
             $sql .= " AND status = :status";
             $params[':status'] = $status;
         }
 
-        $sql .= " ORDER BY criticality DESC, name ASC";
+        if (!empty($filters['location']) && $filters['location'] !== 'ALL') {
+            $sql .= " AND location = :location";
+            $params[':location'] = $filters['location'];
+        }
+
+        if (!empty($filters['brand']) && $filters['brand'] !== 'ALL') {
+            $sql .= " AND brand = :brand";
+            $params[':brand'] = $filters['brand'];
+        }
+
+        if (!empty($filters['criticality']) && $filters['criticality'] !== 'ALL') {
+            $sql .= " AND criticality = :criticality";
+            $params[':criticality'] = $filters['criticality'];
+        }
+
+        if (!empty($filters['family']) && $filters['family'] !== 'ALL') {
+            $sql .= " AND riesgo_ge = :riesgo_ge";
+            $params[':riesgo_ge'] = $filters['family'];
+        }
+
+        if (!empty($filters['category_id']) && $filters['category_id'] !== 'ALL') {
+            $sql .= " AND category_id = :category_id";
+            $params[':category_id'] = $filters['category_id'];
+        }
+
+        // Ordenar por riesgo_ge primero si estamos viendo "Todos" para facilitar la agrupación visual
+        $orderBy = !empty($filters['family']) && $filters['family'] === 'ALL'
+            ? "riesgo_ge ASC, criticality DESC, name ASC"
+            : "criticality DESC, name ASC";
+
+        $sql .= " ORDER BY $orderBy";
+
+        if ($limit > 0) {
+            $sql .= " LIMIT $limit OFFSET $offset";
+        }
 
         try {
             $stmt = $this->db->prepare($sql);
@@ -83,7 +129,62 @@ class AssetRepository
                 yield AssetEntity::fromArray($row);
             }
         } catch (\Exception $e) {
-            LoggerService::error("Error en AssetRepository::search", ['query' => $query, 'error' => $e->getMessage()]);
+            LoggerService::error("Error en AssetRepository::searchPaginated", ['query' => $query, 'filters' => $filters, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Contar resultados de búsqueda para paginación
+     */
+    public function countSearchResults(string $query = '', string $status = 'ALL', array $filters = []): int
+    {
+        $sql = "SELECT COUNT(*) FROM assets 
+                WHERE (name LIKE :q1 OR brand LIKE :q2 OR id LIKE :q3 OR serial_number LIKE :q4)";
+
+        $params = [
+            ':q1' => "%$query%",
+            ':q2' => "%$query%",
+            ':q3' => "%$query%",
+            ':q4' => "%$query%"
+        ];
+
+        if ($status !== 'ALL') {
+            $sql .= " AND status = :status";
+            $params[':status'] = $status;
+        }
+
+        if (!empty($filters['location']) && $filters['location'] !== 'ALL') {
+            $sql .= " AND location = :location";
+            $params[':location'] = $filters['location'];
+        }
+
+        if (!empty($filters['brand']) && $filters['brand'] !== 'ALL') {
+            $sql .= " AND brand = :brand";
+            $params[':brand'] = $filters['brand'];
+        }
+
+        if (!empty($filters['criticality']) && $filters['criticality'] !== 'ALL') {
+            $sql .= " AND criticality = :criticality";
+            $params[':criticality'] = $filters['criticality'];
+        }
+
+        if (!empty($filters['family']) && $filters['family'] !== 'ALL') {
+            $sql .= " AND riesgo_ge = :riesgo_ge";
+            $params[':riesgo_ge'] = $filters['family'];
+        }
+
+        if (!empty($filters['category_id']) && $filters['category_id'] !== 'ALL') {
+            $sql .= " AND category_id = :category_id";
+            $params[':category_id'] = $filters['category_id'];
+        }
+
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($params);
+            return (int) $stmt->fetchColumn();
+        } catch (\Exception $e) {
+            LoggerService::error("Error en AssetRepository::countSearchResults", ['query' => $query, 'filters' => $filters, 'error' => $e->getMessage()]);
+            return 0;
         }
     }
 
@@ -104,12 +205,38 @@ class AssetRepository
     }
 
     /**
-     * Obtener ubicaciones únicas (Servicios Hospitalarios Oficiales)
+     * Obtener ubicaciones únicas desde la tabla de activos
      */
     public function getUniqueLocations(): array
     {
-        // Ahora consultamos la tabla maestra de servicios en lugar de los strings en assets
-        $stmt = $this->db->query("SELECT name FROM hospital_services ORDER BY name ASC");
+        $stmt = $this->db->query("SELECT DISTINCT location FROM assets WHERE location IS NOT NULL AND location != '' ORDER BY location ASC");
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Obtener marcas únicas desde la tabla de activos
+     */
+    public function getUniqueBrands(): array
+    {
+        $stmt = $this->db->query("SELECT DISTINCT brand FROM assets WHERE brand IS NOT NULL AND brand != '' ORDER BY brand ASC");
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Obtener criticidades únicas
+     */
+    public function getUniqueCriticalities(): array
+    {
+        $stmt = $this->db->query("SELECT DISTINCT criticality FROM assets WHERE criticality IS NOT NULL AND criticality != '' ORDER BY criticality ASC");
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Obtener categorías únicas
+     */
+    public function getUniqueCategories(): array
+    {
+        $stmt = $this->db->query("SELECT DISTINCT category_id FROM assets WHERE category_id IS NOT NULL AND category_id != '' ORDER BY category_id ASC");
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
@@ -137,7 +264,6 @@ class AssetRepository
 
             $stmt = $this->db->prepare($sql);
 
-            // Map keys a snake_case si vienen en camelCase
             $params = [
                 ':id' => $data['id'] ?? null,
                 ':name' => $data['name'] ?? null,
@@ -181,7 +307,23 @@ class AssetRepository
             $fields = [];
             $params = [':id' => $id];
 
-            $allowedFields = ['name', 'brand', 'model', 'serial_number', 'location', 'sub_location', 'status'];
+            $allowedFields = [
+                'name',
+                'brand',
+                'model',
+                'serial_number',
+                'location',
+                'sub_location',
+                'status',
+                'useful_life_pct',
+                'total_useful_life',
+                'years_remaining',
+                'purchased_year',
+                'clase_riesgo',
+                'riesgo_biomedico',
+                'valor_reposicion',
+                'frecuencia_mp_meses'
+            ];
             foreach ($allowedFields as $field) {
                 if (isset($data[$field])) {
                     $fields[] = "$field = :$field";

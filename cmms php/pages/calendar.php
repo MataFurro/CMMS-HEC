@@ -51,16 +51,16 @@ foreach ($months as $idx => $m) {
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-            <h1 class="text-4xl font-bold tracking-tight text-white flex items-center gap-3">
+            <h1 class="text-4xl font-bold tracking-tight text-text-main flex items-center gap-3">
                 Agenda Técnica 2026
                 <span
                     class="text-medical-blue material-symbols-outlined text-3xl font-variation-fill">event_upcoming</span>
             </h1>
-            <p class="text-slate-400 mt-2 text-lg">Cronograma maestro sincronizado con el módulo de Órdenes de Trabajo.
+            <p class="text-text-muted mt-2 text-lg">Cronograma maestro sincronizado con el módulo de Órdenes de Trabajo.
             </p>
         </div>
         <div class="flex items-center gap-4">
-            <div class="flex bg-white/5 border border-border-dark p-1.5 rounded-2xl">
+            <div class="flex bg-panel-dark/50 border border-border-dark p-1.5 rounded-2xl">
                 <?php
                 $views = [
                     ['id' => 'year', 'label' => 'Año'],
@@ -72,8 +72,8 @@ foreach ($months as $idx => $m) {
                     $isActive = $view === $v['id'];
                     $class = $isActive
                         ? 'bg-medical-blue text-white shadow-lg shadow-medical-blue/20'
-                        : 'text-slate-500 hover:text-white';
-                    ?>
+                        : 'text-text-muted hover:text-text-main';
+                ?>
                     <a href="?page=calendar&view=<?= $v['id'] ?>"
                         class="px-5 py-2 text-xs font-bold rounded-xl transition-all <?= $class ?>">
                         <?= $v['label'] ?>
@@ -81,7 +81,7 @@ foreach ($months as $idx => $m) {
                 <?php endforeach; ?>
             </div>
             <a href="?page=work_orders"
-                class="flex items-center gap-3 px-6 py-3 border border-slate-700 text-slate-300 rounded-2xl hover:bg-white/5 transition-all font-bold text-sm">
+                class="flex items-center gap-3 px-6 py-3 border border-border-dark text-text-muted rounded-2xl hover:bg-panel-dark transition-all font-bold text-sm">
                 <span class="material-symbols-outlined text-xl">settings_applications</span>
                 <span>Manejo de OTs</span>
             </a>
@@ -92,48 +92,79 @@ foreach ($months as $idx => $m) {
         <!-- Sidebar Legend (Common) -->
         <div class="lg:col-span-3 space-y-6">
             <div class="bg-panel-dark p-6 rounded-3xl border border-border-dark shadow-xl">
-                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-6 px-1 text-center">
+                <h3 class="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] mb-6 px-1 text-center">
                     Leyenda de Estados</h3>
                 <div class="space-y-4">
-                    <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-transparent">
+                    <div class="flex items-center gap-3 p-3 bg-panel-dark/40 rounded-xl border border-transparent">
                         <div class="size-3 rounded-full bg-danger"></div>
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Correctivos
+                        <span class="text-[10px] font-black text-text-muted uppercase tracking-widest">Correctivos
                             Críticos</span>
                     </div>
-                    <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-transparent">
+                    <div class="flex items-center gap-3 p-3 bg-panel-dark/40 rounded-xl border border-transparent">
                         <div class="size-3 rounded-full bg-medical-blue"></div>
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Preventivos
+                        <span class="text-[10px] font-black text-text-muted uppercase tracking-widest">Preventivos
                             Programados</span>
                     </div>
-                    <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-transparent">
+                    <div class="flex items-center gap-3 p-3 bg-panel-dark/40 rounded-xl border border-transparent">
                         <div class="size-3 rounded-full bg-amber-500"></div>
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Calibraciones
+                        <span class="text-[10px] font-black text-text-muted uppercase tracking-widest">Calibraciones
                             Pendientes</span>
                     </div>
                 </div>
                 <div class="mt-8 pt-8 border-t border-border-dark space-y-4">
-                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Filtro por
-                        Servicio</p>
-                    <div class="space-y-3">
+                    <div class="flex items-center justify-between px-1">
+                        <p class="text-[10px] font-black text-text-muted uppercase tracking-widest">Filtro por Servicio</p>
+                        <div class="flex gap-2">
+                            <button onclick="toggleAllServices(true)" class="text-[9px] font-bold text-medical-blue uppercase hover:underline">Todos</button>
+                            <span class="text-[9px] text-border-dark">|</span>
+                            <button onclick="toggleAllServices(false)" class="text-[9px] font-bold text-text-muted uppercase hover:underline">Ninguno</button>
+                        </div>
+                    </div>
+
+                    <!-- Buscador dinámico de servicios -->
+                    <div class="relative group">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm text-text-muted group-focus-within:text-medical-blue transition-colors">search</span>
+                        <input type="text" id="serviceSearch" placeholder="Buscar servicio..."
+                            class="w-full bg-panel-dark/50 border border-border-dark rounded-xl py-2 pl-9 pr-4 text-xs text-text-main focus:border-medical-blue focus:ring-1 focus:ring-medical-blue/20 transition-all outline-none"
+                            onkeyup="filterServices()">
+                    </div>
+
+                    <div id="serviceList" class="space-y-1 max-height-[300px] overflow-y-auto pr-2 custom-scrollbar" style="max-height: 320px;">
                         <?php
                         $allLocations = getAllLocations();
                         foreach ($allLocations as $loc): ?>
-                            <label class="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" checked
-                                    class="size-5 rounded-lg border-border-dark bg-background-dark text-medical-blue focus:ring-0" />
-                                <span
-                                    class="text-xs text-slate-400 group-hover:text-white font-bold uppercase tracking-wider transition-colors"><?= $loc ?></span>
+                            <label class="service-item flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 cursor-pointer group transition-all" data-service="<?= strtolower($loc) ?>">
+                                <div class="relative flex items-center justify-center">
+                                    <input type="checkbox" checked
+                                        class="service-checkbox size-4 rounded-md border-border-dark bg-medical-dark text-medical-blue focus:ring-0 checked:border-medical-blue transition-all" />
+                                </div>
+                                <span class="text-[11px] text-text-muted group-hover:text-text-main font-bold uppercase tracking-wider transition-colors truncate"><?= $loc ?></span>
                             </label>
                         <?php endforeach; ?>
                     </div>
                 </div>
+
+                <script>
+                    function filterServices() {
+                        const query = document.getElementById('serviceSearch').value.toLowerCase();
+                        const items = document.querySelectorAll('.service-item');
+                        items.forEach(item => {
+                            const service = item.getAttribute('data-service');
+                            item.style.display = service.includes(query) ? 'flex' : 'none';
+                        });
+                    }
+
+                    function toggleAllServices(checked) {
+                        document.querySelectorAll('.service-checkbox').forEach(cb => cb.checked = checked);
+                    }
+                </script>
             </div>
             <div
                 class="bg-medical-blue/5 border border-medical-blue/20 p-6 rounded-3xl flex flex-col items-center text-center">
                 <span class="material-symbols-outlined text-medical-blue text-3xl mb-3">sync</span>
                 <h4 class="text-[10px] font-black text-medical-blue uppercase tracking-widest mb-2">Sincronización
                     Activa</h4>
-                <p class="text-xs font-bold text-white">Actualizado en tiempo real</p>
+                <p class="text-xs font-bold text-text-main">Actualizado en tiempo real</p>
             </div>
         </div>
 
@@ -144,9 +175,9 @@ foreach ($months as $idx => $m) {
             <?php if ($view === 'month'): ?>
                 <div
                     class="bg-panel-dark rounded-[2rem] border border-border-dark shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300">
-                    <div class="grid grid-cols-7 border-b border-border-dark bg-white/5">
+                    <div class="grid grid-cols-7 border-b border-border-dark bg-medical-dark/30">
                         <?php foreach ($weekDays as $day): ?>
-                            <div class="py-5 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                            <div class="py-5 text-center text-[10px] font-black text-text-muted uppercase tracking-[0.2em]">
                                 <?= substr($day, 0, 2) ?>
                             </div>
                         <?php endforeach; ?>
@@ -157,12 +188,12 @@ foreach ($months as $idx => $m) {
                         for ($i = -2; $i <= 32; $i++):
                             $isCurrentMonth = $i > 0 && $i <= 31;
                             $isToday = $i === 14;
-                            ?>
+                        ?>
                             <div
-                                class="p-3 border-r border-b border-border-dark transition-all hover:bg-white/[0.02] flex flex-col relative group <?= !$isCurrentMonth ? 'opacity-10 bg-slate-900/50' : '' ?> <?= $isToday ? 'bg-medical-blue/5' : '' ?>">
+                                class="p-3 border-r border-b border-border-dark transition-all hover:bg-panel-dark/20 flex flex-col relative group <?= !$isCurrentMonth ? 'opacity-10 bg-medical-dark/50' : '' ?> <?= $isToday ? 'bg-medical-blue/5' : '' ?>">
                                 <div class="flex justify-between items-start mb-2">
                                     <span
-                                        class="text-sm font-black font-mono <?= $isToday ? 'text-medical-blue' : 'text-slate-500' ?>">
+                                        class="text-sm font-black font-mono <?= $isToday ? 'text-medical-blue' : 'text-text-muted' ?>">
                                         <?= $i <= 0 ? 30 + $i : ($i > 31 ? $i - 31 : $i) ?>
                                     </span>
                                     <?php if ($isToday): ?>
@@ -198,7 +229,7 @@ foreach ($months as $idx => $m) {
                         <div
                             class="bg-panel-dark rounded-3xl border border-border-dark p-6 hover:border-medical-blue/40 transition-all group relative overflow-hidden">
                             <div class="flex justify-between items-start mb-4">
-                                <h4 class="text-sm font-black text-white uppercase tracking-widest"><?= $item['month'] ?></h4>
+                                <h4 class="text-sm font-black text-text-main uppercase tracking-widest"><?= $item['month'] ?></h4>
                                 <span
                                     class="text-[10px] font-black px-2 py-0.5 rounded <?= $item['ots'] > 15 ? 'bg-danger/10 text-danger' : 'bg-medical-blue/10 text-medical-blue' ?>">
                                     <?= $item['ots'] ?> OTs
@@ -207,7 +238,7 @@ foreach ($months as $idx => $m) {
                             <div class="grid grid-cols-7 gap-1 opacity-40 group-hover:opacity-100 transition-opacity">
                                 <?php for ($d = 0; $d < 28; $d++): ?>
                                     <div
-                                        class="aspect-square rounded-[2px] <?= ($d + $idx) % 7 === 0 ? 'bg-medical-blue/40' : 'bg-slate-800' ?>">
+                                        class="aspect-square rounded-[2px] <?= ($d + $idx) % 7 === 0 ? 'bg-medical-blue/40' : 'bg-medical-dark' ?>">
                                     </div>
                                 <?php endfor; ?>
                             </div>
@@ -225,12 +256,12 @@ foreach ($months as $idx => $m) {
             <?php elseif ($view === 'week'): ?>
                 <div
                     class="bg-panel-dark rounded-[2rem] border border-border-dark shadow-2xl overflow-hidden animate-in fade-in slide-in-from-right-4 duration-300">
-                    <div class="grid grid-cols-[80px_1fr_1fr_1fr_1fr_1fr_1fr_1fr] border-b border-border-dark bg-white/5">
+                    <div class="grid grid-cols-[80px_1fr_1fr_1fr_1fr_1fr_1fr_1fr] border-b border-border-dark bg-medical-dark/30">
                         <div class="py-4 border-r border-border-dark"></div>
                         <?php foreach ($weekDays as $idx => $day): ?>
                             <div
-                                class="py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest border-r border-border-dark/30">
-                                <?= $day ?> <span class="block text-white opacity-40 mt-1">0<?= $idx + 9 ?> Feb</span>
+                                class="py-4 text-center text-[10px] font-black text-text-muted uppercase tracking-widest border-r border-border-dark/30">
+                                <?= $day ?> <span class="block text-text-main opacity-40 mt-1">0<?= $idx + 9 ?> Feb</span>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -238,7 +269,7 @@ foreach ($months as $idx => $m) {
                         <?php foreach ($hours as $hour): ?>
                             <div class="grid grid-cols-[80px_1fr_1fr_1fr_1fr_1fr_1fr_1fr] border-b border-border-dark/30">
                                 <div
-                                    class="py-6 px-3 text-[10px] font-mono text-slate-600 border-r border-border-dark text-right font-bold uppercase">
+                                    class="py-6 px-3 text-[10px] font-mono text-text-muted border-r border-border-dark text-right font-bold uppercase">
                                     <?= $hour ?>
                                 </div>
                                 <?php foreach ($weekDays as $idx => $day): ?>
@@ -247,14 +278,14 @@ foreach ($months as $idx => $m) {
                                         <?php if ($idx === 0 && $hour === '10:00'): ?>
                                             <div
                                                 class="absolute inset-x-1 top-2 p-3 bg-medical-blue/20 border-l-4 border-medical-blue rounded-xl z-10 shadow-lg shadow-medical-blue/10">
-                                                <p class="text-[9px] font-black text-white uppercase leading-none">OT #2026-0892</p>
+                                                <p class="text-[9px] font-black text-text-main uppercase leading-none">OT #2026-0892</p>
                                                 <p class="text-[8px] text-medical-blue font-bold mt-1 uppercase truncate">V. Mecánico
                                                     PB840</p>
                                             </div>
                                         <?php elseif ($idx === 2 && $hour === '14:00'): ?>
                                             <div
                                                 class="absolute inset-x-1 top-2 p-3 bg-danger/20 border-l-4 border-danger rounded-xl z-10">
-                                                <p class="text-[9px] font-black text-white uppercase leading-none">URGENCIA CRÍTICA</p>
+                                                <p class="text-[9px] font-black text-text-main uppercase leading-none">URGENCIA CRÍTICA</p>
                                                 <p class="text-[8px] text-danger font-bold mt-1 uppercase truncate">Rayos X Portátil</p>
                                             </div>
                                         <?php endif; ?>
@@ -269,11 +300,11 @@ foreach ($months as $idx => $m) {
             <?php elseif ($view === 'day'): ?>
                 <div
                     class="bg-panel-dark rounded-[2rem] border border-border-dark shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
-                    <div class="p-8 border-b border-border-dark bg-white/5 flex items-center justify-between">
+                    <div class="p-8 border-b border-border-dark bg-medical-dark/30 flex items-center justify-between">
                         <div>
-                            <h3 class="text-xl font-bold text-white uppercase tracking-tight"><?= date('l, d \d\e F, Y') ?>
+                            <h3 class="text-xl font-bold text-text-main uppercase tracking-tight"><?= date('l, d \d\e F, Y') ?>
                             </h3>
-                            <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">4 Intervenciones
+                            <p class="text-xs text-text-muted font-bold uppercase tracking-widest mt-1">4 Intervenciones
                                 Programadas para hoy</p>
                         </div>
                         <div
@@ -288,15 +319,15 @@ foreach ($months as $idx => $m) {
                         <?php foreach ($dayEvents as $event): ?>
                             <div class="flex gap-8 group">
                                 <div class="w-20 pt-1 shrink-0">
-                                    <span class="text-lg font-mono font-black text-white"><?= $event['time'] ?></span>
-                                    <div class="mt-2 h-full w-px bg-slate-800 mx-auto opacity-50 group-last:hidden"></div>
+                                    <span class="text-lg font-mono font-black text-text-main"><?= $event['time'] ?></span>
+                                    <div class="mt-2 h-full w-px bg-panel-dark mx-auto opacity-50 group-last:hidden"></div>
                                 </div>
                                 <div
-                                    class="flex-1 card-glass p-6 border-l-4 border-l-<?= $event['color'] == 'medical-blue' ? 'medical-blue' : ($event['color'] == 'amber-500' ? 'amber-500' : ($event['color'] == 'danger' ? 'danger' : 'slate-500')) ?> hover:bg-white/[0.03] transition-all">
+                                    class="flex-1 card-glass p-6 border-l-4 border-l-<?= $event['color'] == 'medical-blue' ? 'medical-blue' : ($event['color'] == 'amber-500' ? 'amber-500' : ($event['color'] == 'danger' ? 'danger' : 'slate-500')) ?> hover:bg-panel-dark/20 transition-all">
                                     <div class="flex justify-between items-start">
                                         <div>
-                                            <h4 class="font-bold text-white text-base"><?= $event['title'] ?></h4>
-                                            <p class="text-sm text-slate-400 font-medium mt-1"><?= $event['equipment'] ?></p>
+                                            <h4 class="font-bold text-text-main text-base"><?= $event['title'] ?></h4>
+                                            <p class="text-sm text-text-muted font-medium mt-1"><?= $event['equipment'] ?></p>
                                         </div>
                                         <?php
                                         $statusLabel = $event['status'] === 'IN_PROGRESS' ? 'En Curso' : 'Programada';
@@ -314,13 +345,13 @@ foreach ($months as $idx => $m) {
                                     </div>
                                     <div class="mt-4 flex items-center gap-6">
                                         <div class="flex items-center gap-2">
-                                            <span class="material-symbols-outlined text-slate-500 text-sm">person</span>
+                                            <span class="material-symbols-outlined text-text-muted text-sm">person</span>
                                             <span
-                                                class="text-[10px] font-bold text-slate-500 uppercase"><?= $event['tech'] ?></span>
+                                                class="text-[10px] font-bold text-text-muted uppercase"><?= $event['tech'] ?></span>
                                         </div>
                                         <div class="flex items-center gap-2">
-                                            <span class="material-symbols-outlined text-slate-500 text-sm">location_on</span>
-                                            <span class="text-[10px] font-bold text-slate-500 uppercase">Sector A - Piso
+                                            <span class="material-symbols-outlined text-text-muted text-sm">location_on</span>
+                                            <span class="text-[10px] font-bold text-text-muted uppercase">Sector A - Piso
                                                 2</span>
                                         </div>
                                     </div>
@@ -332,12 +363,12 @@ foreach ($months as $idx => $m) {
             <?php endif; ?>
 
             <div class="mt-6 flex justify-between items-center px-4 opacity-50">
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">© BioCMMS Agenda -
+                <p class="text-[10px] font-black text-text-muted uppercase tracking-widest">© BioCMMS Agenda -
                     Sincronizado con v4.2 Pro</p>
                 <div class="flex gap-4">
-                    <span class="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase"><span
+                    <span class="flex items-center gap-2 text-[10px] font-black text-text-muted uppercase"><span
                             class="size-2 rounded-full bg-slate-700"></span> Feriado</span>
-                    <span class="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase"><span
+                    <span class="flex items-center gap-2 text-[10px] font-black text-text-muted uppercase"><span
                             class="size-2 rounded-full bg-medical-blue"></span> Programado</span>
                 </div>
             </div>

@@ -27,16 +27,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
     <div class="flex items-center justify-between">
         <div>
-            <h1 class="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
+            <h1 class="text-3xl font-bold tracking-tight text-[var(--text-main)] flex items-center gap-3">
                 <span class="material-symbols-outlined text-medical-blue text-3xl">add_circle</span>
                 Registro de Nuevo Activo
             </h1>
-            <p class="text-slate-400 mt-1 text-sm uppercase tracking-widest font-semibold opacity-70">
+            <p class="text-[var(--text-muted)] mt-1 text-sm uppercase tracking-widest font-semibold opacity-70">
                 Completar datos técnicos según norma CMMS HEC
             </p>
         </div>
         <a href="?page=inventory"
-            class="p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-white transition-all flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
+            class="p-2.5 rounded-xl bg-medical-surface border border-border-dark text-[var(--text-muted)] hover:text-medical-blue transition-all flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
             <span class="material-symbols-outlined text-sm">arrow_back</span>
             Volver
         </a>
@@ -53,40 +53,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     Identificación de Equipo</h3>
 
                 <div class="space-y-2">
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">ID Inventario</label>
+                    <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">ID Inventario</label>
                     <input required name="id" placeholder="Ej: PB-840-00122"
-                        class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                        class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)]" />
                 </div>
 
                 <div class="space-y-2">
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Nombre del Equipo</label>
+                    <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Nombre del Equipo</label>
                     <input required name="name" placeholder="Ej: Ventilador Mecánico"
-                        class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                        class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)]" />
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Marca</label>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Marca</label>
                         <input required name="brand"
-                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)]" />
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Modelo</label>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Modelo</label>
                         <input required name="model"
-                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)]" />
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">N° de Serie</label>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">N° de Serie</label>
                         <input required name="serial_number" placeholder="Ej: SN-992031-B"
-                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)]" />
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pertenencia</label>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Pertenencia</label>
                         <select name="ownership"
-                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white appearance-none">
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)] appearance-none">
                             <option value="Propio">Propio</option>
                             <option value="Comodato">Comodato</option>
                             <option value="Arriendo">Arriendo</option>
@@ -96,30 +96,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Costo Adquisición</label>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Costo Adquisición</label>
                         <input type="number" step="0.01" name="acquisition_cost" placeholder="0.00"
-                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)]" />
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Año de Compra</label>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Año de Compra</label>
                         <input type="number" name="purchased_year" value="<?= date('Y') ?>"
-                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)]" />
                     </div>
                 </div>
 
                 <div class="space-y-2">
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Bajo Plan de
+                    <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Bajo Plan de
                         Mantenimiento</label>
                     <div class="flex gap-4">
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="radio" name="underMaintenancePlan" value="1" checked
                                 class="size-4 accent-medical-blue" />
-                            <span class="text-sm text-slate-300">Sí</span>
+                            <span class="text-sm text-[var(--text-muted)]">Sí</span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="radio" name="underMaintenancePlan" value="0"
                                 class="size-4 accent-medical-blue" />
-                            <span class="text-sm text-slate-300">No</span>
+                            <span class="text-sm text-[var(--text-muted)]">No</span>
                         </label>
                     </div>
                 </div>
@@ -133,9 +133,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Ubicación</label>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Ubicación</label>
                         <select required name="location"
-                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white appearance-none">
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)] appearance-none">
                             <option value="">Seleccionar Ubicación</option>
                             <?php foreach (getAllLocations() as $loc): ?>
                                 <option value="<?= $loc ?>"><?= $loc ?></option>
@@ -143,98 +143,102 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </select>
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Sub-Ubicación</label>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Sub-Ubicación</label>
                         <input name="sub_location" placeholder="Ej: Box 04 / Cama 4"
-                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)]" />
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Criticidad</label>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Criticidad</label>
                         <select required name="criticality"
-                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white appearance-none">
-                            <option value="CRITICAL">CRITICAL</option>
-                            <option value="RELEVANT" selected>RELEVANT</option>
-                            <option value="LOW">LOW</option>
-                            <option value="NA">NA (No Aplica)</option>
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)] appearance-none">
+                            <option value="CRITICAL">Crítico</option>
+                            <option value="RELEVANT" selected>Relevante</option>
+                            <option value="LOW">No Aplica</option>
                         </select>
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Riesgo GE</label>
-                        <input name="riesgo_ge" placeholder="Ej: Life Support"
-                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Familia / Clase</label>
+                        <select name="riesgo_ge"
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)] appearance-none">
+                            <option value="">Sin Clase</option>
+                            <?php foreach (getCategoryOptions() as $cat): ?>
+                                <option value="<?= htmlspecialchars($cat) ?>"><?= htmlspecialchars($cat) ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Código UMDNS (Opcional/NA)</label>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Código UMDNS (Opcional/NA)</label>
                         <input name="codigo_umdns" placeholder="Ej: 17-429"
-                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)]" />
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Fecha Instalación</label>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Fecha Instalación</label>
                         <input type="date" name="fecha_instalacion"
-                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)]" />
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Proveedor</label>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Proveedor</label>
                         <input name="vendor" placeholder="Ej: Draeger Medical"
-                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)]" />
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Vencimiento Garantía</label>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Vencimiento Garantía</label>
                         <input type="date" name="warranty_expiration"
-                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)]" />
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Vida Útil Total (Años)</label>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Vida Útil Total (Años)</label>
                         <input type="number" name="total_useful_life" value="10"
-                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)]" />
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Años Restantes</label>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Años Restantes</label>
                         <input type="number" name="years_remaining" value="10"
-                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)]" />
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Estado Inicial</label>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Estado Inicial</label>
                         <select name="status"
-                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white appearance-none">
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)] appearance-none">
                             <option value="OPERATIVE">OPERATIVO</option>
                             <option value="MAINTENANCE">EN MANTENCIÓN</option>
                             <option value="NO_OPERATIVE">FUERA DE SERVICIO</option>
                         </select>
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">URL Imagen (Opcional)</label>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">URL Imagen (Opcional)</label>
                         <input name="image_url" placeholder="https://..."
-                            class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white" />
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)]" />
                     </div>
                 </div>
 
                 <!-- Observations Field Additions -->
                 <div class="space-y-2">
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Observaciones Generales</label>
+                    <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Observaciones Generales</label>
                     <textarea name="observations" rows="2"
-                        class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-white resize-none"></textarea>
+                        class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)] resize-none"></textarea>
                 </div>
             </div>
         </div>
 
-        <div class="pt-8 border-t border-slate-700/50 flex justify-end gap-4">
+        <div class="pt-8 border-t border-border-dark/50 flex justify-end gap-4">
             <a href="?page=inventory"
-                class="px-8 py-3 rounded-2xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all text-sm font-bold uppercase tracking-wider text-center">
+                class="px-8 py-3 rounded-2xl text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-all text-sm font-bold uppercase tracking-wider text-center">
                 Cancelar
             </a>
             <button type="submit"

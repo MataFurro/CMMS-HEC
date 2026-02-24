@@ -6,7 +6,7 @@
  */
 
 // --- Identidad Visual & Paleta Premium ---
-define('APP_NAME_HTML', 'BioCMMS v4.2 <span class="text-medical-blue font-light">Pro</span>');
+define('APP_NAME_HTML', 'BioCMMS v4.3 <span class="text-medical-blue font-light">Pro</span>');
 define('COLOR_MEDICAL_BLUE', '#0ea5e9'); // Más vibrante v4.2
 define('COLOR_EMERALD', '#10b981');
 define('COLOR_AMBER', '#f59e0b');
@@ -49,7 +49,7 @@ define('SIDEBAR_DASHBOARD',       'Tablero de Gestión');
 define('SIDEBAR_CALENDAR',        'Agenda Técnica');
 define('SIDEBAR_WORK_ORDERS',      'Órdenes de Trabajo');
 define('SIDEBAR_INVENTORY',       'Inventario Biomédico');
-define('SIDEBAR_FAMILY_ANALYSIS', 'Análisis por Familia');
+define('SIDEBAR_FAMILY_ANALYSIS', 'Clasificación por Clase');
 define('SIDEBAR_MESSENGER',       'SMS OT (Solicitudes)');
 
 // --- Factores de Costo TCO / Depreciación ---

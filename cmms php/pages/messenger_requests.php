@@ -62,14 +62,14 @@ try {
         <div>
             <nav class="flex items-center gap-2 mb-4">
                 <span class="text-[10px] font-black uppercase tracking-[0.2em] text-medical-blue bg-medical-blue/10 px-2 py-0.5 rounded">Mensajería Profesional</span>
-                <span class="material-symbols-outlined text-xs text-slate-600">chevron_right</span>
-                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Solicitudes Clínicas</span>
+                <span class="material-symbols-outlined text-xs text-[var(--text-muted)] opacity-50">chevron_right</span>
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-muted)] opacity-70">Solicitudes Clínicas</span>
             </nav>
-            <h1 class="text-4xl font-black text-white tracking-tight flex items-center gap-4">
+            <h1 class="text-4xl font-black text-[var(--text-main)] tracking-tight flex items-center gap-4">
                 Solicitudes Pendientes
                 <span class="text-medical-blue material-symbols-outlined text-3xl font-variation-fill">mail</span>
             </h1>
-            <p class="text-slate-400 mt-2 text-lg font-medium italic opacity-80">Integración directa MySQL v4.2 PRO.</p>
+            <p class="text-[var(--text-muted)] mt-2 text-lg font-medium italic opacity-80">Integración directa MySQL v4.3 PRO.</p>
         </div>
     </div>
 
@@ -87,30 +87,30 @@ try {
     <?php if (isset($error)): ?>
         <div class="card-glass border-l-4 border-l-red-500 p-4">
             <p class="text-red-400 font-bold">Resumen del Estado:</p>
-            <p class="text-slate-400 text-sm"><?= $error ?></p>
+            <p class="text-[var(--text-muted)] text-sm"><?= $error ?></p>
         </div>
     <?php endif; ?>
 
-    <div class="card-glass overflow-hidden shadow-2xl border border-white/5">
+    <div class="card-glass overflow-hidden shadow-2xl border border-border-dark">
         <table class="w-full text-left">
             <thead>
-                <tr class="bg-white/5 border-b border-white/10 uppercase text-[10px] font-black tracking-widest text-slate-500">
+                <tr class="bg-slate-200/50 dark:bg-white/5 border-b border-border-dark uppercase text-[10px] font-black tracking-widest text-[var(--text-muted)]">
                     <th class="px-6 py-4">ID</th>
                     <th class="px-6 py-4">Servicio / Equipo</th>
                     <th class="px-6 py-4">Descripción de Falla</th>
                     <th class="px-6 py-4 text-center">Acciones</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-white/5">
+            <tbody class="divide-y divide-border-dark">
                 <?php foreach ($requests as $r): ?>
-                    <tr class="hover:bg-white/5 transition-all text-sm border-b border-white/5">
-                        <td class="px-6 py-4 font-black">#<?= $r['id'] ?></td>
+                    <tr class="hover:bg-slate-200/30 dark:hover:bg-white/5 transition-all text-sm">
+                        <td class="px-6 py-4 font-black text-medical-blue">#<?= $r['id'] ?></td>
                         <td class="px-6 py-4">
-                            <div class="font-bold text-white"><?= htmlspecialchars($r['servicio'] ?? $r['asset_name'] ?? 'N/A') ?></div>
+                            <div class="font-bold text-[var(--text-main)]"><?= htmlspecialchars($r['servicio'] ?? $r['asset_name'] ?? 'N/A') ?></div>
                             <div class="text-medical-blue text-xs font-mono"><?= htmlspecialchars($r['serie'] ?? $r['asset_id'] ?? 'S/N') ?></div>
                         </td>
-                        <td class="px-6 py-4 text-slate-400 line-clamp-2 max-w-xs" title="<?= htmlspecialchars($r['texto']) ?>">
-                            <?= htmlspecialchars($r['texto']) ?>
+                        <td class="px-6 py-4 text-[var(--text-muted)] font-medium max-w-xs" title="<?= htmlspecialchars($r['texto']) ?>">
+                            <div class="truncate"><?= htmlspecialchars($r['texto']) ?></div>
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex justify-center gap-2">
@@ -133,8 +133,8 @@ try {
                 <?php if (empty($requests)): ?>
                     <tr>
                         <td colspan="4" class="px-6 py-20 text-center">
-                            <span class="material-symbols-outlined text-5xl text-slate-700 mb-4 block">inbox</span>
-                            <p class="text-slate-500 font-bold">No hay nuevas solicitudes en la bandeja central MySQL.</p>
+                            <span class="material-symbols-outlined text-5xl text-[var(--text-muted)] opacity-20 mb-4 block">inbox</span>
+                            <p class="text-[var(--text-muted)] font-bold">No hay nuevas solicitudes en la bandeja central MySQL.</p>
                         </td>
                     </tr>
                 <?php endif; ?>

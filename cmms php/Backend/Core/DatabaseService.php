@@ -44,9 +44,10 @@ class DatabaseService
 
                 self::$instance = new PDO($dsn, $user, $pass, $options);
             } catch (\PDOException $e) {
-                // Loguear error y fallar con mensaje controlado
-                error_log("DATABASE CONNECTION ERROR: " . $e->getMessage());
-                throw new Exception("Error de conexión con la base de datos.");
+                // Loguear error y lanzar excepción con detalle técnico
+                $detail = $e->getMessage();
+                error_log("DATABASE CONNECTION ERROR: " . $detail);
+                throw new Exception("Error de conexión a MySQL. Verifica que XAMPP/MySQL esté iniciado. Detalle: " . $detail);
             }
         }
 

@@ -13,13 +13,13 @@ use Exception;
 /**
  * Backend/Providers/AuditProvider.php
  * ─────────────────────────────────────────────────────
- * Proveedor de Auditoría Agéntica (FDA 21 CFR Part 11 compliant).
- * Registra no solo la acción, sino la intención y razonamiento.
+ * Proveedor de Auditoría de Sistema (FDA 21 CFR Part 11 compliant).
+ * Registra la acción, justificación técnica y trazabilidad.
  * ─────────────────────────────────────────────────────
  */
 
 /**
- * Registra una acción en la pista de auditoría con razonamiento agéntico.
+ * Registra una acción en la pista de auditoría con justificación técnica.
  */
 function logAuditAction(string $action, string $targetType, ?string $targetId, string $reason, array $details = []): bool
 {
@@ -31,10 +31,10 @@ function logAuditAction(string $action, string $targetType, ?string $targetId, s
 
         $stmt = $db->prepare($sql);
 
-        // Enriquecer detalles con el razonamiento
+        // Enriquecer detalles con el razonamiento sistemático
         $enrichedDetails = array_merge($details, [
             'agentic_reasoning' => $reason,
-            'system_version' => 'v4.6-agentic',
+            'system_version' => 'v4.6-standard',
             'session_id' => session_id() ?: 'cli'
         ]);
 

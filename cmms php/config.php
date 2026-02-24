@@ -1,6 +1,6 @@
 <?php
 
-// BioCMMS v4.2 Pro - Configuración Global
+// BioCMMS v4.3 Pro - Configuración Global
 require_once __DIR__ . '/includes/constants.php';
 require_once __DIR__ . '/Backend/autoloader.php';
 session_start();
@@ -53,44 +53,10 @@ define('DB_PASS', $_ENV['DB_PASS'] ?? '');
 // Modo Demo - Activar para auditoría (Desconecta la DB)
 define('USE_MOCK_DATA', filter_var($_ENV['USE_MOCK_DATA'] ?? false, FILTER_VALIDATE_BOOLEAN));
 
-// Datos Simulados (Mock Database)
-$technicians = [
-    ['name' => 'Mario Gómez', 'role' => 'Especialista UCI', 'initial' => 'MG', 'stats' => ['done' => 50, 'progress' => 25, 'pending' => 25], 'total' => 28, 'capacity_pct' => 85],
-    ['name' => 'Pablo Rojas', 'role' => 'Electromedicina', 'initial' => 'PR', 'stats' => ['done' => 30, 'progress' => 50, 'pending' => 20], 'total' => 20, 'capacity_pct' => 95],
-    ['name' => 'Ana Muñoz', 'role' => 'Imagenología', 'initial' => 'AM', 'stats' => ['done' => 60, 'progress' => 20, 'pending' => 20], 'total' => 15, 'capacity_pct' => 62],
-];
+// El sistema ahora utiliza repositorios MySQL. 
+// Las consultas de técnicos y usuarios se realizan vía UserProvider.php
 
-// Usuarios Simulados (RBAC)
-$mock_users = [
-    'u1' => ['id' => 4, 'name' => 'Mario Gómez', 'role' => ROLE_TECHNICIAN, 'avatar' => 'https://i.pravatar.cc/150?u=u1'],
-    'u2' => ['id' => 3, 'name' => 'Laura Ingeniera', 'role' => ROLE_ENGINEER, 'avatar' => 'https://i.pravatar.cc/150?u=u2'],
-    'u3' => ['id' => 2, 'name' => 'Roberto Jefe', 'role' => ROLE_CHIEF_ENGINEER, 'avatar' => 'https://i.pravatar.cc/150?u=u3'],
-    'u4' => ['id' => 1, 'name' => 'Ana Auditora', 'role' => ROLE_AUDITOR, 'avatar' => 'https://i.pravatar.cc/150?u=u4'],
-];
-
-// Login simulado para compatibilidad con router legacy
-if (!isset($_SESSION['user_id'])) {
-    $default_user = $mock_users['u3'];
-    $_SESSION['user_id'] = $default_user['id'];
-    $_SESSION['user_name'] = $default_user['name'];
-    $_SESSION['user_role'] = $default_user['role'];
-    $_SESSION['user'] = $default_user;
-}
-
-// Helpers de Permisos
-function canModify()
-{
-    return in_array($_SESSION['user_role'] ?? '', [ROLE_ENGINEER, ROLE_CHIEF_ENGINEER]);
-}
-function canExecuteWorkOrder()
-{
-    return in_array($_SESSION['user_role'] ?? '', [ROLE_TECHNICIAN, ROLE_CHIEF_ENGINEER]);
-}
-function canViewDashboard()
-{
-    return true;
-}
-
+// Helpers de UI
 function getStatusClass($status)
 {
     return match ($status) {

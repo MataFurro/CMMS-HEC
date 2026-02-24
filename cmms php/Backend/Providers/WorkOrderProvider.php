@@ -15,25 +15,19 @@ require_once __DIR__ . '/UserProvider.php';
 use Backend\Repositories\WorkOrderRepository;
 
 /**
-<<<<<<< HEAD:cmms php/backend/providers/WorkOrderProvider.php
  * Cargar el modelo e interfaz aquí para asegurar disponibilidad
  */
 require_once __DIR__ . '/../Models/WorkOrderStatus.php';
 require_once __DIR__ . '/../Models/WorkOrderEntity.php';
 
 /**
-=======
->>>>>>> origin/main:cmms php/Backend/Providers/WorkOrderProvider.php
  * Obtener todas las órdenes de trabajo usando Generadores
  */
 function getAllWorkOrders(): array
 {
-<<<<<<< HEAD:cmms php/backend/providers/WorkOrderProvider.php
-=======
     if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
         return [];
     }
->>>>>>> origin/main:cmms php/Backend/Providers/WorkOrderProvider.php
     $repo = new WorkOrderRepository();
     $orders = [];
     foreach ($repo->findAll() as $entity) {
@@ -50,6 +44,59 @@ function getWorkOrderById(string $id): ?array
     $repo = new WorkOrderRepository();
     $entity = $repo->findById($id);
     return $entity ? $entity->toArray() : null;
+}
+
+/**
+ * Obtiene el historial de tiempos entre fallas (TBF) para un activo.
+ * Usado para análisis de confiabilidad.
+ */
+function getAssetFailureHistory(string $assetId): array
+{
+    try {
+        $db = \Backend\Core\DatabaseService::getInstance();
+        $sql = "SELECT completed_date FROM work_orders 
+                WHERE asset_id = :asset_id 
+                AND type = 'Correctiva' 
+                AND status = 'Terminada' 
+                ORDER BY completed_date ASC";
+        $stmt = $db->prepare($sql);
+        $stmt->execute(['asset_id' => $assetId]);
+        $dates = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        if (count($dates) < 2) return [];
+
+        $tbfs = [];
+        for ($i = 1; $i < count($dates); $i++) {
+            $d1 = new DateTime($dates[$i - 1]);
+            $d2 = new DateTime($dates[$i]);
+            $diff = $d1->diff($d2)->days;
+            if ($diff > 0) $tbfs[] = $diff;
+        }
+
+        return $tbfs;
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+/**
+ * Obtener la fecha de la última OT correctiva terminada para un activo.
+ */
+function getLastCorrectiveDate(string $assetId): ?string
+{
+    try {
+        $db = \Backend\Core\DatabaseService::getInstance();
+        $sql = "SELECT completed_date FROM work_orders 
+                WHERE asset_id = :asset_id 
+                AND type = 'Correctiva' 
+                AND status = 'Terminada' 
+                ORDER BY completed_date DESC LIMIT 1";
+        $stmt = $db->prepare($sql);
+        $stmt->execute(['asset_id' => $assetId]);
+        return $stmt->fetchColumn() ?: null;
+    } catch (Exception $e) {
+        return null;
+    }
 }
 
 /**
@@ -96,41 +143,24 @@ function countWorkOrdersByType(): array
  */
 function getWorkOrderStats(): array
 {
-<<<<<<< HEAD:cmms php/backend/providers/WorkOrderProvider.php
-=======
     if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
         return [
-            'total' => 0,
-            'total_ot' => 0,
             'TOTAL' => 0,
             'Pendiente' => 0,
             'En Proceso' => 0,
             'Terminada' => 0,
-            'CRITICAL_TODAY' => 0,
-            'pending' => 0,
-            'progress' => 0,
-            'completed' => 0,
-            'critical_today' => 0
+            'CRITICAL_TODAY' => 0
         ];
     }
->>>>>>> origin/main:cmms php/Backend/Providers/WorkOrderProvider.php
     $repo = new WorkOrderRepository();
     $stats = $repo->getStatusStats();
 
     return [
-<<<<<<< HEAD:cmms php/backend/providers/WorkOrderProvider.php
         'TOTAL' => (int) ($stats['total'] ?? 0),
         'Pendiente' => (int) ($stats['pending'] ?? 0),
         'En Proceso' => (int) ($stats['progress'] ?? 0),
         'Terminada' => (int) ($stats['completed'] ?? 0),
         'CRITICAL_TODAY' => (int) ($stats['critical_today'] ?? 0)
-=======
-        'TOTAL' => (int) $stats['total'],
-        'Pendiente' => (int) $stats['pending'],
-        'En Proceso' => (int) $stats['progress'],
-        'Terminada' => (int) $stats['completed'],
-        'CRITICAL_TODAY' => (int) $stats['critical_today']
->>>>>>> origin/main:cmms php/Backend/Providers/WorkOrderProvider.php
     ];
 }
 
@@ -151,7 +181,6 @@ function getWorkloadSaturation(): int
     if (empty($technicians))
         return 0;
 
-<<<<<<< HEAD:cmms php/backend/providers/WorkOrderProvider.php
     $totalCapacity = array_sum(array_column($technicians, 'capacity_pct'));
     return count($technicians) > 0 ? (int) round($totalCapacity / count($technicians)) : 0;
 }
@@ -184,10 +213,6 @@ function createWorkOrder(array $data): string
     ];
 
     return $repo->create($dbData);
-=======
-    $totalCapacity = array_sum(array_column($technicians, 'capacity'));
-    return count($technicians) > 0 ? (int) round($totalCapacity / count($technicians)) : 0;
->>>>>>> origin/main:cmms php/Backend/Providers/WorkOrderProvider.php
 }
 
 /**
@@ -195,7 +220,6 @@ function createWorkOrder(array $data): string
  */
 function createWorkOrderFromRequest(array $data): string
 {
-<<<<<<< HEAD:cmms php/backend/providers/WorkOrderProvider.php
     // Mapear campos de mensajería a campos de OT
     $otData = [
         'asset_id' => $data['asset_id'],
@@ -204,30 +228,6 @@ function createWorkOrderFromRequest(array $data): string
         'observations' => $data['problem'] ?? '',
         'ms_request_id' => $data['ms_request_id'],
         'ms_email' => $data['ms_email']
-=======
-    global $MOCK_WORK_ORDERS;
-
-    // Persistencia en sesión para que no se pierdan al navegar
-    if (!isset($_SESSION['MOCK_WORK_ORDERS_PERSIST'])) {
-        $_SESSION['MOCK_WORK_ORDERS_PERSIST'] = $MOCK_WORK_ORDERS;
-    }
-
-    $newId = "OT-" . date("Y") . "-" . str_pad(count($_SESSION['MOCK_WORK_ORDERS_PERSIST']) + 101, 4, "0", STR_PAD_LEFT);
-
-    $newOrder = [
-        'id' => $newId,
-        'asset_id' => $data['asset_id'] ?? 'S/N',
-        'asset_name' => $data['asset_name'] ?? 'Equipo Desconocido',
-        'type' => $data['type'] ?? 'Correctiva',
-        'status' => 'Pendiente',
-        'priority' => $data['priority'] ?? 'Media',
-        'tech' => $data['tech'] ?? 'Por Asignar',
-        'date' => date("Y-m-d"),
-        'problem' => $data['problem'] ?? '',
-        'location' => $data['location'] ?? DEFAULT_HOSPITAL_NAME,
-        'ms_email' => $data['ms_email'] ?? null,
-        'ms_request_id' => $data['ms_request_id'] ?? null // Vinculación por ID
->>>>>>> origin/main:cmms php/Backend/Providers/WorkOrderProvider.php
     ];
 
     return createWorkOrder($otData);
@@ -245,7 +245,6 @@ function completeWorkOrder(string $otId, array $executionData = []): bool
         return false;
     }
 
-<<<<<<< HEAD:cmms php/backend/providers/WorkOrderProvider.php
     // Preparar datos para actualización parcial de la OT
     $updateData = [
         'status' => 'Terminada',
@@ -261,7 +260,8 @@ function completeWorkOrder(string $otId, array $executionData = []): bool
 
     if ($success) {
         // Auditoría base
-        logAuditAction('OT_COMPLETED', 'WORK_ORDER', $otId, "Cierre manual por técnico. Estado final: " . ($executionData['final_asset_status'] ?? 'OPERATIVE'), [
+        require_once __DIR__ . '/AuditProvider.php';
+        \Backend\Providers\logAuditAction('OT_COMPLETED', 'WORK_ORDER', $otId, "Cierre manual por técnico. Estado final: " . ($executionData['final_asset_status'] ?? 'OPERATIVE'), [
             'duration' => $executionData['duration_hours'] ?? 0,
             'failure_code' => $updateData['failure_code']
         ]);
@@ -286,42 +286,17 @@ function completeWorkOrder(string $otId, array $executionData = []): bool
             }
         }
 
-        // ── AGENTIC FEATURE: Silent Cascading Closure ──
-        // Si es correctiva y duró más de 4 horas, cerramos preventivas pendientes automáticamente.
+        // Cierre automático de preventivas por intervención mayor.
         if (($order->type ?? '') === 'Correctiva' && (float)($updateData['duration_hours'] ?? 0) >= 4.0) {
             cascadeClosePreventives($order->assetId, $otId);
-=======
-    $success = $repo->updateStatus($otId, 'Terminada');
-
-    if ($success) {
-        \Backend\Core\LoggerService::info("Orden de Trabajo finalizada", ['id' => $otId]);
-
-        // Feedback Loop: Actualizar base de datos del Mensajero
-        if ($order instanceof \Backend\Models\WorkOrderEntity && $order->msRequestId) {
-            try {
-                $msDbPath = __DIR__ . '/../../API Mail/database/messenger.db';
-                if (file_exists($msDbPath)) {
-                    $db = new PDO('sqlite:' . $msDbPath);
-                    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-                    $stmt = $db->prepare("UPDATE reports SET status = 'Finalizado' WHERE id = :id");
-                    $stmt->execute([':id' => $order->msRequestId]);
-
-                    \Backend\Core\LoggerService::info("FEEDBACK LOOP: Solicitud vinculada finalizada.", ['ms_id' => $order->msRequestId]);
-                }
-            } catch (Exception $e) {
-                \Backend\Core\LoggerService::error("ERROR FEEDBACK LOOP", ['error' => $e->getMessage()]);
-            }
->>>>>>> origin/main:cmms php/Backend/Providers/WorkOrderProvider.php
         }
     }
 
     return $success;
-<<<<<<< HEAD:cmms php/backend/providers/WorkOrderProvider.php
 }
 
 /**
- * AGENTIC LOGIC: Cierre automático de preventivas por intervención mayor.
+ * Cierre automático de preventivas por intervención mayor.
  */
 function cascadeClosePreventives(string $assetId, string $triggerOtId): void
 {
@@ -345,7 +320,7 @@ function cascadeClosePreventives(string $assetId, string $triggerOtId): void
             UPDATE work_orders 
             SET status = 'Terminada', 
                 completed_date = CURRENT_DATE,
-                observations = CONCAT(IFNULL(observations,''), '\n\n[SISTEMA AGÉNTICO]: OT cerrada automáticamente por intervención correctiva mayor (OT Origen: ', :trigger_id, '). Verificación realizada durante reparación.'),
+                observations = CONCAT(IFNULL(observations,''), '\n\n[BITÁCORA]: OT cerrada automáticamente por intervención técnica mayor (OT Origen: ', :trigger_id, '). Verificación realizada durante reparación.'),
                 updated_at = NOW()
             WHERE id = :id
         ");
@@ -357,24 +332,25 @@ function cascadeClosePreventives(string $assetId, string $triggerOtId): void
             ]);
 
             // Auditoría de la cascada
-            logAuditAction('AUTO_CASCADE_CLOSURE', 'WORK_ORDER', $p['id'], "Cierre preventivo automático gatillado por OT Correctiva mayor ($triggerOtId).", [
+            require_once __DIR__ . '/AuditProvider.php';
+            \Backend\Providers\logAuditAction('AUTO_CASCADE_CLOSURE', 'WORK_ORDER', $p['id'], "Cierre preventivo automático gatillado por OT Correctiva mayor ($triggerOtId).", [
                 'trigger_ot' => $triggerOtId,
                 'asset_id' => $assetId
             ]);
 
-            \Backend\Core\LoggerService::info("CASCADA AGÉNTICA: OT Preventiva cerrada automáticamente", ['id' => $p['id'], 'trigger' => $triggerOtId]);
+            \Backend\Core\LoggerService::info("SISTEMA: OT Preventiva cerrada automáticamente", ['id' => $p['id'], 'trigger' => $triggerOtId]);
         }
     } catch (Exception $e) {
-        \Backend\Core\LoggerService::error("ERROR EN CASCADA AGÉNTICA", ['asset' => $assetId, 'error' => $e->getMessage()]);
+        \Backend\Core\LoggerService::error("ERROR EN CIERRE AUTOMÁTICO", ['asset' => $assetId, 'error' => $e->getMessage()]);
     }
 }
+
 /**
  * Calcular el impacto financiero del downtime por área técnica
  */
 function getDowntimeImpact(): array
 {
     require_once __DIR__ . '/../../includes/constants.php';
-    $repo = new WorkOrderRepository();
     $db = \Backend\Core\DatabaseService::getInstance();
 
     // Query para obtener suma de horas por ubicación de activos
@@ -414,7 +390,96 @@ function getDowntimeImpact(): array
         'total_loss' => $totalLoss,
         'areas' => array_slice($impacts, 0, 5) // Top 5 áreas
     ];
-=======
->>>>>>> origin/main:cmms php/Backend/Providers/WorkOrderProvider.php
 }
 
+/**
+ * Obtener el total de horas de inactividad (downtime) registradas.
+ */
+function getTotalDowntimeHours(): float
+{
+    try {
+        $db = \Backend\Core\DatabaseService::getInstance();
+        $query = "SELECT SUM(duration_hours) FROM work_orders WHERE status = 'Terminada' AND type = 'Correctiva'";
+        return (float)($db->query($query)->fetchColumn() ?: 0);
+    } catch (Exception $e) {
+        return 0;
+    }
+}
+
+/**
+ * Guarda el progreso parcial de una OT sin cerrarla.
+ */
+function saveWorkOrderProgress(string $otId, array $executionData = []): bool
+{
+    $repo = new WorkOrderRepository();
+    $order = $repo->findById($otId);
+
+    if (!$order) {
+        return false;
+    }
+
+    // Si la OT está pendiente, al guardar progreso pasa a 'En Proceso'
+    $newStatus = ($order->status->value === 'Pendiente') ? 'En Proceso' : $order->status->value;
+
+    $updateData = [
+        'status' => $newStatus,
+        'duration_hours' => $executionData['duration_hours'] ?? $order->durationHours,
+        'failure_code' => $executionData['failure_code'] ?? $order->failureCode,
+        'final_asset_status' => $executionData['final_asset_status'] ?? $order->finalAssetStatus,
+        'observations' => $executionData['observations'] ?? $order->observations,
+        'checklist_data' => $executionData['checklist_data'] ?? null
+    ];
+
+    return $repo->partialUpdate($otId, $updateData);
+}
+
+/**
+ * Sube un adjunto para una OT
+ */
+function uploadOtAttachment(string $otId, string $assetId, array $fileInfo, string $category = 'evidencia', string $caption = ''): bool
+{
+    try {
+        $uploadBaseDir = __DIR__ . '/../../storage/uploads/ot/' . $otId . '/';
+        if (!is_dir($uploadBaseDir)) {
+            mkdir($uploadBaseDir, 0777, true);
+        }
+
+        $fileName = time() . '_' . basename($fileInfo['name']);
+        $targetPath = $uploadBaseDir . $fileName;
+        $relativePath = 'storage/uploads/ot/' . $otId . '/' . $fileName;
+
+        if (move_uploaded_file($fileInfo['tmp_name'], $targetPath)) {
+            $db = \Backend\Core\DatabaseService::getInstance();
+            $stmt = $db->prepare("INSERT INTO ot_attachments (work_order_id, asset_id, uploaded_by, file_path, file_type, caption, category) VALUES (:ot_id, :asset_id, :user_id, :path, :type, :caption, :cat)");
+
+            return $stmt->execute([
+                'ot_id' => $otId,
+                'asset_id' => $assetId,
+                'user_id' => $_SESSION['user_id'] ?? null,
+                'path' => $relativePath,
+                'type' => $fileInfo['type'],
+                'caption' => $caption,
+                'cat' => $category
+            ]);
+        }
+        return false;
+    } catch (Exception $e) {
+        \Backend\Core\LoggerService::error("Error al subir adjunto de OT", ['ot' => $otId, 'error' => $e->getMessage()]);
+        return false;
+    }
+}
+
+/**
+ * Obtener todos los adjuntos de una OT
+ */
+function getOtAttachments(string $otId): array
+{
+    try {
+        $db = \Backend\Core\DatabaseService::getInstance();
+        $stmt = $db->prepare("SELECT * FROM ot_attachments WHERE work_order_id = :ot_id ORDER BY uploaded_at DESC");
+        $stmt->execute(['ot_id' => $otId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        return [];
+    }
+}
