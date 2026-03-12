@@ -14,7 +14,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_minsal' && canModify()
 }
 
 $stats = getFinancialStats();
-$downtime = getDowntimeImpact();
+$impactData = getDowntimeImpact(); // Top 5 áreas
+$waterfallData = getUptimeWaterfallData();
+$waveData = getAvailabilityLossWaveData();
 $clinicalImpact = getClinicalImpactStats();
 
 // Datos de tendencia (Simulados por ahora, pero basados en el valor real)
@@ -57,7 +59,7 @@ $formula_tinc = "Veq = Vo - [Pu + (At * Pt) + (At * Pm) + (At * Pv) + Ps + Pi]";
 
     <!-- KPI Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="card-glass p-6 group hover:border-medical-blue/30 transition-all">
+        <div class="card-glass p-6 border border-[var(--border-color)]/30 group-hover:border-medical-blue transition-all">
             <div class="flex items-center gap-4 mb-4">
                 <div
                     class="p-3 bg-emerald-500/10 text-emerald-500 rounded-xl group-hover:scale-110 transition-transform">
@@ -87,7 +89,7 @@ $formula_tinc = "Veq = Vo - [Pu + (At * Pt) + (At * Pm) + (At * Pv) + Ps + Pi]";
             </div>
         </div>
 
-        <div class="card-glass p-6 group hover:border-medical-blue/30 transition-all">
+        <div class="card-glass p-6 border border-[var(--border-color)]/30 group-hover:border-medical-blue transition-all">
             <div class="flex items-center gap-4 mb-4">
                 <div class="p-3 bg-medical-blue/10 text-medical-blue rounded-xl group-hover:scale-110 transition-transform">
                     <span class="material-symbols-outlined">health_and_safety</span>
@@ -115,8 +117,44 @@ $formula_tinc = "Veq = Vo - [Pu + (At * Pt) + (At * Pm) + (At * Pv) + Ps + Pi]";
         </div>
     </div>
 
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Cascada de Uptime (Erosión de Disponibilidad) -->
+        <div class="card-glass p-8 relative overflow-hidden h-[450px]">
+            <div class="absolute top-0 right-0 p-8 opacity-5">
+                <span class="material-symbols-outlined text-8xl text-emerald-500">timer</span>
+            </div>
+            <div class="mb-6">
+                <h3 class="text-sm font-black text-[var(--text-main)] uppercase tracking-[0.2em] flex items-center gap-3">
+                    <span class="material-symbols-outlined text-emerald-500">waterfall_chart</span>
+                    Cascada de Disponibilidad
+                </h3>
+                <p class="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest mt-1">Erosión del Uptime Teórico</p>
+            </div>
+            <div class="h-[280px]">
+                <canvas id="waterfallChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Ola de Obsolescencia: Riesgo Operativo -->
+        <div class="card-glass p-8 relative overflow-hidden h-[450px]">
+            <div class="absolute top-0 right-0 p-8 opacity-5">
+                <span class="material-symbols-outlined text-8xl text-blue-500">waves</span>
+            </div>
+            <div class="mb-6">
+                <h3 class="text-sm font-black text-[var(--text-main)] uppercase tracking-[0.2em] flex items-center gap-3">
+                    <span class="material-symbols-outlined text-blue-500">tide</span>
+                    Riesgo de Obsolescencia
+                </h3>
+                <p class="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest mt-1">Pérdida Proyectada de Disponibilidad 2024-2030</p>
+            </div>
+            <div class="h-[280px]">
+                <canvas id="waveChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Depreciación Ajustada (Metodología TINC) -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Depreciación Ajustada (Metodología TINC) -->
         <div class="lg:col-span-2 card-glass p-8 space-y-8">
             <div class="flex items-center justify-between">
                 <div>
@@ -124,141 +162,205 @@ $formula_tinc = "Veq = Vo - [Pu + (At * Pt) + (At * Pm) + (At * Pv) + Ps + Pi]";
                         <span class="material-symbols-outlined text-medical-blue">calculate</span>
                         Depreciación Ajustada (Metodología TINC)
                     </h3>
-                    <p class="text-text-muted text-sm mt-1">Cálculo de valor residual basado en uso, fallas e incidentes
-                        adversos.</p>
+                    <p class="text-text-muted text-sm mt-1">Valor residual basado en horas operativas y fallas.</p>
                 </div>
             </div>
 
-            <div
-                class="p-6 bg-medical-dark rounded-2xl border border-border-dark font-mono text-xs text-medical-blue text-center shadow-inner">
+            <div class="p-6 bg-[var(--input-bg)] rounded-2xl border border-[var(--border-color)] font-mono text-xs text-medical-blue text-center shadow-inner">
                 <?= $formula_tinc ?>
             </div>
 
             <div class="space-y-6">
-                <div
-                    class="flex items-center justify-between text-xs font-black uppercase tracking-[0.2em] text-text-muted px-4">
-                    <span>Variable de Ajuste</span>
-                    <span>Impacto Financiero</span>
+                <div class="flex items-center justify-between text-xs font-black uppercase tracking-[0.2em] text-text-muted px-4">
+                    <span>Variable de Tiempo</span>
+                    <span>Impacto en Disponibilidad</span>
                 </div>
 
                 <div class="space-y-3">
-                    <div
-                        class="p-4 bg-panel-dark/50 rounded-xl border border-border-dark flex items-center justify-between group hover:bg-panel-dark transition-all">
+                    <div class="p-4 bg-panel-dark rounded-xl border border-[var(--border-color)] flex items-center justify-between">
                         <div class="flex items-center gap-4">
                             <span class="material-symbols-outlined text-amber-500">warning</span>
-                            <span class="text-sm font-bold text-text-main">Falta de Mantenimientos (Pm)</span>
+                            <span class="text-sm font-bold text-text-main">Mantenimientos Pendientes</span>
                         </div>
-                        <span class="text-sm font-black text-amber-500">- $<?= number_format($stats['penalizacion_pm'] ?? 0, 0, ',', '.') ?></span>
-                    </div>
-                    <div
-                        class="p-4 bg-panel-dark/50 rounded-xl border border-border-dark flex items-center justify-between group hover:bg-panel-dark transition-all">
-                        <div class="flex items-center gap-4">
-                            <span class="material-symbols-outlined text-red-500">emergency</span>
-                            <span class="text-sm font-bold text-text-main">Eventos Adversos (Pi)</span>
-                        </div>
-                        <span class="text-sm font-black text-red-500">- $<?= number_format($stats['penalizacion_pi'] ?? 0, 0, ',', '.') ?></span>
+                        <span class="text-sm font-black text-amber-500"><?= $stats['obsolescencia_proxima'] ?> Equipos</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Costo de Inactividad -->
+        <!-- Impacto de Downtime -->
         <div class="card-glass p-8 space-y-6">
             <h3 class="text-xl font-bold text-text-main flex items-center gap-3">
                 <span class="material-symbols-outlined text-red-500">timer_off</span>
-                Impacto de Downtime
+                Top Downtime por Área
             </h3>
-
-            <div class="space-y-8">
-                <div class="text-center py-6 bg-red-500/5 rounded-2xl border border-red-500/10">
-                    <p class="text-[10px] font-black text-text-muted uppercase tracking-widest mb-1">Impacto en Pacientes (Est.)</p>
-                    <h4 class="text-4xl font-black text-text-main"><?= $clinicalImpact['patients_affected'] ?> Atenciones</h4>
-                    <p class="text-xs font-bold text-red-500 mt-1"><?= $clinicalImpact['trend'] ?></p>
-                </div>
-
-                <div class="space-y-4">
-                    <h4 class="text-xs font-black text-text-muted uppercase tracking-widest border-b border-border-dark pb-2">
-                        Top Áreas con Horas de Inactividad</h4>
-                    <div class="space-y-3">
-                        <?php if (empty($downtime['areas'])): ?>
-                            <p class="text-[10px] text-text-muted/60 font-bold uppercase text-center py-4">Sin datos de falla registrados</p>
-                        <?php else: ?>
-                            <?php foreach ($downtime['areas'] as $area):
-                                $maxHours = 100; // Referencia
-                                $pct = min(($area['hours'] / $maxHours) * 100, 100);
-                            ?>
-                                <div class="space-y-1">
-                                    <div class="flex justify-between text-xs font-bold mb-1">
-                                        <span class="text-text-muted"><?= $area['area'] ?></span>
-                                        <span class="text-text-main"><?= number_format($area['hours'], 1) ?> Horas</span>
-                                    </div>
-                                    <div class="w-full bg-medical-dark h-1.5 rounded-full overflow-hidden">
-                                        <div
-                                            class="bg-red-500 h-full rounded-full shadow-[0_0_8px_rgba(239,68,68,0.5)]"
-                                            style="width: <?= $pct ?>%">
-                                        </div>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ROI y Contratos -->
-    <div class="card-glass p-8">
-        <div class="flex items-center gap-4 mb-8">
-            <div class="p-2.5 bg-emerald-500/10 text-emerald-500 rounded-xl border border-emerald-500/20">
-                <span class="material-symbols-outlined">handshake</span>
-            </div>
-            <div>
-                <h3 class="text-xl font-bold text-text-main uppercase tracking-tight">Evaluación de Contratos y ROI</h3>
-                <p class="text-xs text-text-muted font-bold uppercase tracking-widest mt-0.5">Análisis Rent vs Buy y
-                    Outsourcing</p>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div
-                class="p-6 bg-panel-dark/40 rounded-2xl border border-emerald-500/20 shadow-xl relative group overflow-hidden">
-                <div
-                    class="absolute -right-4 -top-4 opacity-10 group-hover:scale-125 transition-transform duration-700">
-                    <span class="material-symbols-outlined text-8xl text-emerald-500">trending_up</span>
-                </div>
-                <h4 class="text-xs font-black text-text-muted uppercase tracking-widest mb-4">Eficiencia In-House</h4>
-                <div class="flex items-baseline gap-2">
-                    <span class="text-4xl font-black text-text-main">67%</span>
-                    <span class="text-emerald-500 font-bold">Ahorro</span>
-                </div>
-                <p class="text-xs text-text-muted mt-2 leading-relaxed">Reducción de costos comparativa frente a
-                    servicios subrogados de terceros.</p>
-            </div>
-
-            <div class="p-6 bg-panel-dark/40 rounded-2xl border border-border-dark">
-                <h4 class="text-xs font-black text-text-muted uppercase tracking-widest mb-4">Garantía Activa</h4>
-                <div class="flex items-baseline gap-2">
-                    <span class="text-4xl font-black text-text-main">142</span>
-                    <span class="text-text-muted text-xs font-bold">Activos</span>
-                </div>
-                <p class="text-xs text-text-muted mt-2 leading-relaxed">Costo evitado por uso efectivo de pólizas de
-                    fabricante vigente.</p>
-            </div>
-
-            <div
-                class="p-6 bg-gradient-to-br from-medical-blue/20 to-cyan-500/5 rounded-2xl border border-medical-blue/30 lg:col-span-1">
-                <h4 class="text-xs font-black text-medical-blue uppercase tracking-widest mb-4">Presupuesto Ejecutado
-                </h4>
-                <div class="flex items-baseline gap-2 mb-2">
-                    <span class="text-4xl font-black text-text-main">82%</span>
-                    <span class="text-text-muted text-xs font-bold">/ Q1-Q2</span>
-                </div>
-                <div class="w-full bg-medical-dark h-2 rounded-full overflow-hidden">
-                    <div class="bg-medical-blue h-full w-[82%] rounded-full shadow-[0_0_12px_rgba(37,99,235,0.4)]">
-                    </div>
-                </div>
+            <div class="space-y-4">
+                <?php if (!empty($impactData['areas'])): ?>
+                    <?php foreach ($impactData['areas'] as $area):
+                        $pct = min(($area['hours'] / 100) * 100, 100);
+                    ?>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-text-muted"><?= $area['area'] ?></span>
+                                <span class="text-text-main"><?= number_format($area['hours'], 1) ?>h</span>
+                            </div>
+                            <div class="w-full bg-[var(--input-bg)] h-1.5 rounded-full overflow-hidden">
+                                <div class="bg-red-500 h-full rounded-full" style="width: <?= $pct ?>%"></div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p class="text-xs text-text-muted text-center py-10 italic">Sin reportes de inactividad</p>
+                <?php endif; ?>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    // Robust Chart Initialization
+    window.addEventListener('load', function() {
+        if (typeof Chart === 'undefined') {
+            console.error('BioCMMS Error: Chart.js failed to load. Please check your internet connection.');
+            return;
+        }
+
+        // Uptime Waterfall Chart
+        (function() {
+            const canvas = document.getElementById('waterfallChart');
+            if (!canvas) return;
+
+            const rawData = <?= json_encode($waterfallData) ?>;
+            if (!rawData || !Array.isArray(rawData)) {
+                console.warn('BioCMMS Warn: No waterfall data available.');
+                return;
+            }
+            const labels = rawData.map(d => d.label);
+            const data = rawData.map(d => d.value);
+
+            const bgColors = rawData.map(d => {
+                if (d.type === 'base') return '#10b98199';
+                if (d.type === 'total') return '#3b82f6';
+                return '#ef444499';
+            });
+
+            new Chart(canvas, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: bgColors,
+                        borderColor: bgColors.map(c => c.replace('99', '')),
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: 'var(--text-muted)',
+                                font: {
+                                    size: 9,
+                                    weight: 'bold'
+                                }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: 'var(--text-muted)'
+                            },
+                            grid: {
+                                color: 'var(--border-color)'
+                            }
+                        }
+                    }
+                }
+            });
+        })();
+
+        // Obsolescence Wave Chart
+        (function() {
+            const ctx = document.getElementById('waveChart');
+            if (!ctx) return;
+
+            const waveData = <?= json_encode($waveData) ?>;
+            const years = Object.keys(waveData);
+            const counts = years.map(y => waveData[y].expired_count);
+            const loss = years.map(y => waveData[y].uptime_loss_risk);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: years,
+                    datasets: [{
+                            label: 'Equipos Vencidos',
+                            data: counts,
+                            backgroundColor: '#3b82f633',
+                            borderColor: '#3b82f6',
+                            borderWidth: 1,
+                            yAxisID: 'y',
+                            order: 2
+                        },
+                        {
+                            label: 'Riesgo Perdida Uptime (%)',
+                            data: loss,
+                            type: 'line',
+                            borderColor: '#f59e0b',
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            fill: false,
+                            yAxisID: 'y1',
+                            tension: 0.4,
+                            order: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#94a3b8',
+                                font: {
+                                    size: 10
+                                }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            position: 'left',
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        },
+                        y1: {
+                            position: 'right',
+                            min: 0,
+                            ticks: {
+                                color: '#f59e0b'
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        })();
+    }); // End Window Load
+</script>

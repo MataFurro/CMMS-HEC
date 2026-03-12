@@ -26,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $priority = $_POST['priority'] ?? 'Media';
     $description = $_POST['description'] ?? '';
     $fromRequestId = $_POST['from_request_id'] ?? null;
+    $assignedTechId = $_POST['assigned_tech_id'] ?: null; // Capturar asignación inicial
     $checklistTemplate = $_POST['checklist_template'] ?? 'formato_general';
 
     // Mapear tipo a los valores del ENUM de la DB (MySQL usa Correctiva/Preventiva/Calibracion)
@@ -42,7 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'type' => $dbType,
         'priority' => $priority,
         'observations' => $description,
-        'status' => 'Pendiente',
+        'status' => 'En Curso',
+        'assigned_tech_id' => $assignedTechId, // Pasar ID de técnico
         'ms_request_id' => $fromRequestId,
         'checklist_template' => $checklistTemplate
     ]);
@@ -93,7 +95,7 @@ if (isset($_GET['from_request'])) {
     <div class="flex items-center justify-between">
         <div>
             <h1 class="text-3xl font-bold tracking-tight text-text-main flex items-center gap-3">
-                <span className="material-symbols-outlined text-medical-blue text-3xl">add_task</span>
+                <span class="material-symbols-outlined text-medical-blue text-3xl">add_task</span>
                 Nueva Orden de Trabajo
             </h1>
             <p class="text-text-muted mt-1 text-sm uppercase tracking-widest font-semibold opacity-70">
@@ -106,9 +108,58 @@ if (isset($_GET['from_request'])) {
         </a>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.Alpine) {
+                console.log('Alpine Global Check: OK');
+            } else {
+                console.warn('Alpine Global Check: NOT FOUND');
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('assetSearchComponent', () => ({
+                otType: 'Correctivo',
+                assetSearch: '<?= htmlspecialchars($pre_asset_id, ENT_QUOTES) ?>',
+                assetResults: [],
+                isSearching: false,
+                init() {
+                    console.log('Alpine Asset Search Initialized (Named Component)');
+                },
+                async searchAssets() {
+                    console.log('Triggering search for:', this.assetSearch);
+                    if (this.assetSearch.length < 1) {
+                        this.assetResults = [];
+                        return;
+                    }
+                    this.isSearching = true;
+                    try {
+                        const apiUrl = `api/search_assets.php?q=${encodeURIComponent(this.assetSearch)}`;
+                        console.log('Fetching:', apiUrl);
+                        const response = await fetch(apiUrl);
+                        if (!response.ok) throw new Error('API Error: ' + response.status);
+                        this.assetResults = await response.json();
+                        console.log('Results:', this.assetResults);
+                    } catch (e) {
+                        console.error('Asset search failed:', e);
+                    } finally {
+                        this.isSearching = false;
+                    }
+                },
+                selectAsset(asset) {
+                    this.assetSearch = asset.hec_id || asset.inventory_id || asset.id;
+                    this.assetResults = [];
+                }
+            }));
+        });
+    </script>
+
     <form method="POST"
-        x-data="{ otType: 'Correctivo' }"
+        x-data="assetSearchComponent"
         class="card-glass p-8 space-y-8 shadow-2xl relative overflow-hidden">
+        <?= csrfField() ?>
         <!-- Hidden field for SMS association -->
         <input type="hidden" name="from_request_id" value="<?= $from_request_id ?>">
 
@@ -118,11 +169,39 @@ if (isset($_GET['from_request'])) {
             <div class="space-y-6">
                 <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-medical-blue border-b border-medical-blue/20 pb-2">Activo Afectado</h3>
 
-                <div class="space-y-2">
+                <div class="space-y-2 relative" @click.away="assetResults = []">
                     <label class="text-xs font-bold text-text-muted uppercase tracking-wider">ID del Activo (ID o Serie)</label>
                     <div class="relative">
-                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-text-muted/60">qr_code</span>
-                        <input name="asset_id" required value="<?= htmlspecialchars($pre_asset_id) ?>" placeholder="Ej: 500000012105..." class="w-full bg-medical-dark/50 border border-border-dark rounded-xl pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-text-main" />
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-text-muted/60"
+                            :class="isSearching ? 'animate-spin' : ''"
+                            x-text="isSearching ? 'progress_activity' : 'qr_code'">
+                        </span>
+                        <input name="asset_id"
+                            required
+                            x-model="assetSearch"
+                            @input.debounce.300ms="searchAssets()"
+                            placeholder="Ej: 500000012105..."
+                            class="w-full bg-medical-dark/50 border border-border-dark rounded-xl pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-text-main" />
+
+                        <!-- Search results dropdown -->
+                        <div x-show="assetResults.length > 0"
+                            x-transition
+                            class="absolute z-50 w-full mt-2 bg-[var(--medical-surface)] border border-border-dark rounded-xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto">
+                            <template x-for="asset in assetResults" :key="asset.id">
+                                <button type="button"
+                                    @click="selectAsset(asset)"
+                                    class="w-full text-left px-4 py-3 hover:bg-medical-blue/10 border-b border-border-dark/30 flex flex-col transition-colors">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-bold text-text-main" x-text="asset.name"></span>
+                                        <span class="text-[10px] font-black text-medical-blue" x-text="asset.hec_id || asset.inventory_id"></span>
+                                    </div>
+                                    <div class="flex justify-between text-[10px] text-text-muted/60">
+                                        <span x-text="'Serie: ' + (asset.serial_number || 'S/S')"></span>
+                                        <span x-text="asset.location"></span>
+                                    </div>
+                                </button>
+                            </template>
+                        </div>
                     </div>
                     <p class="text-[10px] text-text-muted italic">Conexión Real: El ID vinculará la OT con el inventario central.</p>
                 </div>
@@ -182,13 +261,13 @@ if (isset($_GET['from_request'])) {
                     </div>
                     <div class="space-y-2">
                         <label class="text-xs font-bold text-text-muted uppercase tracking-wider">Asignar a (Opcional)</label>
-                        <select name="assigned_tech" class="w-full bg-medical-dark/50 border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-text-main appearance-none">
+                        <select name="assigned_tech_id" class="w-full bg-medical-dark/50 border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-text-main appearance-none">
                             <option value="">-- Sin Asignar --</option>
                             <?php
                             require_once __DIR__ . '/../Backend/Providers/UserProvider.php';
                             foreach (getActiveTechnicians() as $tech):
                             ?>
-                                <option value="<?= htmlspecialchars($tech['name']) ?>"><?= htmlspecialchars($tech['name']) ?></option>
+                                <option value="<?= $tech['id'] ?>"><?= htmlspecialchars($tech['name']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>

@@ -77,16 +77,43 @@ function calcularDisponibilidad($MTBF, $MTTR)
 /**
  * Calcula el Número de Gestión del Equipo (GE) según Fennigkoh-Smith
  * 
- * @param array $equipo Array con campos: funcion, riesgo, mantenimiento
+ * @param array $equipo Array con campos: funcion_ge, riesgo_ge_score, mantenimiento_ge
  * @return int GE (si >= 12, equipo es prioritario)
  */
 function calcularGE($equipo)
 {
-    $funcion = $equipo['funcion'] ?? 5; // 1-10 (default: 5)
-    $riesgo = $equipo['riesgo'] ?? 3; // 1-5 (default: 3)
-    $mantenimiento = $equipo['mantenimiento'] ?? 3; // 1-5 (default: 3)
+    if (is_object($equipo)) {
+        $equipo = method_exists($equipo, 'toArray') ? $equipo->toArray() : (array)$equipo;
+    }
 
-    return $funcion + $riesgo + $mantenimiento;
+    $funcion = $equipo['funcion_ge'] ?? ($equipo['funcion'] ?? 5);
+    $riesgo = $equipo['riesgo_ge_score'] ?? ($equipo['riesgo'] ?? 3);
+    $mantenimiento = $equipo['mantenimiento_ge'] ?? ($equipo['mantenimiento'] ?? 3);
+
+    return (int)$funcion + (int)$riesgo + (int)$mantenimiento;
+}
+
+/**
+ * Determina la frecuencia de mantenimiento preventivo según puntuación GE
+ * 
+ * @param int $ge Puntuación GE
+ * @return string Etiqueta de frecuencia
+ */
+function obtenerFrecuenciaMP($ge)
+{
+    if ($ge >= 12) return 'Semestral (Alta)';
+    if ($ge >= 9)  return 'Anual (Media)';
+    return 'Según necesidad / Bianual (Baja)';
+}
+
+/**
+ * Retorna la frecuencia en meses para cálculos de programación
+ */
+function obtenerMesesFrecuencia($ge)
+{
+    if ($ge >= 12) return 6;
+    if ($ge >= 9)  return 12;
+    return 24;
 }
 
 /**
@@ -97,6 +124,10 @@ function calcularGE($equipo)
  */
 function calcularGEAjustado($equipo)
 {
+    if (is_object($equipo)) {
+        $equipo = method_exists($equipo, 'toArray') ? $equipo->toArray() : (array)$equipo;
+    }
+
     $prioridad = $equipo['prioridad'] ?? 5;
     $mantenimiento = $equipo['mantenimiento'] ?? 3;
     $tasaUso = $equipo['tasaUso'] ?? 0.5; // 0-1
@@ -166,7 +197,7 @@ function generarAlertas($MTBF, $MTTR, $disponibilidad, $GE)
 }
 
 /**
- * Calcula métricas globales del sistema
+ * Calcula métricas globales del sistema de forma optimizada
  * 
  * @param array $assets Array de equipos
  * @param array $otCorrectivas Array de OT correctivas
@@ -174,13 +205,32 @@ function generarAlertas($MTBF, $MTTR, $disponibilidad, $GE)
  */
 function calcularMetricasGlobales($assets, $otCorrectivas)
 {
+    // Agrupar OTs por activo una sola vez
+    $otsPorActivo = [];
+    foreach ($otCorrectivas as $ot) {
+        $aid = $ot['asset_id'] ?? '';
+        if ($aid) {
+            $otsPorActivo[$aid][] = $ot;
+        }
+    }
+
     $mtbfs = [];
     $mttrs = [];
     $disponibilidades = [];
+    $totalDowntime = 0;
 
     foreach ($assets as $asset) {
-        $mtbf = calcularMTBF($asset['id'], $otCorrectivas);
-        $mttr = calcularMTTR($asset['id'], $otCorrectivas);
+        $assetId = $asset['id'] ?? null;
+        if (!$assetId) continue;
+
+        $otsActivo = $otsPorActivo[$assetId] ?? [];
+
+        $mtbf = calcularMTBF_Internal($assetId, $otsActivo);
+        $mttr = calcularMTTR_Internal($assetId, $otsActivo);
+
+        // Sumar downtime real
+        $assetDowntime = array_sum(array_column($otsActivo, 'duration_hours'));
+        $totalDowntime += $assetDowntime;
 
         if ($mtbf !== null) {
             $mtbfs[] = $mtbf;
@@ -193,6 +243,39 @@ function calcularMetricasGlobales($assets, $otCorrectivas)
         'mtbf_promedio' => count($mtbfs) > 0 ? array_sum($mtbfs) / count($mtbfs) : 0,
         'mttr_promedio' => count($mttrs) > 0 ? array_sum($mttrs) / count($mttrs) : 0,
         'disponibilidad_promedio' => count($disponibilidades) > 0 ? array_sum($disponibilidades) / count($disponibilidades) : 0,
+        'total_downtime_hours' => $totalDowntime,
         'equipos_analizados' => count($mtbfs)
     ];
+}
+
+/**
+ * Versión interna de calcularMTBF que ya recibe las OTs filtradas
+ */
+function calcularMTBF_Internal($equipo_id, $fallos)
+{
+    $numFallos = count($fallos);
+    if ($numFallos <= 1) return null;
+
+    usort($fallos, function ($a, $b) {
+        return strtotime($a['date'] ?? '') - strtotime($b['date'] ?? '');
+    });
+
+    $first = reset($fallos);
+    $last = end($fallos);
+    $t1 = strtotime($first['date'] ?? '');
+    $t2 = strtotime($last['date'] ?? '');
+
+    if (!$t1 || !$t2) return null;
+    $tiempoTotal = ($t2 - $t1) / 86400;
+
+    return $tiempoTotal / ($numFallos - 1);
+}
+
+/**
+ * Versión interna de calcularMTTR que ya recibe las OTs filtradas
+ */
+function calcularMTTR_Internal($equipo_id, $fallos)
+{
+    $duraciones = array_column($fallos, 'duration_hours');
+    return count($duraciones) > 0 ? array_sum($duraciones) / count($duraciones) : 0;
 }

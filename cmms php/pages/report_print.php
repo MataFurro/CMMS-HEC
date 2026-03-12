@@ -13,7 +13,28 @@ if (!$ot) die("Orden no encontrada");
 
 $asset = getAssetById($ot['asset_id']);
 $attachments = getOtAttachments($id);
-$template = getChecklistTemplate($ot['checklist_template'] ?? 'formato_general');
+
+$templateKey = $ot['checklist_template'] ?? null;
+if (!$templateKey) {
+    $assetName = mb_strtolower($asset['name'] ?? '', 'UTF-8');
+    if (strpos($assetName, 'ventilador') !== false) {
+        $templateKey = 'ventilador_mecanico';
+    } elseif (strpos($assetName, 'bomba de infus') !== false) {
+        $templateKey = 'bomba_infusion';
+    } elseif (strpos($assetName, 'desfibrilador') !== false) {
+        $templateKey = 'monitor_desfibrilador';
+    } elseif (strpos($assetName, 'electrocardiógrafo') !== false || strpos($assetName, 'electrocardiografo') !== false) {
+        $templateKey = 'electrocardiografo';
+    } elseif (strpos($assetName, 'monitor') !== false) {
+        $templateKey = 'monitor_signos_vitales';
+    } else {
+        $templateKey = 'formato_general';
+    }
+}
+$template = getChecklistTemplate($templateKey);
+if (!$template) {
+    $template = getChecklistTemplate('formato_general');
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -150,29 +171,91 @@ $template = getChecklistTemplate($ot['checklist_template'] ?? 'formato_general')
     <!-- Measurements / Results -->
     <section class="mb-8 print-break-inside-avoid">
         <h2 class="text-xs font-black uppercase tracking-widest text-blue-600 mb-4 border-b border-blue-100 pb-1">Pruebas / Protocolo (<?= $template['label'] ?>)</h2>
+        <?php $savedChecklist = $ot['checklist_data'] ?? []; ?>
         <div class="grid grid-cols-2 gap-8 text-[11px]">
             <div>
                 <h3 class="font-bold text-slate-800 mb-2 border-b border-slate-100 pb-1">Checklist Cualitativo</h3>
                 <ul class="space-y-1">
-                    <?php foreach ($template['qualitative'] ?? [] as $check): ?>
+                    <?php foreach ($template['qualitative'] ?? [] as $idx => $check):
+                        $val = $savedChecklist['qualitative']["q_$idx"] ?? 'na';
+                        $color = $val === 'pass' ? 'text-green-600' : ($val === 'fail' ? 'text-red-600' : 'text-slate-400');
+                        $label = $val === 'pass' ? '✓ PASA' : ($val === 'fail' ? '✗ FALLA' : '- N/A');
+                    ?>
                         <li class="flex items-center justify-between py-1 border-b border-slate-50 last:border-0 text-slate-600 font-medium">
-                            <span><?= $check ?></span>
-                            <span class="font-black text-green-600">✓ PASA</span>
+                            <span class="pr-4"><?= $check ?></span>
+                            <span class="font-black <?= $color ?> text-right whitespace-nowrap"><?= $label ?></span>
                         </li>
                     <?php endforeach; ?>
+
+                    <?php
+                    // Custom Qualitative Checks
+                    foreach (($savedChecklist['qualitative'] ?? []) as $k => $v) {
+                        if (str_starts_with($k, 'q_custom_label_')) {
+                            $id = str_replace('q_custom_label_', '', $k);
+                            $val = $savedChecklist['qualitative']["q_custom_val_$id"] ?? 'na';
+                            $color = $val === 'pass' ? 'text-green-600' : ($val === 'fail' ? 'text-red-600' : 'text-slate-400');
+                            $label = $val === 'pass' ? '✓ PASA' : ($val === 'fail' ? '✗ FALLA' : '- N/A');
+                    ?>
+                            <li class="flex items-center justify-between py-1 border-b border-slate-50 last:border-0 text-slate-600 font-medium">
+                                <span class="pr-4"><?= htmlspecialchars($v) ?> <span class="text-[7px] bg-slate-100 text-slate-400 px-1 rounded ml-1 uppercase tracking-widest">Adicional</span></span>
+                                <span class="font-black <?= $color ?> text-right whitespace-nowrap"><?= $label ?></span>
+                            </li>
+                    <?php
+                        }
+                    }
+                    ?>
                 </ul>
             </div>
             <div>
                 <h3 class="font-bold text-slate-800 mb-2 border-b border-slate-100 pb-1">Metrología Básica</h3>
                 <ul class="space-y-1 text-slate-600">
-                    <li class="flex items-center justify-between py-1 border-b border-slate-50 font-medium">
-                        <span>Seguridad Eléctrica (IEC 62353)</span>
-                        <span class="font-black text-green-600 uppercase">Cumple</span>
-                    </li>
-                    <li class="flex items-center justify-between py-1 border-b border-slate-50 font-medium">
-                        <span>Verificación Funcional</span>
-                        <span class="font-black text-green-600 uppercase">Conforme</span>
-                    </li>
+                    <?php foreach ($template['electrical_safety'] ?? [] as $sIdx => $safety):
+                        $val = $savedChecklist['electrical_safety']["es_$sIdx"] ?? '—';
+                    ?>
+                        <li class="flex items-center justify-between py-1 border-b border-slate-50 font-medium">
+                            <span class="pr-4"><?= $safety['param'] ?> (<?= htmlspecialchars($safety['expected']) ?>)</span>
+                            <span class="font-black text-slate-800 text-right whitespace-nowrap"><?= htmlspecialchars($val) ?></span>
+                        </li>
+                    <?php endforeach; ?>
+
+                    <?php foreach ($template['quantitative'] ?? [] as $gIdx => $group):
+                        $groupSavedNA = isset($savedChecklist['quantitative']["group_na_$gIdx"]) && $savedChecklist['quantitative']["group_na_$gIdx"] == 'on';
+                        if ($groupSavedNA) {
+                    ?>
+                            <li class="flex items-center justify-between py-1 border-b border-slate-50 font-medium">
+                                <span class="pr-4"><?= $group['group'] ?></span>
+                                <span class="font-black text-slate-400 text-right whitespace-nowrap">- N/A</span>
+                            </li>
+                        <?php
+                            continue;
+                        }
+                        foreach ($group['points'] as $pIdx => $point):
+                            $val = $savedChecklist['quantitative']["m_{$gIdx}_{$pIdx}"] ?? '—';
+                        ?>
+                            <li class="flex items-center justify-between py-1 border-b border-slate-50 font-medium">
+                                <span class="pr-4"><?= $group['group'] ?>: <?= $point['simulated'] ?><?= $group['unit'] ?></span>
+                                <span class="font-black text-slate-800 text-right whitespace-nowrap"><?= htmlspecialchars($val) ?> <?= $group['unit'] ?></span>
+                            </li>
+                    <?php
+                        endforeach;
+                    endforeach;
+                    ?>
+
+                    <?php
+                    // Custom Quantitative Checks
+                    foreach (($savedChecklist['quantitative'] ?? []) as $k => $v) {
+                        if (str_starts_with($k, 'm_custom_label_')) {
+                            $id = str_replace('m_custom_label_', '', $k);
+                            $val = $savedChecklist['quantitative']["m_custom_val_$id"] ?? '—';
+                    ?>
+                            <li class="flex items-center justify-between py-1 border-b border-slate-50 font-medium">
+                                <span class="pr-4"><?= htmlspecialchars($v) ?> <span class="text-[7px] bg-slate-100 text-slate-400 px-1 rounded ml-1 uppercase tracking-widest">Adicional</span></span>
+                                <span class="font-black text-slate-800 text-right whitespace-nowrap"><?= htmlspecialchars($val) ?></span>
+                            </li>
+                    <?php
+                        }
+                    }
+                    ?>
                 </ul>
             </div>
         </div>

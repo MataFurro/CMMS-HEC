@@ -25,23 +25,23 @@ try {
         $requestId = $_POST['request_id'];
 
         // 1. Obtener datos del reporte antes de marcarlo como procesado
-        $stmt_get = $db->prepare("SELECT * FROM messenger_reports WHERE id = :id");
+        $stmt_get = $db->prepare("SELECT * FROM service_requests WHERE id = :id");
         $stmt_get->execute([':id' => $requestId]);
         $report = $stmt_get->fetch(PDO::FETCH_ASSOC);
 
         if ($report) {
             // 2. Crear OT Real en el sistema
             createWorkOrderFromRequest([
-                'asset_id' => $report['serie'] ?? $report['asset_id'] ?? 'S/N',
-                'asset_name' => $report['servicio'] ?? $report['asset_name'] ?? 'Equipo Desconocido',
-                'problem' => $report['texto'],
-                'priority' => 'Alta',
-                'ms_email' => $report['email'],
+                'asset_id'      => $report['asset_id'] ?? 'S/N',
+                'asset_name'    => $report['asset_name_fallback'] ?? 'Equipo Desconocido',
+                'problem'       => $report['description'],
+                'priority'      => $report['priority'] ?? 'Alta',
+                'ms_email'      => $report['requester_email'],
                 'ms_request_id' => $report['id']
             ]);
 
-            // 3. Cambiar estado a 'Procesado'
-            $stmt = $db->prepare("UPDATE messenger_reports SET status = 'Procesado' WHERE id = :id");
+            // 3. Cambiar estado a 'Convertida_OT'
+            $stmt = $db->prepare("UPDATE service_requests SET status = 'Convertida_OT' WHERE id = :id");
             $stmt->execute([':id' => $requestId]);
         }
 
@@ -50,10 +50,10 @@ try {
     }
 
     // Solo traer solicitudes PENDIENTES
-    $requests = $db->query("SELECT * FROM messenger_reports WHERE status = 'Pendiente' ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+    $requests = $db->query("SELECT * FROM service_requests WHERE status = 'En Curso' ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     $requests = [];
-    $error = "Error de Conexión MySQL (Módulo Mensajería): " . $e->getMessage();
+    $error = "Error de Conexión MySQL (Módulo Integración Clínico): " . $e->getMessage();
 }
 ?>
 
@@ -94,7 +94,7 @@ try {
     <div class="card-glass overflow-hidden shadow-2xl border border-border-dark">
         <table class="w-full text-left">
             <thead>
-                <tr class="bg-slate-200/50 dark:bg-white/5 border-b border-border-dark uppercase text-[10px] font-black tracking-widest text-[var(--text-muted)]">
+                <tr class="bg-medical-surface border-b border-[var(--border-color)] uppercase text-[10px] font-black tracking-widest text-text-muted/60">
                     <th class="px-6 py-4">ID</th>
                     <th class="px-6 py-4">Servicio / Equipo</th>
                     <th class="px-6 py-4">Descripción de Falla</th>
@@ -103,19 +103,19 @@ try {
             </thead>
             <tbody class="divide-y divide-border-dark">
                 <?php foreach ($requests as $r): ?>
-                    <tr class="hover:bg-slate-200/30 dark:hover:bg-white/5 transition-all text-sm">
+                    <tr class="hover:bg-medical-blue/5 transition-all text-sm group">
                         <td class="px-6 py-4 font-black text-medical-blue">#<?= $r['id'] ?></td>
                         <td class="px-6 py-4">
-                            <div class="font-bold text-[var(--text-main)]"><?= htmlspecialchars($r['servicio'] ?? $r['asset_name'] ?? 'N/A') ?></div>
-                            <div class="text-medical-blue text-xs font-mono"><?= htmlspecialchars($r['serie'] ?? $r['asset_id'] ?? 'S/N') ?></div>
+                            <div class="font-bold text-[var(--text-main)]"><?= htmlspecialchars($r['asset_name_fallback'] ?? 'N/A') ?></div>
+                            <div class="text-medical-blue text-xs font-mono"><?= htmlspecialchars($r['asset_id'] ?? 'S/N') ?></div>
                         </td>
-                        <td class="px-6 py-4 text-[var(--text-muted)] font-medium max-w-xs" title="<?= htmlspecialchars($r['texto']) ?>">
-                            <div class="truncate"><?= htmlspecialchars($r['texto']) ?></div>
+                        <td class="px-6 py-4 text-[var(--text-muted)] font-medium max-w-xs" title="<?= htmlspecialchars($r['description']) ?>">
+                            <div class="truncate"><?= htmlspecialchars($r['description']) ?></div>
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex justify-center gap-2">
                                 <a href="?page=work_order_opening&from_request=<?= $r['id'] ?>"
-                                    class="p-2 bg-medical-blue/10 text-medical-blue rounded-lg hover:bg-medical-blue/20 transition-all border border-medical-blue/20 shadow-lg"
+                                    class="p-2 bg-panel-dark text-text-muted hover:border hover:border-medical-blue/30 transition-all border border-[var(--border-color)] shadow-sm"
                                     title="Abrir Formulario de OT">
                                     <span class="material-symbols-outlined text-xl">add_task</span>
                                 </a>

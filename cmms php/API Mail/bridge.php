@@ -34,15 +34,14 @@ function saveReport(string $to, string $subject, array $data): string
         require_once __DIR__ . '/../Backend/Core/DatabaseService.php';
         $db = \Backend\Core\DatabaseService::getInstance();
         $stmt = $db->prepare("
-            INSERT INTO messenger_reports (asset_name, asset_id, texto, imagen_path, email, status) 
-            VALUES (:name, :serie, :text, :path, :email, 'Pendiente')
+            INSERT INTO service_requests (id, requester_email, description, priority, status, asset_name_fallback) 
+            VALUES (:id, :email, :text, 'Media', 'En Curso', :fallback_name)
         ");
         $stmt->execute([
-            ':name'  => $data['nombre_equipo'] ?? 'N/A',
-            ':serie' => $data['serie_equipo'] ?? 'N/A',
+            ':id'    => $trackingId,
+            ':email' => $data['email_solicitante'] ?? null,
             ':text'  => $data['descripcion'] ?? '',
-            ':path'  => $data['path_imagen'] ?? null,
-            ':email' => $data['email_solicitante'] ?? null
+            ':fallback_name' => ($data['nombre_equipo'] ?? 'N/A') . ' Serie: ' . ($data['serie_equipo'] ?? 'N/A')
         ]);
     } catch (\Exception $e) {
         // Fallback al log si falla el DB
@@ -52,12 +51,12 @@ function saveReport(string $to, string $subject, array $data): string
     // ── BITÁCORA DE SISTEMA (Rastreo de Origen) ──
     logAuditAction(
         'REQUEST_RECEIVED',
-        'MESSENGER_REPORT',
+        'SERVICE_REQUEST',
         $trackingId,
-        "Reporte clínico recibido vía Messenger. El Sistema de Integración ha registrado el reporte tecnológico en la base de datos.",
+        "Reporte clínico externo recibido. Registrado en módulo Service Requests.",
         [
             'from' => $data['email_solicitante'] ?? 'Unknown',
-            'equipment' => $data['nombre_equipo'] ?? 'N/A',
+            'equipment_info' => $data['nombre_equipo'] ?? 'N/A',
             'tracking_id' => $trackingId
         ]
     );

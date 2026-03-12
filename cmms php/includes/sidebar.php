@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../Backend/Providers/UserProvider.php'; // Standardized Path
 $menuItems = getSidebarMenu($_SESSION['user_role'] ?? '');
 ?>
-<aside class="fixed lg:sticky top-0 left-0 flex flex-col w-20 lg:w-72 bg-medical-surface border-r border-border-dark h-screen shrink-0 z-50 transition-all duration-300">
+<aside class="sticky top-0 left-0 flex flex-col w-20 lg:w-72 bg-medical-surface border-r border-[var(--border-color)] h-screen shrink-0 z-50 transition-all duration-300">
     <div class="p-4 lg:p-8 flex flex-col items-center lg:items-start overflow-y-auto custom-scrollbar">
         <div class="flex items-center gap-3 mb-10 lg:mb-12">
             <div class="bg-medical-blue rounded-lg w-10 h-10 lg:w-12 lg:h-12 flex items-center justify-center shadow-lg shadow-medical-blue/20">
@@ -11,7 +11,7 @@ $menuItems = getSidebarMenu($_SESSION['user_role'] ?? '');
             </div>
             <div class="hidden lg:block">
                 <h2 class="text-sm font-black tracking-tight text-text-main leading-none uppercase">BioCMMS</h2>
-                <p class="text-[10px] text-medical-blue font-black tracking-widest uppercase mt-1">v4.4 PRO EDITION</p>
+                <p class="text-[10px] text-medical-blue font-black tracking-widest uppercase mt-1">v4.5</p>
             </div>
         </div>
 
@@ -30,9 +30,9 @@ $menuItems = getSidebarMenu($_SESSION['user_role'] ?? '');
         </nav>
     </div>
 
-    <div class="mt-auto p-4 lg:p-8 border-t border-border-dark w-full bg-medical-surface/50 backdrop-blur-md">
+    <div class="mt-auto p-4 lg:p-8 border-t border-[var(--border-color)] w-full bg-medical-surface/50 backdrop-blur-md">
         <div class="flex items-center gap-4">
-            <div class="size-10 rounded-full bg-slate-800/50 flex items-center justify-center shrink-0 border border-slate-700 shadow-inner">
+            <div class="size-10 rounded-full bg-[var(--panel-dark)] flex items-center justify-center shrink-0 border border-[var(--border-color)] shadow-inner">
                 <span class="material-symbols-outlined text-text-muted">account_circle</span>
             </div>
             <div class="hidden lg:block overflow-hidden flex-1">

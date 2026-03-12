@@ -14,6 +14,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die('Acceso denegado. Solo Ingeniero/Admin puede crear activos.');
     }
 
+    if (!verifyCsrfToken()) {
+        die("<div class='p-8 text-center text-red-500 font-bold'>Token de seguridad inválido (CSRF). Por favor, vuelva atrás y recargue la página.</div>");
+    }
+
     $result = saveAsset($_POST);
 
     if ($result) {
@@ -43,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <form method="POST" class="card-glass p-8 space-y-8 shadow-2xl relative overflow-hidden">
+        <?= csrfField() ?>
         <div class="absolute top-0 right-0 w-32 h-32 bg-medical-blue/5 blur-3xl rounded-full -mr-16 -mt-16"></div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
@@ -52,10 +57,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     class="text-[10px] font-black uppercase tracking-[0.2em] text-medical-blue border-b border-medical-blue/20 pb-2">
                     Identificación de Equipo</h3>
 
-                <div class="space-y-2">
-                    <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">ID Inventario</label>
-                    <input required name="id" placeholder="Ej: PB-840-00122"
-                        class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)]" />
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">ID Propio HEC</label>
+                        <input type="text" disabled placeholder="Autogenerado (Ej: MON-CRI-00001)"
+                            class="w-full bg-slate-800/30 border border-border-dark rounded-xl px-4 py-3 text-sm outline-none transition-all text-[var(--text-muted)] cursor-not-allowed" />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">N° Inventario Físico (Opcional)</label>
+                        <input name="id" placeholder="Ej: 5000000100"
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)]" />
+                    </div>
                 </div>
 
                 <div class="space-y-2">

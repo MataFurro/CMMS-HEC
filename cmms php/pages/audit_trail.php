@@ -23,9 +23,9 @@ $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- Filtros Rápidos -->
     <div class="flex gap-4 overflow-x-auto pb-2">
-        <button class="px-6 py-2 bg-slate-800 border border-slate-700 rounded-xl text-slate-300 font-bold text-xs uppercase tracking-widest hover:border-medical-blue transition-all">Todos</button>
-        <button class="px-6 py-2 bg-slate-800 border border-slate-700 rounded-xl text-slate-300 font-bold text-xs uppercase tracking-widest hover:border-medical-blue transition-all">Cierres Automáticos</button>
-        <button class="px-6 py-2 bg-slate-800 border border-slate-700 rounded-xl text-slate-300 font-bold text-xs uppercase tracking-widest hover:border-medical-blue transition-all">Reportes Bio</button>
+        <button class="px-6 py-2 bg-medical-surface border border-[var(--border-color)] text-[var(--text-muted)] hover:border-medical-blue transition-all">Todos</button>
+        <button class="px-6 py-2 bg-medical-surface border border-[var(--border-color)] text-[var(--text-muted)] hover:border-medical-blue transition-all">Cierres Automáticos</button>
+        <button class="px-6 py-2 bg-medical-surface border border-[var(--border-color)] text-[var(--text-muted)] hover:border-medical-blue transition-all">Reportes Bio</button>
     </div>
 
     <div class="grid grid-cols-1 gap-6">
@@ -33,16 +33,16 @@ $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $details = json_decode($log['details'], true);
             $isSystem = isset($details['agentic_reasoning']) || (isset($log['action']) && strpos($log['action'], 'AUTO') !== false);
         ?>
-            <div class="card-glass p-6 border-l-4 <?= $isSystem ? 'border-medical-blue' : 'border-slate-700' ?> group hover:bg-slate-800/40 transition-all">
+            <div class="card-glass p-6 border-l-4 <?= $isSystem ? 'border-medical-blue' : 'border-[var(--border-color)]' ?> group hover:bg-medical-blue/5 transition-all">
                 <div class="flex flex-col md:flex-row justify-between gap-4">
                     <div class="flex gap-4">
-                        <div class="w-12 h-12 rounded-xl <?= $isSystem ? 'bg-medical-blue/10 text-medical-blue' : 'bg-slate-700/50 text-slate-500' ?> flex items-center justify-center shrink-0">
+                        <div class="w-12 h-12 rounded-xl <?= $isSystem ? 'bg-medical-blue/10 text-medical-blue' : 'bg-medical-surface border border-[var(--border-color)] text-[var(--text-muted)]' ?> flex items-center justify-center shrink-0">
                             <span class="material-symbols-outlined text-2xl"><?= $isSystem ? 'settings_suggest' : 'person' ?></span>
                         </div>
                         <div>
                             <div class="flex items-center gap-3">
                                 <h3 class="text-[var(--text-main)] font-bold text-lg"><?= $log['action'] ?></h3>
-                                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded <?= $isSystem ? 'bg-medical-blue/20 text-medical-blue' : 'bg-slate-700 text-slate-400' ?>">
+                                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded <?= $isSystem ? 'bg-medical-blue/20 text-medical-blue' : 'bg-medical-surface border border-[var(--border-color)] text-[var(--text-muted)]' ?>">
                                     <?= $isSystem ? 'Acción de Sistema' : 'Acción Humana' ?>
                                 </span>
                             </div>
@@ -50,8 +50,8 @@ $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
                     <div class="text-right">
-                        <p class="text-xs font-bold text-slate-500 uppercase"><?= date('d M Y, H:i:s', strtotime($log['timestamp'])) ?></p>
-                        <p class="text-[10px] font-mono text-slate-600 mt-1">IP: <?= $log['ip_address'] ?></p>
+                        <p class="text-xs font-bold text-[var(--text-muted)] opacity-60 uppercase"><?= date('d M Y, H:i:s', strtotime($log['timestamp'])) ?></p>
+                        <p class="text-[10px] font-mono text-[var(--text-muted)] opacity-50 mt-1">IP: <?= $log['ip_address'] ?></p>
                     </div>
                 </div>
 
@@ -76,9 +76,9 @@ $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 <div class="mt-4 flex flex-wrap gap-2">
                     <?php if (isset($details['system_version'])): ?>
-                        <span class="text-[10px] font-bold text-slate-600 border border-slate-700/50 px-2 py-0.5 rounded">Kernel: <?= $details['system_version'] ?></span>
+                        <span class="text-[10px] font-bold text-[var(--text-muted)] opacity-60 border border-[var(--border-color)] px-2 py-0.5 rounded">Kernel: <?= $details['system_version'] ?></span>
                     <?php endif; ?>
-                    <span class="text-[10px] font-bold text-slate-600 border border-slate-700/50 px-2 py-0.5 rounded">Ref: <?= $log['id'] ?></span>
+                    <span class="text-[10px] font-bold text-[var(--text-muted)] opacity-60 border border-[var(--border-color)] px-2 py-0.5 rounded">Ref: <?= $log['id'] ?></span>
                 </div>
             </div>
         <?php endforeach; ?>

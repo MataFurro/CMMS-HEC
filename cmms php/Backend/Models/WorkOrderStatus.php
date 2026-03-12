@@ -4,8 +4,8 @@ namespace Backend\Models;
 
 enum WorkOrderStatus: string
 {
-    case PENDING = 'Pendiente';
-    case IN_PROGRESS = 'En Proceso';
+    case IN_PROGRESS = 'En Curso';
+    case ON_HOLD = 'En Espera';
     case COMPLETED = 'Terminada';
     case CANCELED = 'Cancelada';
 }

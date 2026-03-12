@@ -4,159 +4,167 @@
 // ── Backend Provider ──
 require_once __DIR__ . '/../Backend/Providers/WorkOrderProvider.php';
 
-$orders = getAllWorkOrders();
+// --- FILTERING & PAGINATION LOGIC ---
+$tipoFilter = $_GET['tipo'] ?? '';
+$estadoFilter = $_GET['estado'] ?? '';
+$desdeFilter = $_GET['desde'] ?? '';
+$hastaFilter = $_GET['hasta'] ?? '';
+
+$page = isset($_GET['p']) ? (int)$_GET['p'] : 1;
+if ($page < 1) $page = 1;
+$limit = 25;
+$offset = ($page - 1) * $limit;
+
+$activeFilters = [
+    'type' => $tipoFilter,
+    'status' => $estadoFilter,
+    'date_from' => $desdeFilter,
+    'date_to' => $hastaFilter
+];
+
+$totalOrdersCount = countTotalWorkOrders($activeFilters);
+$totalPages = ceil($totalOrdersCount / $limit);
+$orders = getWorkOrdersPaginated($limit, $offset, $activeFilters);
 $stats = getWorkOrderStats();
+
+// --- HELPER: URL BUILDER ---
+$filterParams = [
+    'page' => 'work_orders',
+    'tipo' => $tipoFilter,
+    'estado' => $estadoFilter,
+    'desde' => $desdeFilter,
+    'hasta' => $hastaFilter
+];
+$buildUrl = function ($p, $overrides = []) use ($filterParams) {
+    if ($p === null) $p = (isset($_GET['p']) ? (int)$_GET['p'] : 1);
+    $params = array_merge($filterParams, $overrides);
+    $params['p'] = $p;
+    return '?' . http_build_query($params);
+};
 ?>
 
 <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div>
-            <nav class="flex items-center gap-2 mb-4">
-                <span
-                    class="text-[10px] font-black uppercase tracking-[0.2em] text-medical-blue bg-medical-blue/10 px-2 py-0.5 rounded">Operaciones</span>
-                <span class="material-symbols-outlined text-xs text-text-muted/60">chevron_right</span>
-                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">Gestión de
-                    Mantenimiento</span>
-            </nav>
-            <h1 class="text-4xl font-black text-[var(--text-main)] tracking-tight flex items-center gap-4">
-                Órdenes de Trabajo
-                <span class="text-medical-blue material-symbols-outlined text-3xl font-variation-fill">task_alt</span>
-            </h1>
-            <p class="text-[var(--text-muted)] mt-2 text-lg font-medium italic opacity-80">Seguimiento y ejecución de
-                intervenciones técnicas en tiempo real.</p>
-        </div>
-        <?php if (canModify()): ?>
+    <?php
+    $headerActions = '';
+    if (canModify()) {
+        $headerActions = '
             <a href="?page=work_order_opening"
                 class="group h-12 px-8 bg-medical-blue text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-medical-blue/90 flex items-center gap-3 transition-all shadow-xl shadow-medical-blue/20 active:scale-95">
                 <span class="material-symbols-outlined text-xl transition-transform group-hover:rotate-12">add_circle</span>
                 Generar Nueva Orden
-            </a>
-        <?php endif; ?>
-    </div>
+            </a>';
+    }
 
-    <!-- Filtros -->
-    <div class="card-glass p-4 mb-6 space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-                <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2 block">Tipo</label>
-                <select id="filter-tipo"
-                    class="w-full bg-medical-surface border border-border-dark rounded-lg px-3 py-2 text-sm text-[var(--text-main)] focus:outline-none focus:border-medical-blue">
-                    <option value="">Todos</option>
-                    <option value="Preventiva">Preventiva</option>
-                    <option value="Correctiva">Correctiva</option>
-                    <option value="Calibración">Calibración</option>
-                </select>
+    $preTitle = 'Operaciones';
+    $title = 'Órdenes de Trabajo';
+    $subTitle = 'Gestión de Mantenimiento';
+    $icon = 'task_alt';
+    $description = 'Seguimiento y ejecución de intervenciones técnicas en tiempo real.';
+    $actions = $headerActions;
+    include __DIR__ . '/../includes/components/header_master.php';
+    ?>
+
+    <!-- Filtros Rediseñados -->
+    <div class="card-glass p-6 mb-8 border border-[var(--border-color)]/30">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+            <div class="md:col-span-3">
+                <label class="flex items-center gap-2 text-[10px] font-black text-text-muted uppercase tracking-[0.15em] mb-3">
+                    <span class="material-symbols-outlined text-sm text-medical-blue">category</span>
+                    Tipo de Orden
+                </label>
+                <div class="relative group">
+                    <select id="filter-tipo"
+                        class="w-full bg-[var(--input-bg)] border-[var(--border-color)] rounded-xl px-4 py-2.5 text-xs text-[var(--text-main)] focus:outline-none focus:ring-4 focus:ring-medical-blue/10 focus:border-medical-blue font-bold transition-all appearance-none cursor-pointer">
+                        <option value="">Todos los Tipos</option>
+                        <option value="Preventiva" <?= $tipoFilter === 'Preventiva' ? 'selected' : '' ?>>Preventiva</option>
+                        <option value="Correctiva" <?= $tipoFilter === 'Correctiva' ? 'selected' : '' ?>>Correctiva</option>
+                        <option value="Calibración" <?= $tipoFilter === 'Calibración' ? 'selected' : '' ?>>Calibración</option>
+                    </select>
+                    <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted/50 group-focus-within:text-medical-blue pointer-events-none transition-colors">expand_more</span>
+                </div>
             </div>
-            <div>
-                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Estado</label>
-                <select id="filter-estado"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-medical-blue">
-                    <option value="">Todos</option>
-                    <option value="En Proceso">En Proceso</option>
-                    <option value="Terminada">Terminada</option>
-                    <option value="Pendiente">Pendiente</option>
-                </select>
+
+            <div class="md:col-span-3">
+                <label class="flex items-center gap-2 text-[10px] font-black text-text-muted uppercase tracking-[0.15em] mb-3">
+                    <span class="material-symbols-outlined text-sm text-amber-500">rule</span>
+                    Estado Actual
+                </label>
+                <div class="relative group">
+                    <select id="filter-estado"
+                        class="w-full bg-[var(--input-bg)] border-[var(--border-color)] rounded-xl px-4 py-2.5 text-xs text-[var(--text-main)] focus:outline-none focus:ring-4 focus:ring-medical-blue/10 focus:border-medical-blue font-bold transition-all appearance-none cursor-pointer">
+                        <option value="">Todos los Estados</option>
+                        <option value="En Curso" <?= $estadoFilter === 'En Curso' ? 'selected' : '' ?>>En Curso</option>
+                        <option value="Terminada" <?= $estadoFilter === 'Terminada' ? 'selected' : '' ?>>Terminada</option>
+                        <option value="En Espera" <?= $estadoFilter === 'En Espera' ? 'selected' : '' ?>>En Espera</option>
+                        <option value="Cancelada" <?= $estadoFilter === 'Cancelada' ? 'selected' : '' ?>>Cancelada</option>
+                    </select>
+                    <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted/50 group-focus-within:text-medical-blue pointer-events-none transition-colors">expand_more</span>
+                </div>
             </div>
-            <div>
-                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Desde</label>
-                <input type="date" id="filter-desde"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-medical-blue">
+
+            <div class="md:col-span-2">
+                <label class="flex items-center gap-2 text-[10px] font-black text-text-muted uppercase tracking-[0.15em] mb-3">
+                    <span class="material-symbols-outlined text-sm text-medical-blue">calendar_today</span>
+                    Desde
+                </label>
+                <input type="date" id="filter-desde" value="<?= htmlspecialchars($desdeFilter) ?>"
+                    class="w-full bg-[var(--input-bg)] border-[var(--border-color)] rounded-xl px-4 py-2.5 text-xs text-[var(--text-main)] focus:outline-none focus:ring-4 focus:ring-medical-blue/10 focus:border-medical-blue font-bold transition-all">
             </div>
-            <div>
-                <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2 block">Hasta</label>
-                <input type="date" id="filter-hasta"
-                    class="w-full bg-medical-surface border border-border-dark rounded-lg px-3 py-2 text-sm text-[var(--text-main)] focus:outline-none focus:border-medical-blue">
+
+            <div class="md:col-span-2">
+                <label class="flex items-center gap-2 text-[10px] font-black text-text-muted uppercase tracking-[0.15em] mb-3">
+                    <span class="material-symbols-outlined text-sm text-medical-blue">event_repeat</span>
+                    Hasta
+                </label>
+                <input type="date" id="filter-hasta" value="<?= htmlspecialchars($hastaFilter) ?>"
+                    class="w-full bg-[var(--input-bg)] border-[var(--border-color)] rounded-xl px-4 py-2.5 text-xs text-[var(--text-main)] focus:outline-none focus:ring-4 focus:ring-medical-blue/10 focus:border-medical-blue font-bold transition-all">
             </div>
-        </div>
-        <div class="flex gap-2">
-            <button onclick="applyFilters()"
-                class="px-4 py-2 bg-medical-blue text-white rounded-lg font-bold hover:bg-medical-blue/90 transition-all text-sm uppercase tracking-wider">
-                Filtrar
-            </button>
-            <button onclick="clearFilters()"
-                class="px-4 py-2 bg-slate-700 text-slate-300 rounded-lg font-bold hover:bg-slate-600 transition-all text-sm uppercase tracking-wider">
-                Limpiar
-            </button>
+
+            <div class="md:col-span-2 flex gap-2 h-[41px]">
+                <button onclick="applyFilters()"
+                    class="flex-1 bg-medical-blue text-white rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-medical-blue/90 transition-all shadow-lg shadow-medical-blue/20 active:scale-95">
+                    FILTRAR
+                </button>
+                <button onclick="clearFilters()"
+                    class="p-2 bg-panel-dark text-text-muted rounded-xl hover:text-red-500 transition-all border border-[var(--border-color)] group shadow-lg"
+                    title="Limpiar Filtros">
+                    <span class="material-symbols-outlined text-xl group-hover:rotate-90 transition-transform">filter_alt_off</span>
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- Stats Row con Diseño Premium -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="card-glass p-0 overflow-hidden group hover:border-medical-blue/30 transition-all duration-300">
-            <div class="p-6 flex items-center gap-6">
-                <div
-                    class="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-500 shadow-inner group-hover:scale-110 transition-transform">
-                    <span class="material-symbols-outlined text-3xl">pending_actions</span>
-                </div>
-                <div>
-                    <p class="text-[10px] text-text-muted font-black uppercase tracking-widest">Pendientes</p>
-                    <p class="text-3xl font-black text-text-main mt-1">
-                        <?= str_pad($stats['Pendiente'] ?? 0, 2, '0', STR_PAD_LEFT) ?> <span
-                            class="text-[10px] font-medium text-text-muted">unids</span>
-                    </p>
-                </div>
-            </div>
-            <div class="h-1 w-full bg-panel-dark">
-                <div class="h-full bg-blue-500 w-[20%] shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div>
-            </div>
-        </div>
+        <?php
+        $label = 'En Curso';
+        $value = str_pad($stats['En Curso'] ?? 0, 2, '0', STR_PAD_LEFT);
+        $subValue = 'unids';
+        $icon = 'pending_actions';
+        $colorClass = 'blue-500';
+        include __DIR__ . '/../includes/components/metric_card.php';
 
-        <div class="card-glass p-0 overflow-hidden group hover:border-amber-500/30 transition-all duration-300">
-            <div class="p-6 flex items-center gap-6">
-                <div
-                    class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 shadow-inner group-hover:scale-110 transition-transform">
-                    <span class="material-symbols-outlined text-3xl">engineering</span>
-                </div>
-                <div>
-                    <p class="text-[10px] text-text-muted font-black uppercase tracking-widest">En Proceso</p>
-                    <p class="text-3xl font-black text-text-main mt-1">
-                        <?= str_pad($stats['En Proceso'] ?? 0, 2, '0', STR_PAD_LEFT) ?> <span
-                            class="text-[10px] font-medium text-text-muted">unids</span>
-                    </p>
-                </div>
-            </div>
-            <div class="h-1 w-full bg-panel-dark">
-                <div class="h-full bg-amber-500 w-[10%] shadow-[0_0_10px_rgba(245,158,11,0.5)]"></div>
-            </div>
-        </div>
+        $label = 'En Espera';
+        $value = str_pad($stats['En Espera'] ?? 0, 2, '0', STR_PAD_LEFT);
+        $subValue = 'unids';
+        $icon = 'engineering';
+        $colorClass = 'amber-500';
+        include __DIR__ . '/../includes/components/metric_card.php';
 
-        <div class="card-glass p-0 overflow-hidden group hover:border-emerald-500/30 transition-all duration-300">
-            <div class="p-6 flex items-center gap-6">
-                <div
-                    class="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 shadow-inner group-hover:scale-110 transition-transform">
-                    <span class="material-symbols-outlined text-3xl">check_circle</span>
-                </div>
-                <div>
-                    <p class="text-[10px] text-text-muted font-black uppercase tracking-widest">Terminadas</p>
-                    <p class="text-3xl font-black text-text-main mt-1">
-                        <?= str_pad($stats['Terminada'] ?? 0, 2, '0', STR_PAD_LEFT) ?> <span
-                            class="text-[10px] font-medium text-text-muted">unids</span>
-                    </p>
-                </div>
-            </div>
-            <div class="h-1 w-full bg-panel-dark">
-                <div class="h-full bg-emerald-500 w-[70%] shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
-            </div>
-        </div>
+        $label = 'Terminadas';
+        $value = str_pad($stats['Terminada'] ?? 0, 2, '0', STR_PAD_LEFT);
+        $subValue = 'unids';
+        $icon = 'check_circle';
+        $colorClass = 'emerald-500';
+        include __DIR__ . '/../includes/components/metric_card.php';
 
-        <div class="card-glass p-0 overflow-hidden group hover:border-red-500/30 transition-all duration-300">
-            <div class="p-6 flex items-center gap-6">
-                <div
-                    class="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 shadow-inner group-hover:scale-110 transition-transform">
-                    <span class="material-symbols-outlined text-3xl">emergency_home</span>
-                </div>
-                <div>
-                    <p class="text-[10px] text-text-muted font-black uppercase tracking-widest">Críticas Hoy</p>
-                    <p class="text-3xl font-black text-text-main mt-1">
-                        <?= str_pad($stats['CRITICAL_TODAY'] ?? 0, 2, '0', STR_PAD_LEFT) ?> <span
-                            class="text-[10px] font-medium text-text-muted">unids</span>
-                    </p>
-                </div>
-            </div>
-            <div class="h-1 w-full bg-panel-dark">
-                <div class="h-full bg-red-500 w-[5%] shadow-[0_0_10px_rgba(239,68,68,0.5)]"></div>
-            </div>
-        </div>
+        $label = 'Críticas Hoy';
+        $value = str_pad($stats['CRITICAL_TODAY'] ?? 0, 2, '0', STR_PAD_LEFT);
+        $subValue = 'unids';
+        $icon = 'emergency_home';
+        $colorClass = 'red-500';
+        include __DIR__ . '/../includes/components/metric_card.php';
+        ?>
     </div>
 
     <script>
@@ -166,29 +174,22 @@ $stats = getWorkOrderStats();
             const desde = document.getElementById('filter-desde').value;
             const hasta = document.getElementById('filter-hasta').value;
 
-            const rows = document.querySelectorAll('.ot-row');
+            const params = new URLSearchParams(window.location.search);
+            if (tipo) params.set('tipo', tipo);
+            else params.delete('tipo');
+            if (estado) params.set('estado', estado);
+            else params.delete('estado');
+            if (desde) params.set('desde', desde);
+            else params.delete('desde');
+            if (hasta) params.set('hasta', hasta);
+            else params.delete('hasta');
+            params.set('p', 1); // Reset to first page
 
-            rows.forEach(row => {
-                let show = true;
-
-                if (tipo && row.dataset.tipo !== tipo) show = false;
-                if (estado && row.dataset.estado !== estado) show = false;
-                if (desde && row.dataset.fecha < desde) show = false;
-                if (hasta && row.dataset.fecha > hasta) show = false;
-
-                row.style.display = show ? '' : 'none';
-            });
+            window.location.href = '?' + params.toString();
         }
 
         function clearFilters() {
-            document.getElementById('filter-tipo').value = '';
-            document.getElementById('filter-estado').value = '';
-            document.getElementById('filter-desde').value = '';
-            document.getElementById('filter-hasta').value = '';
-
-            document.querySelectorAll('.ot-row').forEach(row => {
-                row.style.display = '';
-            });
+            window.location.href = '?page=work_orders';
         }
     </script>
 
@@ -196,62 +197,61 @@ $stats = getWorkOrderStats();
     <div class="card-glass overflow-hidden shadow-xl">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="bg-slate-200/50 dark:bg-white/5 border-b border-border-dark">
-                    <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-[var(--text-muted)]">
+                <tr class="bg-medical-surface border-b-2 border-[var(--border-color)]">
+                    <th class="px-4 py-4 text-xs font-black uppercase tracking-wider text-[var(--text-muted)] w-40">
                         <div class="flex items-center gap-2">
                             <span class="material-symbols-outlined text-sm">fingerprint</span>
                             ID Orden
                         </div>
                     </th>
-                    <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-500">
+                    <th class="px-4 py-4 text-xs font-black uppercase tracking-wider text-[var(--text-muted)] w-32">
                         <div class="flex items-center gap-2">
                             <span class="material-symbols-outlined text-sm">event</span>
                             Fecha
                         </div>
                     </th>
-                    <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-500">
+                    <th class="px-4 py-4 text-xs font-black uppercase tracking-wider text-[var(--text-muted)] min-w-[200px]">
                         <div class="flex items-center gap-2">
                             <span class="material-symbols-outlined text-sm">precision_manufacturing</span>
                             Activo
                         </div>
                     </th>
-                    <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-500">
+                    <th class="px-4 py-4 text-xs font-black uppercase tracking-wider text-[var(--text-muted)] w-32">
                         <div class="flex items-center gap-2">
                             <span class="material-symbols-outlined text-sm">category</span>
                             Tipo
                         </div>
                     </th>
-                    <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-500 text-center">
+                    <th class="px-4 py-4 text-xs font-black uppercase tracking-wider text-[var(--text-muted)] text-center w-36">
                         <div class="flex items-center justify-center gap-2">
                             <span class="material-symbols-outlined text-sm">priority_high</span>
                             Prioridad
                         </div>
                     </th>
-                    <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-500 text-center">
+                    <th class="px-4 py-4 text-xs font-black uppercase tracking-wider text-[var(--text-muted)] text-center w-36">
                         <div class="flex items-center justify-center gap-2">
-                            <span class="material-symbols-outlined text-sm">state_managed</span>
                             Estado
                         </div>
                     </th>
-                    <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-500">
+                    <th class="px-4 py-4 text-xs font-black uppercase tracking-wider text-[var(--text-muted)] min-w-[180px]">
                         <div class="flex items-center gap-2">
                             <span class="material-symbols-outlined text-sm">engineering</span>
                             Técnico
                         </div>
                     </th>
-                    <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-500 text-right">Acciones
+                    <th class="px-4 py-4 text-xs font-black uppercase tracking-wider text-[var(--text-muted)] text-right">Acciones
                     </th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-border-dark/30">
                 <?php foreach ($orders as $ot): ?>
-                    <tr class="ot-row hover:bg-medical-blue/5 transition-colors" data-tipo="<?= $ot['type'] ?>"
+                    <tr class="ot-row hover:bg-medical-blue/5 transition-colors group" data-tipo="<?= $ot['type'] ?>"
                         data-estado="<?= $ot['status'] ?>" data-fecha="<?= $ot['date'] ?>">
-                        <td class="px-6 py-4 font-mono text-sm text-medical-blue font-bold"><?= $ot['id'] ?></td>
-                        <td class="px-6 py-4 text-xs font-bold text-text-muted"><?= date('d/m/Y', strtotime($ot['date'])) ?></td>
-                        <td class="px-6 py-4 text-sm font-bold text-text-main"><?= $ot['asset'] ?></td>
-                        <td class="px-6 py-4 text-xs font-bold text-text-muted uppercase"><?= $ot['type'] ?></td>
-                        <td class="px-6 py-4 text-center">
+                        <td class="px-4 py-4 font-mono text-sm text-medical-blue font-bold"><?= $ot['id'] ?></td>
+                        <td class="px-4 py-4 text-xs font-bold text-text-muted whitespace-nowrap"><?= date('d/m/Y', strtotime($ot['date'])) ?></td>
+                        <td class="px-4 py-4 text-sm font-bold text-text-main"><?= $ot['asset'] ?></td>
+                        <td class="px-4 py-4 text-xs font-bold text-text-muted uppercase"><?= $ot['type'] ?></td>
+                        <td class="px-4 py-4 text-center">
                             <?php
                             $prioClass = match ($ot['priority']) {
                                 'Alta' => 'text-danger bg-danger/10 border-danger/20',
@@ -259,40 +259,43 @@ $stats = getWorkOrderStats();
                                 default => 'text-text-muted bg-panel-dark/50 border-border-dark/50'
                             };
                             ?>
-                            <span class="px-2 py-1 rounded text-[10px] font-black uppercase border <?= $prioClass ?>">
+                            <span class="px-2 py-1 rounded text-[10px] font-black uppercase border whitespace-nowrap <?= $prioClass ?>">
                                 <?= $ot['priority'] ?>
                             </span>
                         </td>
-                        <td class="px-6 py-4 text-center">
+                        <td class="px-4 py-4 text-center">
                             <?php
                             $statusClass = match ($ot['status']) {
                                 'Terminada' => 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
-                                'En Proceso' => 'text-blue-500 bg-blue-500/10 border-blue-500/20',
-                                'Pendiente' => 'text-text-muted bg-panel-dark/50 border-border-dark/50',
-                                default => ''
+                                'En Curso' => 'text-blue-500 bg-blue-500/10 border-blue-500/20',
+                                'En Espera' => 'text-amber-500 bg-amber-500/10 border-amber-500/20',
+                                'Cancelada' => 'text-red-500 bg-red-500/10 border-red-500/20',
+                                default => 'text-text-muted bg-panel-dark/50 border-border-dark/50'
                             };
                             ?>
                             <span
-                                class="px-3 py-1 rounded-full text-[10px] font-black uppercase border <?= $statusClass ?>">
+                                class="px-3 py-1 rounded-full text-[10px] font-black uppercase border whitespace-nowrap <?= $statusClass ?>">
                                 <?= $ot['status'] ?>
                             </span>
                         </td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <span class="material-symbols-outlined text-text-muted text-sm">person</span>
-                                <span class="text-xs text-text-main font-bold"><?= $ot['tech'] ?></span>
+                        <td class="px-4 py-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-8 h-8 rounded-full bg-medical-surface flex items-center justify-center border border-[var(--border-color)] group-hover:bg-medical-blue/20 transition-colors">
+                                    <span class="material-symbols-outlined text-text-muted text-sm">person</span>
+                                </div>
+                                <span class="text-xs text-text-main font-bold truncate max-w-[120px]"><?= $ot['tech'] ?></span>
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-right">
-                            <div class="flex items-center justify-end gap-2">
+                        <td class="px-4 py-4 text-right">
+                            <div class="flex items-center justify-end gap-3">
                                 <a href="?page=work_order_execution&id=<?= $ot['id'] ?>"
-                                    class="p-2 bg-panel-dark text-text-muted hover:text-text-main hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-all border border-border-dark/50"
+                                    class="p-2 bg-panel-dark text-text-muted hover:text-text-main hover:border hover:border-medical-blue/30 rounded-lg transition-all border border-[var(--border-color)] shadow-sm"
                                     title="Ver Detalles">
                                     <span class="material-symbols-outlined text-lg">visibility</span>
                                 </a>
                                 <?php if ($ot['status'] !== 'Terminada' && canExecuteWorkOrder()): ?>
                                     <a href="?page=work_order_execution&id=<?= $ot['id'] ?>&action=complete"
-                                        class="px-4 py-2 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-lg text-[10px] font-black uppercase hover:bg-emerald-500 hover:text-white transition-all shadow-lg shadow-emerald-500/5">
+                                        class="px-5 py-2.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-xl text-[10px] font-black uppercase hover:bg-emerald-500 hover:text-white transition-all shadow-lg shadow-emerald-500/5 active:scale-95">
                                         EJECUTAR
                                     </a>
                                 <?php endif; ?>

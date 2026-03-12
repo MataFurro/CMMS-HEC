@@ -6,7 +6,7 @@
  */
 
 // --- Identidad Visual & Paleta Premium ---
-define('APP_NAME_HTML', 'BioCMMS v4.3 <span class="text-medical-blue font-light">Pro</span>');
+define('APP_NAME_HTML', 'BioCMMS v4.5');
 define('COLOR_MEDICAL_BLUE', '#0ea5e9'); // Más vibrante v4.2
 define('COLOR_EMERALD', '#10b981');
 define('COLOR_AMBER', '#f59e0b');
@@ -20,9 +20,9 @@ define('COLOR_PANEL_DARK', '#111820');
 // --- Botones y Acciones ---
 define('BTN_DOWNLOAD_EXCEL', 'Descargar Reporte Excel');
 define('BTN_UPLOAD_EXCEL',   'Subir Masivo Excel');
-define('BTN_NEW_ASSET',      'Nuevo Activo Biomédico');
-define('BTN_OPEN_OT',        'Abrir Orden de Trabajo');
-define('BTN_PROCESS_REQ',    'Procesar Solicitud');
+define('BTN_NEW_ASSET',      'Nuevo Registro de Activo');
+define('BTN_OPEN_OT',        'Generar Orden de Servicio');
+define('BTN_PROCESS_REQ',    'Gestión de Solicitud');
 
 // --- Estados de Activos (Mapeo a DB ENUM) ---
 define('STATUS_OPERATIVE',           'OPERATIVE');
@@ -30,6 +30,21 @@ define('STATUS_MAINTENANCE',         'MAINTENANCE');
 define('STATUS_NO_OPERATIVE',        'NO_OPERATIVE');
 define('STATUS_OPERATIVE_WITH_OBS',  'OPERATIVE_WITH_OBS');
 define('STATUS_OUT_OF_SERVICE',      'NO_OPERATIVE');
+
+// --- Estados de Orden de Trabajo (Alineado con NotebookLM) ---
+define('STATUS_OT_OPEN',      'OPEN');      // Pendiente / Abierta
+define('STATUS_OT_ASSIGNED',  'ASSIGNED');  // Programada / Asignada
+define('STATUS_OT_PROGRESS',  'PROGRESS');  // En Curso
+define('STATUS_OT_ON_HOLD',    'ON_HOLD');   // En Espera (Repuestos/Terceros)
+define('STATUS_OT_CLOSED',    'CLOSED');    // Terminada / Cerrada
+
+// --- Labels de Estados OT (UI) ---
+define('LABEL_OT_OPEN',      'En Curso');
+define('LABEL_OT_ASSIGNED',  'Asignada');
+define('LABEL_OT_PROGRESS',  'En Curso');
+define('LABEL_OT_ON_HOLD',    'En Espera');
+define('LABEL_OT_CANCELLED',  'Cancelada');
+define('LABEL_OT_CLOSED',    'Terminada');
 
 // --- Criticidad (Labels) ---
 define('CRITICALITY_CRITICAL', 'Crítico');
@@ -45,12 +60,12 @@ define('ROLE_AUDITOR',        'AUDITOR');
 define('ROLE_USER',           'USER');
 
 // --- Sidebar Labels ---
-define('SIDEBAR_DASHBOARD',       'Tablero de Gestión');
-define('SIDEBAR_CALENDAR',        'Agenda Técnica');
-define('SIDEBAR_WORK_ORDERS',      'Órdenes de Trabajo');
-define('SIDEBAR_INVENTORY',       'Inventario Biomédico');
-define('SIDEBAR_FAMILY_ANALYSIS', 'Clasificación por Clase');
-define('SIDEBAR_MESSENGER',       'SMS OT (Solicitudes)');
+define('SIDEBAR_DASHBOARD',       'Centro de Inteligencia Operativa');
+define('SIDEBAR_CALENDAR',        'Planificación de Intervenciones');
+define('SIDEBAR_WORK_ORDERS',      'Gestión de Servicios Técnicos');
+define('SIDEBAR_INVENTORY',       'Catálogo de Activos Clínicos');
+define('SIDEBAR_FAMILY_ANALYSIS', 'Analítica por Especialidad');
+define('SIDEBAR_MESSENGER',       'Canal de Atención (GOS)');
 
 // --- Factores de Costo TCO / Depreciación ---
 define('MAINTENANCE_COST_FACTOR', 0.08);

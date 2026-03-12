@@ -1,9 +1,14 @@
 <?php
 
-// BioCMMS v4.3 Pro - Configuración Global
+// BioCMMS v4.5 - Configuración Global
 require_once __DIR__ . '/includes/constants.php';
 require_once __DIR__ . '/Backend/autoloader.php';
 session_start();
+
+// --- Protección CSRF v4.5 ---
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
 // --- Migrador de Roles de Sesión (Previene bucles por datos antiguos) ---
 if (isset($_SESSION['user_role'])) {
@@ -60,10 +65,11 @@ define('USE_MOCK_DATA', filter_var($_ENV['USE_MOCK_DATA'] ?? false, FILTER_VALID
 function getStatusClass($status)
 {
     return match ($status) {
-        'COMPLETED', STATUS_OPERATIVE, 'Terminada' => 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30',
-        'IN_PROGRESS', STATUS_MAINTENANCE, 'En Proceso' => 'bg-amber-500/10 text-amber-500 border-amber-500/30',
-        'PENDING', 'Pendiente' => 'bg-slate-700/10 text-slate-500 border-slate-700/30',
-        default => 'bg-red-500/10 text-red-500 border-red-500/30',
+        'Terminada' => 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30',
+        'En Curso' => 'bg-blue-500/10 text-blue-500 border-blue-500/30',
+        'En Espera' => 'bg-amber-500/10 text-amber-500 border-amber-500/30',
+        'Cancelada' => 'bg-red-500/10 text-red-500 border-red-500/30',
+        default => 'bg-slate-700/10 text-slate-500 border-slate-700/30',
     };
 }
 

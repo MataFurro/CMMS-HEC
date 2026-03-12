@@ -24,7 +24,10 @@ function importAssetsFromFile(array $fileData): array
     $fileName = $fileData['name'];
     $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
-    $stats = ['success' => 0, 'errors' => 0, 'total' => 0, 'details' => []];
+    $stats = ['success' => 0, 'updated' => 0, 'merged' => 0, 'skipped' => 0, 'errors' => 0, 'total' => 0, 'details' => [], 'conflicts' => []];
+    $seenInventoryIds = []; // track same-file duplicate identity keys (invId|sn)
+
+
     $rows = [];
 
     try {
@@ -54,14 +57,16 @@ function importAssetsFromFile(array $fileData): array
         'model' => ['modelo', 'model'],
         'brand' => ['marca', 'fabricante', 'brand'],
         'serial_number' => ['serie', 'n de serie', 'n° de serie', 'serial', 's/n', 'numero de serie'],
-        'criticality' => ['criticidad', 'criticality', 'prioridad', 'clasificacion'],
+        'risk_class' => ['clase', 'familia', 'especialidad', 'categoria', 'subclase', 'sub-clase', 'grupo'],
+        'criticality' => ['criticidad', 'criticality', 'prioridad', 'clasificacion', 'criticorelevanteim12noaplica'],
         'location' => ['ubicacion', 'servicio', 'area', 'unidad', 'departamento', 'servicio clínico', 'servicio clinico'],
         'sub_location' => ['sub-ubicacion', 'sububicacion', 'recinto', 'piso', 'sala', 'oficina', 'nivel'],
-        'status' => ['estado', 'status', 'situacion'],
+        'status' => ['estado', 'status', 'situacion', 'estadobuenoregularmalobaja'],
         'purchased_year' => ['año compra', 'fecha compra', 'año', 'adquisicion', 'año de adquisición', 'adquisición'],
         'total_useful_life' => ['vida útil', 'vida util (total)', 'vida util', 'vida util completa', 'vida util total'],
         'years_remaining' => ['vida útil residual', 'vida util residual', 'años restantes', 'años residuales', 'vida residual'],
-        'acquisition_cost' => ['costo', 'valor', 'precio', 'costo de adquisición', 'costo adquisicion', 'valor de adquisicion', 'acquisition cost', 'valor comercial']
+        'acquisition_cost' => ['costo adquisicion', 'valor adquisicion', 'precio adquisicion', 'valor de adquisicion', 'costo de adquisicion', 'acquisition cost', 'valor comercial', 'precio unitario'],
+        'annual_maint_cost' => ['costo anual de mantenimiento', 'mantenimiento anual', 'precio de referencia mantenimiento anual', 'costo anual de mantenimiento segun convenio', 'presupuesto mantenimiento']
     ];
 
     // Función de limpieza estándar para comparación (Convertir a ASCII básico)
@@ -132,17 +137,124 @@ function importAssetsFromFile(array $fileData): array
         $headers[] = $mapped ?? $hClean;
     }
 
+    // --- DEBUG PROBE ---
+    $debugInfo = "FILE: $fileName\n";
+    $debugInfo .= "ROWS: " . count($rows) . "\n";
+    $debugInfo .= "HEADERS RAW: " . implode(" | ", $headersRaw) . "\n";
+    $debugInfo .= "HEADERS MAPPED: " . implode(" | ", $headers) . "\n";
+    if (!empty($rows)) {
+        $debugInfo .= "FIRST ROW RAW: " . implode(" | ", $rows[0]) . "\n";
+    }
+    file_put_contents(__DIR__ . '/debug_import.txt', $debugInfo);
+    // -------------------
+
     // Heurística Fallback if mapping fails
     if ($mappedCount < 3 && count($headersRaw) > 10) {
-        $headers = ['location', 'sub_location', 'category', 'sub-category', 'name', 'brand', 'model', 'serial_number', 'id', 'purchased_year', 'total_useful_life', 'years_remaining'];
+        $headers = ['location', 'sub_location', 'risk_class', 'category', 'name', 'brand', 'model', 'serial_number', 'id', 'purchased_year', 'total_useful_life', 'years_remaining', 'criticality', 'acquisition_cost'];
     }
 
+    // --- NORMALIZACIÓN DE CRITICIDAD (según estándar MINSAL acreditación) ---
+    // EMC = Equipos Médicos Críticos (soporte vital, monitoreo, anestesia)
+    // EMR = Equipos Médicos Relevantes (apoyo transversal a seguridad)
+    // EMI = Equipos de Interés (F&S >= 12) -> mapeado a RELEVANT
+    // LOW = No Aplica / Fuera de clasificación
+    $normalizeCriticality = function ($val) use ($cleaner) {
+        $c = $cleaner($val);
+        $map = [
+            // CRITICAL: soporte vital
+            'critical' => 'CRITICAL',
+            'critico' => 'CRITICAL',
+            'criticos' => 'CRITICAL',
+            'alta' => 'CRITICAL',
+            'emc' => 'CRITICAL',
+            'prioritario' => 'CRITICAL',
+            'prioritarios' => 'CRITICAL',
+            'esencial' => 'CRITICAL',
+            'vital' => 'CRITICAL',
+            'soportevital' => 'CRITICAL',
+            // RELEVANT: apoyo transversal, EMI (F&S >=12)
+            'relevant' => 'RELEVANT',
+            'relevante' => 'RELEVANT',
+            'relevantes' => 'RELEVANT',
+            'emr' => 'RELEVANT',
+            'emi' => 'RELEVANT',
+            'im12' => 'RELEVANT',
+            'media' => 'RELEVANT',
+            'importante' => 'RELEVANT',
+            'apoyo' => 'RELEVANT',
+            // LOW: no aplica
+            'low' => 'LOW',
+            'baja' => 'LOW',
+            'bajas' => 'LOW',
+            'noaplica' => 'LOW',
+            'na' => 'LOW',
+            'menor' => 'LOW',
+            'noesencial' => 'LOW',
+            'sinclasificacion' => 'LOW'
+        ];
+        return $map[$c] ?? 'LOW';
+    };
+
     // 3. Procesar Filas
+    $rowIndex = 0;
     foreach ($rows as $data) {
+        $rowIndex++;
         if (empty(array_filter($data))) continue;
+
+        // Handle rows with no name instead of skipping
+        $row = array_combine(array_slice($headers, 0, count($data)), array_slice($data, 0, count($headers)));
+        if (empty(trim($row['name'] ?? ''))) {
+            $row['name'] = 'SIN NOMBRE';
+            $stats['details'][] = "⚠️ Fila $rowIndex: Equipo sin nombre en el archivo Excel se importó como 'SIN NOMBRE'.";
+        }
         $stats['total']++;
 
-        $row = array_combine(array_slice($headers, 0, count($data)), array_slice($data, 0, count($headers)));
+
+        // Normalizar criticidad
+        if (isset($row['criticality'])) {
+            $row['criticality'] = $normalizeCriticality($row['criticality']);
+        }
+
+        // --- MAPEO CLASE → riesgo_ge (catálogo oficial HEC) ---
+        if (isset($row['risk_class'])) {
+            $claseRaw = mb_strtoupper(trim($row['risk_class']), 'UTF-8');
+
+            // Usar el cleaner para normalización insensible a acentos/encoding
+            $claseClean = $cleaner($row['risk_class']);
+
+            // Mapeo basado en llaves "limpias" (sin acentos, sin espacios)
+            $claseMap = [
+                'apoyodiagnostico'            => 'APOYO DIAGNÓSTICO',
+                'apoyoendoscopico'            => 'APOYO ENDOSCÓPICO',
+                'apoyoindustrial'             => 'APOYO INDUSTRIAL',
+                'apoyoquirurgico'             => 'APOYO QUIRÚRGICO',
+                'apoyoterapeutico'            => 'APOYO TERAPÉUTICO',
+                'apoyoterapeuticobajocosto'   => 'APOYO TERAPÉUTICO',
+                'esterilizacion'              => 'ESTERILIZACIÓN',
+                'imagenologia'                => 'IMAGENOLOGÍA',
+                'laboratorio'                 => 'LABORATORIO / FARMACIA',
+                'farmacia'                    => 'LABORATORIO / FARMACIA',
+                'laboratoriofarmacia'         => 'LABORATORIO / FARMACIA',
+                'medfisrehabilitacion'        => 'MED. FIS. REHABILITACIÓN',
+                'rehabilitacion'              => 'MED. FIS. REHABILITACIÓN',
+                'mobiliario'                  => 'MOBILIARIO',
+                'monitoreo'                   => 'MONITOREO',
+                'odontologia'                 => 'ODONTOLOGÍA',
+                'bajocosto'                   => 'BAJO COSTO',
+                'equiposmedicos'              => 'GENERAL',
+                'equipomedico'                => 'GENERAL',
+                'instrumental'                => 'INSTRUMENTAL',
+            ];
+
+            // Si coincide con una llave limpia, usar el valor oficial. Si no, dejar el original limpio (o bruto).
+            if (isset($claseMap[$claseClean])) {
+                $row['riesgo_ge'] = $claseMap[$claseClean];
+            } else {
+                // Fallback: Si no hay en el mapa, intentar limpiar un poco pero mantener el texto original capitalizado
+                $row['riesgo_ge'] = $claseRaw;
+            }
+            unset($row['risk_class']);
+        }
 
         // --- LÓGICA DE VIDA ÚTIL ---
         $row['useful_life_pct'] = 100; // Por defecto
@@ -162,35 +274,194 @@ function importAssetsFromFile(array $fileData): array
             if (empty($row['sub_location']) && (strpos($hrC, 'recinto') !== false || strpos($hrC, 'piso') !== false)) $row['sub_location'] = $data[$idx];
             if (empty($row['years_remaining']) && strpos($hrC, 'vidautilresidual') !== false) $row['years_remaining'] = $data[$idx];
             if (empty($row['total_useful_life']) && strpos($hrC, 'vidautil') !== false && strpos($hrC, 'residual') === false) $row['total_useful_life'] = $data[$idx];
+            // Salvaguarda para clase (columna 3 del Excel original)
+            if (empty($row['riesgo_ge']) && ($hrC === 'clase' || strpos($hrC, 'subclase') === false && strpos($hrC, 'clase') !== false)) {
+                $row['riesgo_ge'] = mb_strtoupper(trim($data[$idx] ?? ''), 'UTF-8');
+            }
         }
 
-        // --- LÓGICA DE ID ROBUSTA ---
-        // 1. Usar ID del Excel si existe
-        $id = $row['id'] ?? null;
+        // --- ID RESOLUTION STRATEGY ---
+        // The system uses auto-increment PKs internally.
+        // 'inventory_id' stores the original Excel ID for deduplication.
+        $rawId = $row['id'] ?? null;
+        $genericValues = ['S/S', 'S/I', 'N/A', 'SIN SERIE', 'COMODATO', 'COMPRA', '0', '-', 'DESC', 'POR DEFINIR', 'MANTENCION'];
+        $isGeneric = empty($rawId) || in_array(mb_strtoupper(trim($rawId)), $genericValues);
 
-        // 2. Si no hay ID, intentar Serie
-        if (empty($id) && !empty($row['serial_number'])) {
-            $id = $row['serial_number'];
+        // For generic IDs, we preserve the original value (e.g. "S/N") or leave it blank
+        $inventoryId = $rawId;
+
+
+        // --- SANITIZACIÓN DE CAMPOS CRÍTICOS ---
+        // MySQL NO_ZERO_DATE rechaza '0000' en YEAR/DATE.
+        // PDO envía '' (string vacío) para campos no mapeados → falla silenciosa.
+        // Convertir strings vacíos a null para YEAR, DATE y DECIMAL.
+        $cleanYear = function ($v): ?int {
+            $v = preg_replace('/[^0-9]/', '', (string)$v);
+            $v = (int)$v;
+            return ($v >= 1900 && $v <= 2100) ? $v : null;
+        };
+        $cleanInt = function ($v): ?int {
+            $v = preg_replace('/[^0-9]/', '', (string)$v);
+            return strlen($v) > 0 ? (int)$v : null;
+        };
+        $cleanDecimal = function ($v): float {
+            $v = preg_replace('/[^0-9.,\-]/', '', (string)$v);
+            $v = str_replace(',', '.', $v);
+            return is_numeric($v) ? (float)$v : 0.0;
+        };
+        $cleanDate = function ($v): ?string {
+            $v = trim((string)$v);
+            if (empty($v) || $v === '0' || $v === '-') return null;
+            // Accept YYYY-MM-DD or DD-MM-YYYY or DD/MM/YYYY
+            if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $v)) return $v;
+            if (preg_match('/^(\d{2})[\/\-](\d{2})[\/\-](\d{4})$/', $v, $m)) return "$m[3]-$m[2]-$m[1]";
+            return null;
+        };
+
+        $row['purchased_year']     = $cleanYear($row['purchased_year'] ?? null);
+        $row['total_useful_life']  = $cleanInt($row['total_useful_life'] ?? null);
+        $row['years_remaining']    = $cleanInt($row['years_remaining'] ?? null);
+        $row['acquisition_cost']   = $cleanDecimal($row['acquisition_cost'] ?? 0);
+        $row['annual_maint_cost']  = $cleanDecimal($row['annual_maint_cost'] ?? 0);
+        $row['fecha_instalacion']  = $cleanDate($row['fecha_instalacion'] ?? null);
+        $row['warranty_expiration'] = $cleanDate($row['warranty_expiration'] ?? null);
+
+        // Recalculate useful_life_pct with sanitized values
+        $tul = $row['total_useful_life'];
+        $yr  = $row['years_remaining'];
+        if ($tul && $tul > 0 && $yr !== null) {
+            $row['useful_life_pct'] = min(100, max(0, (int)round(($yr / $tul) * 100)));
         }
 
-        // 3. Si persiste el vacío, generar uno determinista basado en Nombre y Serie para evitar duplicados
-        if (empty($id)) {
-            $id = "ID-" . substr(md5(($row['name'] ?? 'EQ') . ($row['serial_number'] ?? uniqid())), 0, 8);
-        }
-
-        $row['id'] = $id;
+        $row['inventory_id'] = $inventoryId;
 
         try {
-            $existing = $repo->findById($id);
-            $success = $existing
-                ? $repo->partialUpdate($id, $row)
-                : $repo->create($row);
+            $serialNum  = trim((string)($row['serial_number'] ?? ''));
+            $cleanSn    = mb_strtoupper($serialNum);
+            $cleanInvId = mb_strtoupper($inventoryId);
 
-            if ($success) $stats['success']++;
-            else $stats['errors']++;
+            // Generic serial values that should NOT be used as unique keys
+            $genericSns = ['S/S', 'S/I', 'S/N', 'N/A', 'SIN SERIE', 'COMODATO', '0', '-', '', 'NULL', 'SIN NUMERO'];
+            $hasValidSn = !in_array($cleanSn, $genericSns) && strlen($cleanSn) > 2;
+
+            // When BOTH inventory_id AND serial_number are generic, we now
+            // preserve the raw S/N label instead of generating a GEN- hash.
+            if ($isGeneric && !$hasValidSn) {
+                $inventoryId = empty($inventoryId) ? 'S/N' : $inventoryId;
+                $cleanInvId  = mb_strtoupper($inventoryId);
+                $row['inventory_id'] = $inventoryId;
+            }
+
+            // Identity key for duplicate detection (Case A).
+            // Only usable when BOTH fields are real/valid identifiers.
+            // If either is generic (S/N, S/I...) force uniqueness so each row
+            // creates its own asset and is never wrongly skipped as duplicate.
+            if (!$hasValidSn || $isGeneric) {
+                $identityKey = $cleanInvId . '|' . $cleanSn . '|' . $rowIndex;
+            } else {
+                $identityKey = $cleanInvId . '|' . $cleanSn;
+            }
+
+            // CASE A: Exact duplicate within this file (same ID + same SN).
+            // Only when BOTH fields are identical is it a true duplicate.
+            if (isset($seenInventoryIds[$identityKey])) {
+                $stats['merged']++;
+                $stats['conflicts'][] = [
+                    'type'         => 'A',
+                    'row'          => $rowIndex,
+                    'name'         => $row['name'],
+                    'inventory_id' => $inventoryId,
+                    'serial'       => $serialNum,
+                    'detail'       => "Fila $rowIndex: Duplicado exacto [{$row['name']}] (ID: '$inventoryId', SN: '$serialNum'). Se conto como 1."
+                ];
+                continue;
+            }
+
+            // Register identity key for future duplicate detection
+            $seenInventoryIds[$identityKey] = $rowIndex;
+
+            // Warn when both identity fields are missing/generic — asset has no reliable key.
+            if ($isGeneric && !$hasValidSn) {
+                $stats['conflicts'][] = [
+                    'type'         => 'NO_ID',
+                    'row'          => $rowIndex,
+                    'name'         => $row['name'],
+                    'inventory_id' => $inventoryId,
+                    'serial'       => $serialNum,
+                    'detail'       => "Fila $rowIndex: [{$row['name']}] no tiene N\xc2\xb0 Inventario ni N\xc2\xb0 Serie validos. Se creo como equipo separado sin identificador confiable."
+                ];
+            }
+
+            // DB LOOKUP by Inventory ID + SN confirmation.
+            // If ID is generic or empty, we SKIP lookup and always CREATE to avoid merging different physical assets.
+            $exactMatch   = null;
+            $partialMatch = null;
+            $candidates   = [];
+
+            if (!$isGeneric) {
+                $candidates = $repo->findAllByInventoryId($inventoryId);
+                foreach ($candidates as $c) {
+                    $dbSerial = mb_strtoupper(trim((string)($c->serialNumber ?? '')));
+                    if ($dbSerial === $cleanSn) {
+                        $exactMatch = $c;
+                        break;
+                    }
+                    if (!$hasValidSn && in_array($dbSerial, $genericSns)) {
+                        $partialMatch = $c;
+                    }
+                }
+            }
+
+            if ($exactMatch) {
+                // Same ID + Same SN in DB -> Update
+                $success = $repo->partialUpdate($exactMatch->id, $row);
+                if ($success) $stats['updated']++;
+                else {
+                    $stats['errors']++;
+                    $stats['details'][] = "ERROR Fila $rowIndex: error al actualizar '{$row['name']}'";
+                }
+            } elseif ($partialMatch) {
+                // Partial fill
+                $success = $repo->partialUpdate($partialMatch->id, $row);
+                if ($success) $stats['updated']++;
+                else {
+                    $stats['errors']++;
+                    $stats['details'][] = "ERROR Fila $rowIndex: error al completar datos de '{$row['name']}'";
+                }
+            } elseif (!empty($candidates) && !$isGeneric) {
+                // CASE B: Same ID in DB but different SN -> different physical asset -> CREATE NEW
+                $existingSn = trim((string)($candidates[0]->serialNumber ?? ''));
+                $row['id']  = $inventoryId;
+                $row['hec_id'] = \generateAssetHecId($row);
+                $success    = $repo->create($row);
+                if ($success) {
+                    $stats['success']++;
+                    $stats['conflicts'][] = [
+                        'type'         => 'B',
+                        'row'          => $rowIndex,
+                        'name'         => $row['name'],
+                        'inventory_id' => $inventoryId,
+                        'serial'       => $serialNum,
+                        'detail'       => "Fila $rowIndex: [{$row['name']}] comparte N Inventario '$inventoryId' con otro equipo (SN existente: '$existingSn'). Creado como equipo separado."
+                    ];
+                } else {
+                    $stats['errors']++;
+                    $stats['details'][] = "ERROR Fila $rowIndex: error al crear '{$row['name']}' (Caso B)";
+                }
+            } else {
+                // CASE D: New asset (or generic ID that we treat as new) -> CREATE
+                $row['id'] = $inventoryId;
+                $row['hec_id'] = \generateAssetHecId($row);
+                $success   = $repo->create($row);
+                if ($success) $stats['success']++;
+                else {
+                    $stats['errors']++;
+                    $stats['details'][] = "ERROR Fila $rowIndex: error al crear '{$row['name']}'";
+                }
+            }
         } catch (\Exception $e) {
             $stats['errors']++;
-            $stats['details'][] = $e->getMessage();
+            $stats['details'][] = "❌ Fila $rowIndex '{$row['name']}': " . $e->getMessage();
         }
     }
 
@@ -216,7 +487,17 @@ function parseXlsxToArray(string $filePath): array
     if ($ssData) {
         $xml = new \SimpleXMLElement($ssData);
         foreach ($xml->si as $si) {
-            $sharedStrings[] = (string)($si->t ?? $si->r->t ?? "");
+            // Handle rich-text strings: concatenate ALL <r><t>...</t></r> runs.
+            // The old code only read the first run, losing text for formatted cells.
+            if (isset($si->r)) {
+                $text = '';
+                foreach ($si->r as $r) {
+                    $text .= (string)($r->t ?? '');
+                }
+                $sharedStrings[] = $text;
+            } else {
+                $sharedStrings[] = (string)($si->t ?? '');
+            }
         }
     }
 

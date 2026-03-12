@@ -5,6 +5,10 @@ namespace Backend\Repositories;
 use Backend\Core\DatabaseService;
 use Backend\Core\LoggerService;
 use Backend\Models\AssetEntity;
+
+require_once __DIR__ . '/../Core/DatabaseService.php';
+require_once __DIR__ . '/../Core/LoggerService.php';
+
 use PDO;
 use Generator;
 
@@ -31,7 +35,7 @@ class AssetRepository
     public function findAll(): Generator
     {
         try {
-            $stmt = $this->db->query("SELECT * FROM assets ORDER BY created_at DESC");
+            $stmt = $this->db->query("SELECT * FROM assets WHERE en_uso = 1 ORDER BY created_at DESC");
             LoggerService::info("Consulta exitosa: Lista total de activos generada.");
             while ($row = $stmt->fetch()) {
                 yield AssetEntity::fromArray($row);
@@ -42,21 +46,116 @@ class AssetRepository
         }
     }
 
-    /**
-     * Buscar un activo por ID
-     */
-    public function findById(string $id): ?AssetEntity
+    public function findById($id): ?AssetEntity
     {
         try {
-            $stmt = $this->db->prepare("SELECT * FROM assets WHERE id = :id");
-            $stmt->execute(['id' => $id]);
+            // Buscamos primero por la llave primaria ID, luego por inventory_id o hec_id
+            $stmt = $this->db->prepare("SELECT * FROM assets WHERE id = :id OR inventory_id = :id_fallback OR hec_id = :id_hec LIMIT 1");
+            $stmt->execute(['id' => $id, 'id_fallback' => $id, 'id_hec' => $id]);
             $asset = $stmt->fetch();
+
             return $asset ? AssetEntity::fromArray($asset) : null;
         } catch (\Exception $e) {
             LoggerService::error("Error en AssetRepository::findById", ['id' => $id, 'error' => $e->getMessage()]);
             return null;
         }
     }
+
+
+    /**
+     * Buscar activo por huella digital (número de serie + nombre + ubicación).
+     * Usado para detectar duplicados durante importación de Excel.
+     * Se usa como fallback cuando el inventory_id no coincide.
+     */
+    public function findByFingerprint(string $serial, string $name, string $location): ?AssetEntity
+    {
+        try {
+            // Intentar coincidencia por serie (más confiable), excluyendo series genéricas
+            $genericSerials = ['S/S', 'S/I', 'N/A', 'SIN SERIE', '0', '-', 'COMODATO', ''];
+            $hasValidSerial = !in_array(strtoupper(trim($serial)), $genericSerials) && strlen(trim($serial)) > 2;
+
+            if ($hasValidSerial) {
+                $stmt = $this->db->prepare("SELECT * FROM assets WHERE LOWER(TRIM(serial_number)) = LOWER(TRIM(:serial)) AND en_uso = 1 LIMIT 1");
+                $stmt->execute(['serial' => $serial]);
+                $asset = $stmt->fetch();
+                if ($asset) return AssetEntity::fromArray($asset);
+            }
+
+            // Fallback: coincidencia por nombre + ubicación (para activos sin serie única)
+            if (!empty($name) && !empty($location)) {
+                $stmt = $this->db->prepare("SELECT * FROM assets WHERE LOWER(TRIM(name)) = LOWER(TRIM(:name)) AND LOWER(TRIM(location)) = LOWER(TRIM(:location)) AND en_uso = 1 LIMIT 1");
+                $stmt->execute(['name' => $name, 'location' => $location]);
+                $asset = $stmt->fetch();
+                if ($asset) return AssetEntity::fromArray($asset);
+            }
+
+            return null;
+        } catch (\Exception $e) {
+            LoggerService::error("Error en AssetRepository::findByFingerprint", ['serial' => $serial, 'error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    /**
+     * Buscar activo EXCLUSIVAMENTE por inventory_id (columna de BD).
+     * Distinto de findById() que usa is_numeric para decidir el campo.
+     * Usar siempre este método durante importación Excel para evitar
+     * confundir inventory_id numéricos (ej. '500000010669') con PKs internas.
+     */
+    public function findByInventoryId(string $inventoryId): ?AssetEntity
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM assets WHERE inventory_id = :inventory_id AND en_uso = 1 LIMIT 1");
+            $stmt->execute(['inventory_id' => $inventoryId]);
+            $asset = $stmt->fetch();
+            return $asset ? AssetEntity::fromArray($asset) : null;
+        } catch (\Exception $e) {
+            LoggerService::error("Error en AssetRepository::findByInventoryId", ['inventory_id' => $inventoryId, 'error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    /**
+     * Buscar TODOS los activos que comparten un determinado inventory_id.
+     * Útil para deduplicar por N° de Inventario + N° de Serie.
+     */
+    public function findAllByInventoryId(string $inventoryId): array
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM assets WHERE inventory_id = :inventory_id AND en_uso = 1");
+            $stmt->execute(['inventory_id' => $inventoryId]);
+            $results = [];
+            while ($row = $stmt->fetch()) {
+                $results[] = AssetEntity::fromArray($row);
+            }
+            return $results;
+        } catch (\Exception $e) {
+            LoggerService::error("Error en AssetRepository::findAllByInventoryId", ['inventory_id' => $inventoryId, 'error' => $e->getMessage()]);
+            return [];
+        }
+    }
+
+    /**
+     * Buscar un activo EXCLUSIVAMENTE por N° de Serie.
+     * Usado durante importación cuando el SN es el identificador primario del equipo físico.
+     * Si el SN es válido y único, este método prevalece sobre el inventory_id.
+     */
+    public function findBySerialNumber(string $serial): ?AssetEntity
+    {
+        try {
+            $stmt = $this->db->prepare(
+                "SELECT * FROM assets WHERE UPPER(TRIM(serial_number)) = UPPER(TRIM(:serial)) AND en_uso = 1 LIMIT 1"
+            );
+            $stmt->execute(['serial' => $serial]);
+            $asset = $stmt->fetch();
+            return $asset ? AssetEntity::fromArray($asset) : null;
+        } catch (\Exception $e) {
+            LoggerService::error("Error en AssetRepository::findBySerialNumber", ['serial' => $serial, 'error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+
 
     /**
      * Buscar activos con filtros usando Generadores
@@ -71,15 +170,18 @@ class AssetRepository
      */
     public function searchPaginated(string $query = '', string $status = 'ALL', int $limit = 0, int $offset = 0, array $filters = []): Generator
     {
-        $sql = "SELECT * FROM assets 
-                WHERE (name LIKE :q1 OR brand LIKE :q2 OR id LIKE :q3 OR serial_number LIKE :q4)";
-
         $params = [
             ':q1' => "%$query%",
             ':q2' => "%$query%",
             ':q3' => "%$query%",
-            ':q4' => "%$query%"
+            ':q4' => "%$query%",
+            ':q5' => "%$query%"
         ];
+
+        $sql = "SELECT * FROM assets 
+                WHERE en_uso = 1 
+                AND (name LIKE :q1 OR brand LIKE :q2 OR inventory_id LIKE :q3 OR serial_number LIKE :q4 OR hec_id LIKE :q5 OR status LIKE :q6)";
+        $params[':q6'] = "%$query%";
 
         if ($status !== 'ALL') {
             $sql .= " AND status = :status";
@@ -97,8 +199,12 @@ class AssetRepository
         }
 
         if (!empty($filters['criticality']) && $filters['criticality'] !== 'ALL') {
-            $sql .= " AND criticality = :criticality";
-            $params[':criticality'] = $filters['criticality'];
+            if ($filters['criticality'] === 'LOW' || $filters['criticality'] === 'NA') {
+                $sql .= " AND (criticality IS NULL OR criticality = '' OR criticality = 'NA' OR criticality = 'LOW' OR criticality NOT IN ('CRITICAL', 'RELEVANT'))";
+            } else {
+                $sql .= " AND criticality = :criticality";
+                $params[':criticality'] = $filters['criticality'];
+            }
         }
 
         if (!empty($filters['family']) && $filters['family'] !== 'ALL') {
@@ -111,10 +217,10 @@ class AssetRepository
             $params[':category_id'] = $filters['category_id'];
         }
 
-        // Ordenar por riesgo_ge primero si estamos viendo "Todos" para facilitar la agrupación visual
+        // Ordenar por HEC ID agrupando las familias y luego por nombre si estamos viendo "Todos"
         $orderBy = !empty($filters['family']) && $filters['family'] === 'ALL'
-            ? "riesgo_ge ASC, criticality DESC, name ASC"
-            : "criticality DESC, name ASC";
+            ? "hec_id ASC, name ASC"
+            : "hec_id ASC, name ASC";
 
         $sql .= " ORDER BY $orderBy";
 
@@ -138,15 +244,18 @@ class AssetRepository
      */
     public function countSearchResults(string $query = '', string $status = 'ALL', array $filters = []): int
     {
-        $sql = "SELECT COUNT(*) FROM assets 
-                WHERE (name LIKE :q1 OR brand LIKE :q2 OR id LIKE :q3 OR serial_number LIKE :q4)";
-
         $params = [
             ':q1' => "%$query%",
             ':q2' => "%$query%",
             ':q3' => "%$query%",
-            ':q4' => "%$query%"
+            ':q4' => "%$query%",
+            ':q5' => "%$query%"
         ];
+
+        $sql = "SELECT COUNT(*) FROM assets 
+                WHERE en_uso = 1 
+                AND (name LIKE :q1 OR brand LIKE :q2 OR inventory_id LIKE :q3 OR serial_number LIKE :q4 OR hec_id LIKE :q5 OR status LIKE :q6)";
+        $params[':q6'] = "%$query%";
 
         if ($status !== 'ALL') {
             $sql .= " AND status = :status";
@@ -164,8 +273,12 @@ class AssetRepository
         }
 
         if (!empty($filters['criticality']) && $filters['criticality'] !== 'ALL') {
-            $sql .= " AND criticality = :criticality";
-            $params[':criticality'] = $filters['criticality'];
+            if ($filters['criticality'] === 'LOW' || $filters['criticality'] === 'NA') {
+                $sql .= " AND (criticality IS NULL OR criticality = '' OR criticality = 'NA' OR criticality = 'LOW' OR criticality NOT IN ('CRITICAL', 'RELEVANT'))";
+            } else {
+                $sql .= " AND criticality = :criticality";
+                $params[':criticality'] = $filters['criticality'];
+            }
         }
 
         if (!empty($filters['family']) && $filters['family'] !== 'ALL') {
@@ -195,11 +308,12 @@ class AssetRepository
     {
         $sql = "SELECT 
                     COUNT(*) as total,
-                    SUM(CASE WHEN status = 'OPERATIVE' THEN 1 ELSE 0 END) as operative,
+                    SUM(CASE WHEN status IN ('OPERATIVE', 'BUENO') THEN 1 ELSE 0 END) as operative,
                     SUM(CASE WHEN status = 'MAINTENANCE' THEN 1 ELSE 0 END) as maintenance,
-                    SUM(CASE WHEN status = 'NO_OPERATIVE' THEN 1 ELSE 0 END) as no_operative,
-                    SUM(CASE WHEN status = 'OPERATIVE_WITH_OBS' THEN 1 ELSE 0 END) as with_obs
-                FROM assets";
+                    SUM(CASE WHEN status IN ('NO_OPERATIVE', 'MALO') THEN 1 ELSE 0 END) as no_operative,
+                    SUM(CASE WHEN status IN ('OPERATIVE_WITH_OBS', 'REGULAR') THEN 1 ELSE 0 END) as with_obs
+                FROM assets
+                WHERE en_uso = 1";
 
         return $this->db->query($sql)->fetch();
     }
@@ -247,34 +361,36 @@ class AssetRepository
     {
         try {
             $sql = "INSERT INTO assets (
-                id, name, serial_number, brand, model, location, sub_location, 
-                vendor, ownership, criticality, status, riesgo_ge, codigo_umdns, 
+                inventory_id, hec_id, name, serial_number, brand, model, location, sub_location, 
+                vendor, contract_id, ownership, criticality, status, riesgo_ge, codigo_umdns, 
                 fecha_instalacion, purchased_year, acquisition_cost, 
                 total_useful_life, useful_life_pct, years_remaining, 
                 warranty_expiration, under_maintenance_plan, en_uso, 
-                image_url, observations
+                image_url, observations, annual_maint_cost, subclase
             ) VALUES (
-                :id, :name, :serial_number, :brand, :model, :location, :sub_location, 
-                :vendor, :ownership, :criticality, :status, :riesgo_ge, :codigo_umdns, 
+                :inventory_id, :hec_id, :name, :serial_number, :brand, :model, :location, :sub_location, 
+                :vendor, :contract_id, :ownership, :criticality, :status, :riesgo_ge, :codigo_umdns, 
                 :fecha_instalacion, :purchased_year, :acquisition_cost, 
                 :total_useful_life, :useful_life_pct, :years_remaining, 
                 :warranty_expiration, :under_maintenance_plan, :en_uso, 
-                :image_url, :observations
+                :image_url, :observations, :annual_maint_cost, :subclase
             )";
 
             $stmt = $this->db->prepare($sql);
 
             $params = [
-                ':id' => $data['id'] ?? null,
-                ':name' => $data['name'] ?? null,
+                ':inventory_id' => $data['inventory_id'] ?? ($data['id'] ?? null),
+                ':hec_id' => $data['hec_id'] ?? null,
+                ':name' => $data['name'],
                 ':serial_number' => $data['serial_number'] ?? null,
                 ':brand' => $data['brand'] ?? null,
                 ':model' => $data['model'] ?? null,
                 ':location' => $data['location'] ?? null,
                 ':sub_location' => $data['sub_location'] ?? null,
                 ':vendor' => $data['vendor'] ?? null,
-                ':ownership' => $data['ownership'] ?? 'Propio',
-                ':criticality' => $data['criticality'] ?? 'RELEVANT',
+                ':contract_id' => $data['contract_id'] ?? null,
+                ':ownership' => $data['ownership'] ?? 'PROPIO',
+                ':criticality' => $data['criticality'] ?? 'LOW',
                 ':status' => $data['status'] ?? 'OPERATIVE',
                 ':riesgo_ge' => $data['riesgo_ge'] ?? null,
                 ':codigo_umdns' => $data['codigo_umdns'] ?? null,
@@ -288,10 +404,15 @@ class AssetRepository
                 ':under_maintenance_plan' => (int)($data['under_maintenance_plan'] ?? 0),
                 ':en_uso' => (int)($data['en_uso'] ?? 1),
                 ':image_url' => $data['image_url'] ?? 'https://via.placeholder.com/300',
-                ':observations' => $data['observations'] ?? null
+                ':observations' => $data['observations'] ?? null,
+                ':annual_maint_cost' => $data['annual_maint_cost'] ?? 0.0,
+                ':subclase' => $data['subclase'] ?? null
             ];
 
-            return $stmt->execute($params);
+            if ($stmt->execute($params)) {
+                return (int)$this->db->lastInsertId();
+            }
+            return false;
         } catch (\Exception $e) {
             LoggerService::error("Error en AssetRepository::create", ['id' => $data['id'] ?? 'N/A', 'error' => $e->getMessage()]);
             return false;
@@ -308,21 +429,43 @@ class AssetRepository
             $params = [':id' => $id];
 
             $allowedFields = [
+                'hec_id',
                 'name',
+                'inventory_id',
                 'brand',
                 'model',
                 'serial_number',
                 'location',
                 'sub_location',
+                'vendor',
+                'contract_id',
+                'ownership',
+                'criticality',
                 'status',
-                'useful_life_pct',
-                'total_useful_life',
-                'years_remaining',
+                'riesgo_ge',
+                'codigo_umdns',
+                'fecha_instalacion',
                 'purchased_year',
+                'acquisition_cost',
+                'total_useful_life',
+                'useful_life_pct',
+                'years_remaining',
+                'warranty_expiration',
+                'under_maintenance_plan',
+                'en_uso',
+                'image_url',
+                'observations',
+                'annual_maint_cost',
                 'clase_riesgo',
                 'riesgo_biomedico',
                 'valor_reposicion',
-                'frecuencia_mp_meses'
+                'frecuencia_mp_meses',
+                'subclase',
+                'ip_address',
+                'mac_address',
+                'firmware_version',
+                'os_version',
+                'is_aem'
             ];
             foreach ($allowedFields as $field) {
                 if (isset($data[$field])) {
@@ -343,7 +486,7 @@ class AssetRepository
     }
 
     /**
-     * Eliminar un activo por ID
+     * Eliminar un activo por ID (Hard Delete)
      */
     public function delete(string $id): bool
     {
@@ -352,6 +495,51 @@ class AssetRepository
             return $stmt->execute(['id' => $id]);
         } catch (\Exception $e) {
             LoggerService::error("Error en AssetRepository::delete", ['id' => $id, 'error' => $e->getMessage()]);
+            return false;
+        }
+    }
+
+    /**
+     * Soft Delete (marcar como fuera de uso)
+     */
+    public function softDelete(string $id): bool
+    {
+        try {
+            $stmt = $this->db->prepare("UPDATE assets SET en_uso = 0, status = 'RETIRED', updated_at = NOW() WHERE id = :id");
+            return $stmt->execute(['id' => $id]);
+        } catch (\Exception $e) {
+            LoggerService::error("Error en AssetRepository::softDelete", ['id' => $id, 'error' => $e->getMessage()]);
+            return false;
+        }
+    }
+
+    /**
+     * Restaurar un activo
+     */
+    public function restore(string $id): bool
+    {
+        try {
+            $stmt = $this->db->prepare("UPDATE assets SET en_uso = 1, updated_at = NOW() WHERE id = :id");
+            return $stmt->execute(['id' => $id]);
+        } catch (\Exception $e) {
+            LoggerService::error("Error en AssetRepository::restore", ['id' => $id, 'error' => $e->getMessage()]);
+            return false;
+        }
+    }
+
+    /**
+     * Borrado masivo (Soft Delete)
+     */
+    public function bulkSoftDelete(array $ids): bool
+    {
+        if (empty($ids)) return true;
+        try {
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $sql = "UPDATE assets SET en_uso = 0, updated_at = NOW() WHERE id IN ($placeholders)";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute($ids);
+        } catch (\Exception $e) {
+            LoggerService::error("Error en AssetRepository::bulkSoftDelete", ['ids' => $ids, 'error' => $e->getMessage()]);
             return false;
         }
     }

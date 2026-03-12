@@ -32,59 +32,63 @@ $error = null;
 
 // Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // 1. Sanitize & Retrieve Inputs
-    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-    $location = $_POST['location'] ?? ''; // e.g. 'manufacturing-a'
-    $equipment = $_POST['equipment'] ?? '';
-    $serial = $_POST['serial_number'] ?? '';
-    $description = $_POST['description'] ?? '';
+    if (!verifyCsrfToken()) {
+        $error = "Token de seguridad inválido. Recargue e intente de nuevo.";
+    } else {
+        // 1. Sanitize & Retrieve Inputs
+        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+        $location = $_POST['location'] ?? ''; // e.g. 'manufacturing-a'
+        $equipment = $_POST['equipment'] ?? '';
+        $serial = $_POST['serial_number'] ?? '';
+        $description = $_POST['description'] ?? '';
 
-    // 2. File Upload Handling
-    $imagePath = null;
-    if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-        $fileTmpPath = $_FILES['photo']['tmp_name'];
-        $fileName = $_FILES['photo']['name'];
-        $fileType = $_FILES['photo']['type'];
+        // 2. File Upload Handling
+        $imagePath = null;
+        if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+            $fileTmpPath = $_FILES['photo']['tmp_name'];
+            $fileName = $_FILES['photo']['name'];
+            $fileType = $_FILES['photo']['type'];
 
-        $allowedFileTypes = ['image/jpeg', 'image/png', 'image/gif'];
-        if (in_array($fileType, $allowedFileTypes)) {
-            // Generate unique name
-            $newFileName = md5(time() . $fileName) . '.' . pathinfo($fileName, PATHINFO_EXTENSION);
-            $destPath = $uploadDir . $newFileName;
+            $allowedFileTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            if (in_array($fileType, $allowedFileTypes)) {
+                // Generate unique name
+                $newFileName = md5(time() . $fileName) . '.' . pathinfo($fileName, PATHINFO_EXTENSION);
+                $destPath = $uploadDir . $newFileName;
 
-            if (move_uploaded_file($fileTmpPath, $destPath)) {
-                $imagePath = $newFileName;
+                if (move_uploaded_file($fileTmpPath, $destPath)) {
+                    $imagePath = $newFileName;
+                } else {
+                    $error = "Error al mover el archivo subido.";
+                }
             } else {
-                $error = "Error al mover el archivo subido.";
+                $error = "Tipo de archivo no permitido. Solo JPG, PNG y GIF.";
             }
-        } else {
-            $error = "Tipo de archivo no permitido. Solo JPG, PNG y GIF.";
         }
-    }
 
-    // 3. Database Insertion (MySQL)
-    if (!$error) {
-        try {
-            $db = DatabaseService::getInstance();
+        // 3. Database Insertion (MySQL)
+        if (!$error) {
+            try {
+                $db = DatabaseService::getInstance();
 
-            // Schema: table 'messenger_reports' (MySQL)
-            // Connector: asset_id (from serial_number input, now acting as ID)
-            $stmt = $db->prepare("INSERT INTO messenger_reports (email, asset_id, asset_name, texto, imagen_path, status, created_at) VALUES (:email, :asset_id, :asset_name, :texto, :imagen, 'Pendiente', NOW())");
+                // Schema: table 'messenger_reports' (MySQL)
+                // Connector: asset_id (from serial_number input, now acting as ID)
+                $stmt = $db->prepare("INSERT INTO messenger_reports (email, asset_id, asset_name, texto, imagen_path, status, created_at) VALUES (:email, :asset_id, :asset_name, :texto, :imagen, 'En Curso', NOW())");
 
-            $stmt->execute([
-                ':email' => $email,
-                ':asset_id' => $serial, // El ID/Serie es el conector
-                ':asset_name' => $equipment, // El nombre del equipo para referencia rápida
-                ':texto' => $description,
-                ':imagen' => $imagePath
-            ]);
+                $stmt->execute([
+                    ':email' => $email,
+                    ':asset_id' => $serial, // El ID/Serie es el conector
+                    ':asset_name' => $equipment, // El nombre del equipo para referencia rápida
+                    ':texto' => $description,
+                    ':imagen' => $imagePath
+                ]);
 
-            $success = true;
+                $success = true;
 
-            // Clear inputs on success
-            $email = $location = $equipment = $serial = $description = '';
-        } catch (Exception $e) {
-            $error = "Error de base de datos MySQL: " . $e->getMessage();
+                // Clear inputs on success
+                $email = $location = $equipment = $serial = $description = '';
+            } catch (Exception $e) {
+                $error = "Error de base de datos MySQL: " . $e->getMessage();
+            }
         }
     }
 } else {
@@ -109,11 +113,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#025082", // Unified medical-blue
+                        "primary": "#10b981", // Emerald Green
                         "background-light": "#f1f5f9",
-                        "background-dark": "#0f172a",
-                        "medical-dark": "#0f172a",
-                        "medical-surface": "#1e293b",
+                        "background-dark": "#06090f",
+                        "medical-dark": "#0b0f1a",
+                        "medical-surface": "var(--medical-surface)",
+                        "border-dark": "var(--border-color)",
                         "text-main": {
                             light: "#0f172a",
                             dark: "#f1f5f9"
@@ -188,7 +193,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $backUrl = ($_SESSION['user_role'] ?? '') === ROLE_USER ? '?page=login&action=logout' : '?page=dashboard';
                 $backTitle = ($_SESSION['user_role'] ?? '') === ROLE_USER ? 'Cerrar Sesión' : 'Volver al Dashboard';
                 ?>
-                <a href="<?= $backUrl ?>" class="w-10 h-10 rounded-lg bg-panel-dark flex items-center justify-center text-text-muted hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95" title="<?= $backTitle ?>">
+                <a href="<?= $backUrl ?>" class="w-10 h-10 rounded-lg bg-panel-dark flex items-center justify-center text-text-muted hover:border hover:border-medical-blue/30 transition-all active:scale-95" title="<?= $backTitle ?>">
                     <span class="material-icons">arrow_back</span>
                 </a>
 
@@ -208,6 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <!-- Form Section -->
         <form class="p-8 space-y-6" method="POST" enctype="multipart/form-data">
+            <?= csrfField() ?>
 
             <!-- Email Input -->
             <div class="space-y-2">
@@ -219,7 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <span class="material-icons text-lg">alternate_email</span>
                     </div>
                     <input
-                        class="block w-full pl-11 pr-4 py-3 bg-medical-dark border-border-dark rounded-lg text-text-main focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-text-muted/40"
+                        class="block w-full pl-11 pr-4 py-3 bg-[var(--input-bg)] border-[var(--border-color)] rounded-lg text-text-main focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-text-muted/40 font-medium"
                         id="email" name="email" placeholder="name@company.com" required type="email" value="<?= htmlspecialchars($email ?? '') ?>" />
                 </div>
             </div>
@@ -235,7 +241,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <?php $locations = getAllLocations(); ?>
                     <select
-                        class="block w-full pl-11 pr-10 py-3 bg-medical-dark border-border-dark rounded-lg text-text-main focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer"
+                        class="block w-full pl-11 pr-10 py-3 bg-[var(--input-bg)] border-[var(--border-color)] rounded-lg text-text-main focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer font-medium"
                         id="location" name="location" required>
                         <option disabled selected value="">Select location...</option>
                         <?php foreach ($locations as $loc): ?>
@@ -258,7 +264,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <span class="material-icons text-lg">medical_services</span>
                     </div>
                     <input
-                        class="block w-full pl-11 pr-4 py-3 bg-medical-dark border-border-dark rounded-lg text-text-main focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-text-muted/40"
+                        class="block w-full pl-11 pr-4 py-3 bg-[var(--input-bg)] border-[var(--border-color)] rounded-lg text-text-main focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-text-muted/40 font-medium"
                         id="equipment" name="equipment" placeholder="Nombre del equipo (Ej. Ventilador Mecánico)" type="text" value="<?= htmlspecialchars($equipment ?? '') ?>" />
                 </div>
             </div>
@@ -273,7 +279,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <span class="material-icons text-lg">qr_code</span>
                     </div>
                     <input
-                        class="block w-full pl-11 pr-4 py-3 bg-medical-dark border-border-dark rounded-lg text-text-main focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-text-muted/40"
+                        class="block w-full pl-11 pr-4 py-3 bg-[var(--input-bg)] border-[var(--border-color)] rounded-lg text-text-main focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-text-muted/40 font-medium"
                         id="serial_number" name="serial_number" placeholder="Ingrese el número de serie" required type="text" value="<?= htmlspecialchars($serial ?? '') ?>" />
                 </div>
             </div>
@@ -284,7 +290,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     Description of the Failure <span class="text-primary">*</span>
                 </label>
                 <textarea
-                    class="block w-full px-4 py-3 bg-medical-dark border-border-dark rounded-lg text-text-main focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-text-muted/40 resize-none"
+                    class="block w-full px-4 py-3 bg-[var(--input-bg)] border-[var(--border-color)] rounded-lg text-text-main focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-text-muted/40 resize-none font-medium"
                     id="description" name="description" placeholder="Describe error codes, visible damage, or unusual sounds..."
                     required rows="4"><?= htmlspecialchars($description ?? '') ?></textarea>
             </div>
@@ -294,7 +300,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label class="block text-sm font-semibold text-text-muted">
                     Equipment Photos
                 </label>
-                <div class="custom-dashed rounded-lg p-8 flex flex-col items-center justify-center gap-3 bg-primary/5 hover:bg-primary/[0.08] transition-colors cursor-pointer group file-input-wrapper">
+                <div class="custom-dashed rounded-lg p-8 flex flex-col items-center justify-center gap-3 bg-primary/5 hover:bg-primary/[0.08] transition-all cursor-pointer group file-input-wrapper border border-transparent hover:border-primary/20">
                     <input type="file" name="photo" accept="image/*" onchange="document.getElementById('file-label').textContent = this.files[0].name">
                     <div class="w-12 h-12 bg-medical-surface rounded-full shadow-sm flex items-center justify-center text-primary transition-transform group-hover:scale-110">
                         <span class="material-icons">photo_camera</span>
