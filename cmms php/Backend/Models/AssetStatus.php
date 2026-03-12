@@ -8,6 +8,7 @@ enum AssetStatus: string
     case MAINTENANCE = 'MAINTENANCE';
     case NO_OPERATIVE = 'NO_OPERATIVE';
     case OPERATIVE_WITH_OBS = 'OPERATIVE_WITH_OBS';
+    case RETIRED = 'RETIRED';
 
     public function getLabel(): string
     {
@@ -16,6 +17,7 @@ enum AssetStatus: string
             self::MAINTENANCE => 'En Mantenimiento',
             self::NO_OPERATIVE => 'Fuera de Servicio',
             self::OPERATIVE_WITH_OBS => 'Operativo con Obs.',
+            self::RETIRED => 'Dado de Baja',
         };
     }
 }

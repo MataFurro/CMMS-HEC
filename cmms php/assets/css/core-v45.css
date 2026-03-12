@@ -1,0 +1,190 @@
+/* assets/css/core-v45.css */
+
+:root {
+    /* Light Theme: Standout Emerald (Clinical & Vibrant) */
+    --medical-blue: #059669;
+    /* Emerald 600 */
+    --medical-blue-hover: #047857;
+    /* Emerald 700 */
+    --medical-dark: #f8fafc;
+    /* Slate 50 - Very Clean */
+    --medical-surface: #ffffff;
+    --panel-dark: #f1f5f9;
+    /* Slate 100 */
+    --border-color: #b1b9c5;
+    /* Stronger definition */
+    --text-main: #0f172a;
+    /* Slate 900 */
+    --text-muted: #334155;
+    /* Slate 700 - Much better contrast for small text */
+    --input-bg: #ffffff;
+    --header-bg: rgba(255, 255, 255, 0.9);
+    --accent-glow: rgba(16, 185, 129, 0.15);
+
+    /* Background Pattern for Light Mode */
+    --bg-pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 30L30 25L35 25L35 30L40 30L40 35L35 35L35 40L30 40L30 35L25 35L25 30L30 30Z' fill='%2310b981' fill-opacity='0.03'/%3E%3C/svg%3E");
+}
+
+.dark {
+    /* Dark Theme: Deep Medical (Professional & High Tech) */
+    --medical-blue: #60a5fa;
+    /* Blue 400 - More vibrant for dark bg */
+    --medical-blue-hover: #3b82f6;
+    /* Blue 500 */
+    --medical-dark: #020617;
+    /* Deeper Navy */
+    --medical-surface: #0f172a;
+    /* Slate 900 */
+    --panel-dark: #020617;
+    --border-color: #1e293b;
+    /* Slate 800 */
+    --text-main: #f8fafc;
+    /* Slate 50 */
+    --text-muted: #cbd5e1;
+    /* Slate 300 - Brightened for clinical readability in dark mode */
+    --input-bg: #1e293b;
+    /* Slate 800 - Match panel tone */
+    --header-bg: rgba(15, 23, 42, 0.9);
+    --bg-pattern: none;
+    --glass-bg: rgba(15, 23, 42, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.15);
+}
+
+.card-glass {
+    background-color: var(--glass-bg, var(--medical-surface));
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border: 1px solid var(--glass-border, var(--border-color));
+    border-radius: 1.25rem;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-glass:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
+    border-color: var(--medical-blue);
+}
+
+.sidebar-link-active {
+    color: var(--medical-blue);
+    background-color: rgba(59, 130, 246, 0.1);
+    /* bg-medical-blue/10 */
+    font-weight: 700;
+    border-right-width: 4px;
+    border-color: var(--medical-blue);
+}
+
+.sidebar-link-inactive {
+    color: var(--text-muted);
+    transition-property: all;
+    transition-duration: 300ms;
+}
+
+.sidebar-link-inactive:hover {
+    color: var(--text-main);
+}
+
+.dark .sidebar-link-inactive:hover {
+    background-color: #1e293b;
+    /* bg-slate-800 */
+}
+
+.sidebar-link-inactive:hover:not(.dark *) {
+    background-color: #e2e8f0;
+    /* bg-slate-200 */
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--medical-dark);
+    background-image: var(--bg-pattern);
+    background-attachment: fixed;
+    color: var(--text-main);
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--medical-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #334155;
+    border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #475569;
+}
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    font-family: 'Material Symbols Outlined' !important;
+    display: inline-block;
+    line-height: 1;
+    overflow: hidden;
+    vertical-align: middle;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'liga';
+}
+
+/* --- INPUTS & SELECTS: Always Readable in Both Themes --- */
+input,
+select,
+textarea {
+    background-color: var(--input-bg) !important;
+    color: var(--text-main) !important;
+    border-color: var(--border-color) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-muted) !important;
+    opacity: 0.6;
+}
+
+/* Dropdown option text visible in both themes */
+option {
+    background-color: var(--medical-surface) !important;
+    color: var(--text-main) !important;
+}
+
+/* Date input calendar icon */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: var(--date-picker-filter, none);
+}
+
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+html,
+body {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+}

@@ -439,6 +439,105 @@ $checklist_templates = [
     ],
 
     // ═══════════════════════════════════════════════════════════════
+    // BOMBA DE INFUSIÓN (Formato V2 - Cuantitativo)
+    // ═══════════════════════════════════════════════════════════════
+    'bomba_infusion' => [
+        'label' => 'Bomba de Infusión',
+        'family' => 'Infusión',
+        'icon'  => 'water_drop',
+        'version' => 'V2',
+
+        'qualitative' => [
+            'Verificar encendido del equipo',
+            'Limpieza externa de carcasa y panel',
+            'Estado de cable de poder y enchufe',
+            'Estado de mecanismo de bombeo (puerta, clamp, rodillos)',
+            'Funcionamiento de sensores (burbuja, oclusión, puerta abierta)',
+            'Funcionamiento de pantalla y botonera',
+            'Alarmas sonoras y visuales operativas',
+            'Estado de batería y prueba de corte de energía',
+            'Fijación a atril (clamp posterior)',
+            'Autodiagnóstico del equipo',
+        ],
+
+        'quantitative' => [
+            [
+                'group' => 'Flujo (Tasa de Infusión)',
+                'unit' => 'mL/h',
+                'tolerance_label' => '±5%',
+                'points' => [
+                    ['simulated' => 10],
+                    ['simulated' => 50],
+                    ['simulated' => 100],
+                ]
+            ],
+            [
+                'group' => 'Presión de Oclusión',
+                'unit' => 'mmHg',
+                'tolerance_label' => '±20%',
+                'points' => [
+                    ['simulated' => 300], // Low occlusion pressure setting
+                    ['simulated' => 600], // High occlusion pressure setting
+                ]
+            ],
+        ],
+
+        'electrical_safety' => [
+            ['param' => 'Tensión de red',      'expected' => '220V',     'tolerance' => '±10%'],
+            ['param' => 'Resistencia a tierra', 'expected' => '≤ 0.2 Ω', 'tolerance' => 'Normativo'],
+            ['param' => 'Corriente de fuga',    'expected' => '≤ 0.5 mA', 'tolerance' => 'Normativo'],
+        ],
+    ],
+
+    // ═══════════════════════════════════════════════════════════════
+    // ELECTROCARDIÓGRAFO (Formato V2 - Cuantitativo)
+    // ═══════════════════════════════════════════════════════════════
+    'electrocardiografo' => [
+        'label' => 'Electrocardiógrafo',
+        'family' => 'Diagnóstico',
+        'icon'  => 'monitor_heart',
+        'version' => 'V2',
+
+        'qualitative' => [
+            'Verificar encendido del equipo',
+            'Limpieza externa y estado de la carcasa',
+            'Estado de cable de poder y protección',
+            'Estado del cable de paciente (latiguillos y conectores)',
+            'Verificar pinzas y peras (electrodos reutilizables)',
+            'Funcionamiento de pantalla (si aplica) y teclado',
+            'Verificar sistema de impresión (rodillo, papel térmico)',
+            'Prueba de calibración interna (señal de 1mV)',
+            'Estado de batería',
+        ],
+
+        'quantitative' => [
+            [
+                'group' => 'Frecuencia Cardíaca Simulada',
+                'unit' => 'LPM',
+                'tolerance_label' => '±2 LPM',
+                'points' => [
+                    ['simulated' => 60],
+                    ['simulated' => 120],
+                ]
+            ],
+            [
+                'group' => 'Amplitud de Señal',
+                'unit' => 'mm/mV',
+                'tolerance_label' => '±5%',
+                'points' => [
+                    ['simulated' => 10], // gain 10mm/mV
+                ]
+            ],
+        ],
+
+        'electrical_safety' => [
+            ['param' => 'Tensión de red',      'expected' => '220V',     'tolerance' => '±10%'],
+            ['param' => 'Resistencia a tierra', 'expected' => '≤ 0.2 Ω', 'tolerance' => 'Normativo'],
+            ['param' => 'Corriente de fuga',    'expected' => '≤ 0.5 mA', 'tolerance' => 'Normativo'],
+        ],
+    ],
+
+    // ═══════════════════════════════════════════════════════════════
     // FORMATO GENERAL (Equipo Médico No Específico)
     // ═══════════════════════════════════════════════════════════════
     'formato_general' => [

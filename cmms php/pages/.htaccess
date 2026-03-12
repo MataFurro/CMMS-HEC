@@ -1,0 +1,4 @@
+# Bloquear acceso directo a los archivos de vista (pages)
+# Todas las peticiones deben pasar por index.php
+Order Deny,Allow
+Deny from all

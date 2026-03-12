@@ -8,13 +8,13 @@ use DateTime;
 /**
  * Entidad Inmutable para Órdenes de Trabajo (PHP 8.2+)
  */
-readonly class WorkOrderEntity
+class WorkOrderEntity
 {
     public function __construct(
         public string $id,
-        public string $assetId,
+        public int $assetId,
         public string $type,
-        public WorkOrderStatus $status = WorkOrderStatus::PENDING,
+        public WorkOrderStatus $status = WorkOrderStatus::IN_PROGRESS,
         public string $priority = 'Media',
         public ?string $assignedTechName = null,
         public ?DateTime $createdDate = null,
@@ -29,7 +29,11 @@ readonly class WorkOrderEntity
         public ?string $failureCode = null,
         public ?DateTime $serviceWarrantyDate = null,
         public ?string $finalAssetStatus = null,
-        public ?array $checklistData = null
+        public ?array $checklistData = null,
+        public ?string $handoverConfirmedBy = null,
+        public ?string $handoverLocation = null,
+        public ?DateTime $handoverTimestamp = null,
+        public ?string $coordinationStalledReason = null
     ) {}
 
     public static function fromArray(array $data): self
@@ -38,7 +42,7 @@ readonly class WorkOrderEntity
             id: $data['id'],
             assetId: $data['asset_id'],
             type: $data['type'],
-            status: WorkOrderStatus::tryFrom($data['status']) ?? WorkOrderStatus::PENDING,
+            status: WorkOrderStatus::tryFrom($data['status'] ?? '') ?? WorkOrderStatus::IN_PROGRESS,
             priority: $data['priority'] ?? 'Media',
             assignedTechName: $data['assigned_tech_name'] ?? null,
             createdDate: isset($data['created_date']) ? new DateTime($data['created_date']) : null,
@@ -53,7 +57,11 @@ readonly class WorkOrderEntity
             failureCode: $data['failure_code'] ?? null,
             serviceWarrantyDate: isset($data['service_warranty_date']) ? new DateTime($data['service_warranty_date']) : null,
             finalAssetStatus: $data['final_asset_status'] ?? null,
-            checklistData: isset($data['checklist_data']) ? (is_string($data['checklist_data']) ? json_decode($data['checklist_data'], true) : $data['checklist_data']) : null
+            checklistData: isset($data['checklist_data']) ? (is_string($data['checklist_data']) ? json_decode($data['checklist_data'], true) : $data['checklist_data']) : null,
+            handoverConfirmedBy: $data['handover_confirmed_by'] ?? null,
+            handoverLocation: $data['handover_location'] ?? null,
+            handoverTimestamp: isset($data['handover_timestamp']) ? new DateTime($data['handover_timestamp']) : null,
+            coordinationStalledReason: $data['coordination_stalled_reason'] ?? null
         );
     }
 
@@ -82,6 +90,10 @@ readonly class WorkOrderEntity
             'service_warranty_date' => $this->serviceWarrantyDate?->format('Y-m-d'),
             'final_asset_status' => $this->finalAssetStatus,
             'checklist_data' => $this->checklistData,
+            'handover_confirmed_by' => $this->handoverConfirmedBy,
+            'handover_location' => $this->handoverLocation,
+            'handover_timestamp' => $this->handoverTimestamp?->format('Y-m-d H:i:s'),
+            'coordination_stalled_reason' => $this->coordinationStalledReason,
             'asset' => $this->assetName, // Legacy
             'tech' => $this->assignedTechName ?? 'Sin Asignar', // Real
             'date' => $this->createdDate?->format('Y-m-d') // Legacy compatibility

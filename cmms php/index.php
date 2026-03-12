@@ -1,39 +1,71 @@
 <?php
 // index.php - Main Router
+ob_start();
 
 // ── Manejador Global de Excepciones (previene Fatal Error por DB) ──
 set_exception_handler(function (Throwable $e) {
     $isDbError = str_contains($e->getMessage(), 'MySQL') || str_contains($e->getMessage(), 'conexión') || str_contains($e->getMessage(), 'SQLSTATE') || $e instanceof PDOException;
     $title   = $isDbError ? 'Base de Datos No Disponible' : 'Error del Sistema';
     $icon    = $isDbError ? 'storage' : 'bug_report';
-    $detail  = htmlspecialchars($e->getMessage());
+    $detail  = htmlspecialchars($e->getMessage()) . "\nFile: " . htmlspecialchars($e->getFile()) . "\nLine: " . $e->getLine();
+    $instruction = $isDbError
+        ? 'Por favor verifica el estado del servidor MySQL en el Panel de Control de XAMPP.'
+        : 'Se ha detectado una anomalía técnica en el código de la aplicación.';
+
     http_response_code($isDbError ? 503 : 500);
     echo "<!DOCTYPE html><html lang='es' class='dark'><head>
         <meta charset='UTF-8'><title>BioCMMS - Error</title>
-        <script src='https://cdn.tailwindcss.com'></script>
+        <script src='assets/vendor/tailwind.min.js'></script>
         <link href='https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined' rel='stylesheet'>
-    </head><body class='bg-slate-900 min-h-screen flex items-center justify-center font-sans'>
-        <div class='text-center space-y-6 max-w-lg px-8'>
-            <span class='material-symbols-outlined text-7xl text-red-500'>$icon</span>
-            <h1 class='text-2xl font-black text-white'>$title</h1>
-            <p class='text-slate-400 text-sm'>Ocurrió un error que impidió cargar la aplicación. Por favor verifica el estado del servidor MySQL en el Panel de Control de XAMPP.</p>
-            <details class='text-left bg-slate-800 rounded-xl p-4 text-xs text-red-400 font-mono cursor-pointer'>
-                <summary class='text-slate-500 mb-2'>Ver detalle técnico</summary>
-                $detail
+        <style>
+            :root {
+                --medical-blue: #059669;
+                --medical-dark: #f8fafc;
+                --medical-surface: #ffffff;
+                --text-main: #0f172a;
+                --text-muted: #334155;
+            }
+            .dark {
+                --medical-blue: #3b82f6;
+                --medical-dark: #0f172a;
+                --medical-surface: #1e293b;
+                --text-main: #f1f5f9;
+                --text-muted: #94a3b8;
+            }
+            body { background-color: var(--medical-dark); color: var(--text-main); font-family: sans-serif; }
+            .card { background-color: var(--medical-surface); border: 1px solid rgba(0,0,0,0.1); }
+            .dark .card { border-color: rgba(255,255,255,0.1); }
+        </style>
+        <script>
+            if (localStorage.getItem('theme') === 'light') document.documentElement.classList.remove('dark');
+        </script>
+    </head><body class='min-h-screen flex items-center justify-center p-6 transition-colors duration-500'>
+        <div class='card text-center space-y-6 max-w-lg w-full px-8 py-10 rounded-[2rem] shadow-2xl'>
+            <div class='w-20 h-20 bg-red-500/10 rounded-3xl flex items-center justify-center mx-auto mb-4'>
+                <span class='material-symbols-outlined text-5xl text-red-500'>$icon</span>
+            </div>
+            <h1 class='text-2xl font-black tracking-tight'>$title</h1>
+            <p class='text-sm opacity-70 leading-relaxed'>$instruction</p>
+            <details class='text-left bg-black/5 dark:bg-white/5 rounded-2xl p-4 text-[10px] font-mono cursor-pointer border border-transparent hover:border-red-500/30 transition-all'>
+                <summary class='opacity-50 mb-2 font-bold uppercase tracking-widest'>Detalle técnico</summary>
+                <div class='whitespace-pre-wrap opacity-80'>$detail</div>
             </details>
-            <a href='?page=dashboard' class='inline-block mt-4 px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all'>
-                Reintentar
+            <a href='?page=dashboard' class='inline-flex items-center gap-2 px-8 py-4 bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl shadow-xl shadow-red-500/20 transition-all active:scale-95'>
+                <span class='material-symbols-outlined text-base'>refresh</span>
+                Reintentar Conexión
             </a>
         </div>
     </body></html>";
     exit;
 });
 
+require_once 'Backend/Core/TemplateUtils.php';
+require_once 'Backend/Core/SecurityUtils.php';
 require_once 'config.php';
-if (!defined('APP_NAME')) define('APP_NAME', 'BioCMMS v4.3 Pro');
+if (!defined('APP_NAME')) define('APP_NAME', 'BioCMMS v4.5');
 
 // 1. Determine target page
-$allowed_pages = ['dashboard', 'inventory', 'calendar', 'work_orders', 'new_asset', 'login', 'asset', 'work_order_execution', 'work_order_opening', 'family_analysis', 'financial_analysis', 'messenger_requests', 'service_request', 'service_request_review', 'accreditation_dashboard'];
+$allowed_pages = ['dashboard', 'inventory', 'calendar', 'work_orders', 'new_asset', 'login', 'asset', 'work_order_execution', 'work_order_opening', 'family_analysis', 'financial_analysis', 'messenger_requests', 'service_request', 'service_request_review', 'accreditation_dashboard', 'bulk_management', 'my_work_orders', 'retired_assets'];
 
 header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
@@ -45,6 +77,15 @@ $page = $_GET['page'] ?? null;
 if (!$page && !isset($_SESSION['user_id'])) {
     header('Location: ?page=login');
     exit;
+}
+
+// --- Validación CSRF Global (Enterprise Security) ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $providedToken = $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+    if (!hash_equals($_SESSION['csrf_token'] ?? '', $providedToken)) {
+        http_response_code(403);
+        die("Error de Seguridad [CSRF]: Solicitud no autorizada en BioCMMS v4.5");
+    }
 }
 
 $page = $page ?? 'dashboard';
@@ -91,7 +132,7 @@ if (isset($_SESSION['user_id'])) {
 
 $hide_sidebar = ($page === 'login' || ($_SESSION['user_role'] ?? '') === ROLE_USER);
 
-if ($page === 'login' || $page === 'service_request') {
+if ($page === 'login' || $page === 'service_request' || (in_array($page, ['bulk_management', 'retired_assets']) && $_SERVER['REQUEST_METHOD'] === 'POST')) {
     include "pages/{$page}.php";
     exit;
 }
@@ -102,12 +143,16 @@ if ($page === 'login' || $page === 'service_request') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= APP_NAME_HTML ?> - Gestión Biomédica</title>
+    <title>BioCMMS v4.5 - Gestión Biomédica</title>
 
     <!-- External Dependencies -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="assets/vendor/tailwind.min.js"></script>
+    <!-- Alpine.js Plugins (MUST come before core) -->
+    <!-- Dependencies (Localized v4.5 Enterprise) -->
+    <script src="assets/vendor/alpine-collapse.min.js" defer></script>
+    <script src="assets/vendor/alpine.min.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -139,87 +184,98 @@ if ($page === 'login' || $page === 'service_request') {
             localStorage.setItem('theme', theme);
         };
         applyTheme(localStorage.getItem('theme') || 'dark');
+        // Reset global para Ultra Wide
+        window.addEventListener('load', () => {
+            document.documentElement.style.maxWidth = 'none';
+            document.body.style.maxWidth = 'none';
+        });
     </script>
-    <style type="text/tailwindcss">
-        :root {
-            /* Light Theme: Clinical (Solid & Clear) */
-            --medical-blue: #025082;
-            --medical-dark: #f1f5f9;   /* Slate 100 - Clean Background */
-            --medical-surface: #ffffff;
-            --panel-dark: #e2e8f0;     /* Slate 200 - Sidebar/Header */
-            --border-dark: #cbd5e1;    /* Slate 300 - Borders */
-            --text-main: #0f172a;      /* Slate 900 - Dark Text */
-            --text-muted: #475569;     /* Slate 600 - Visible Labels */
-            --input-bg: #ffffff;
-            --header-bg: #ffffff;
+    <link rel="stylesheet" href="assets/css/core-v45.css">
+    <style>
+        html,
+        body {
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
         }
 
-        .dark {
-            /* Dark Theme: Deep Medical */
-            --medical-blue: #3b82f6;
-            --medical-dark: #0f172a;
-            --medical-surface: #1e293b;
-            --panel-dark: #111827;
-            --border-dark: #334155;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            --input-bg: #0f172a;
-            --header-bg: rgba(15, 23, 42, 0.9);
+        /* Contenedor principal: usa todo el ancho disponible del flex-1 */
+        main {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box;
+            padding: 2rem !important;
         }
 
-        .card-glass { 
-            background-color: var(--medical-surface);
-            border: 1px solid var(--border-dark);
-            border-radius: 0.75rem; /* rounded-xl */
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
-            transition-property: all;
-            transition-duration: 300ms;
+        /* Contenido interior: ancho máximo para pantallas ultra wide */
+        main>* {
+            max-width: 1800px;
+            /* Permitimos mucho más espacio en vez de 1400 */
+            margin: 0 auto;
+            /* Centrar orgánicamente si es más grande que 1800 */
+            width: 100%;
         }
-        .sidebar-link-active {
-            color: var(--medical-blue);
-            background-color: rgba(59, 130, 246, 0.1); /* bg-medical-blue/10 */
-            font-weight: 700;
-            border-right-width: 4px;
-            border-color: var(--medical-blue);
+
+        /* Ejecución de OT: SIN max-width, usa todo el espacio del flex-1 */
+        .page-work_order_execution main>*,
+        .page-work_order_execution #executionState,
+        .page-work_order_execution #executionForm {
+            max-width: 100% !important;
+            width: 100% !important;
         }
-        .sidebar-link-inactive {
+
+        /* Ejecución de OT necesita padding propio para que sticky funcione bien */
+        .page-work_order_execution main {
+            padding: 1.5rem 2rem !important;
+        }
+
+        /* 3. Componentes de Mediciones Técnicas (Grid Horizontal) */
+        .grid-tech-horizontal {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+        }
+
+        .tech-measurement-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            padding: 0.75rem 1rem;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .tech-label {
+            font-size: 10px;
+            font-weight: 900;
             color: var(--text-muted);
-            transition-property: all;
-            transition-duration: 300ms;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            flex-grow: 1;
         }
-        .sidebar-link-inactive:hover {
-            color: var(--text-main);
+
+        .tech-input-wrapper {
+            width: 120px;
+            flex-shrink: 0;
         }
-        .dark .sidebar-link-inactive:hover {
-            background-color: #1e293b; /* bg-slate-800 */
-        }
-        .sidebar-link-inactive:hover:not(.dark *) {
-            background-color: #e2e8f0; /* bg-slate-200 */
-        }
-        .stat-value { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: var(--text-main); }
-        .stat-label { font-size: 0.75rem; line-height: 1rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-        
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--medical-dark); 
-            color: var(--text-main); 
-        }
-        
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--medical-dark); }
-        ::-webkit-scrollbar-thumb { @apply bg-slate-700 rounded-full hover:bg-slate-600; }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
     </style>
+    <script src="assets/vendor/chart.min.js"></script>
+    <script src="assets/vendor/sweetalert2.min.js"></script>
+    <link rel="stylesheet" href="assets/css/theme-pro.css">
 </head>
 
-<body class="antialiased min-h-screen">
-    <div class="flex">
+<body class="antialiased min-h-screen page-<?= $page ?>">
+    <div class="flex w-full min-h-screen">
         <?php if (!$hide_sidebar) include 'includes/sidebar.php'; ?>
 
-        <div class="flex-1 flex flex-col min-w-0">
+        <div class="flex-1 flex flex-col min-w-0 w-full">
             <?php if (!$hide_sidebar) include 'includes/header.php'; ?>
 
-            <main class="p-6 lg:p-10 max-w-[1600px] w-full mx-auto overflow-y-auto">
+            <main class="w-full flex-1 overflow-y-auto">
                 <?php
                 $file = "pages/{$page}.php";
                 if (file_exists($file)) {
@@ -234,7 +290,6 @@ if ($page === 'login' || $page === 'service_request') {
             </main>
         </div>
     </div>
-    <script src="//unpkg.com/alpinejs" defer></script>
 </body>
 
 </html>

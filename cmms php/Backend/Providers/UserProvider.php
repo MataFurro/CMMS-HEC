@@ -36,14 +36,16 @@ function authenticateUser(string $email): ?array
 function getSidebarMenu(string $userRole): array
 {
     $allMenuItems = [
+        ['name' => 'Panel de Actividades', 'path' => 'my_work_orders', 'icon' => 'fact_check', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN, ROLE_AUDITOR]],
         ['name' => SIDEBAR_DASHBOARD, 'path' => 'dashboard', 'icon' => 'dashboard', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER]],
         ['name' => SIDEBAR_CALENDAR, 'path' => 'calendar', 'icon' => 'calendar_month', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN]],
         ['name' => SIDEBAR_WORK_ORDERS, 'path' => 'work_orders', 'icon' => 'assignment', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN]],
         ['name' => SIDEBAR_INVENTORY, 'path' => 'inventory', 'icon' => 'precision_manufacturing', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN, ROLE_AUDITOR]],
         ['name' => SIDEBAR_FAMILY_ANALYSIS, 'path' => 'family_analysis', 'icon' => 'analytics', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_AUDITOR]],
         ['name' => SIDEBAR_MESSENGER, 'path' => 'messenger_requests', 'icon' => 'mail', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER]],
-        ['name' => 'Análisis Financiero', 'path' => 'financial_analysis', 'icon' => 'payments', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER]],
-        ['name' => 'Acreditación', 'path' => 'accreditation_dashboard', 'icon' => 'verified', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_AUDITOR]],
+        ['name' => 'Business Intelligence', 'path' => 'financial_analysis', 'icon' => 'payments', 'roles' => [ROLE_CHIEF_ENGINEER]],
+        ['name' => 'Optimización Masiva', 'path' => 'bulk_management', 'icon' => 'tune', 'roles' => [ROLE_CHIEF_ENGINEER]],
+        ['name' => 'Archivo Histórico (Bajas)', 'path' => 'retired_assets', 'icon' => 'skull', 'roles' => [ROLE_CHIEF_ENGINEER]],
     ];
 
     return array_filter($allMenuItems, function ($item) use ($userRole) {
@@ -63,22 +65,35 @@ function userHasPermission(string $userRole, string $page): bool
         'inventory' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN, ROLE_AUDITOR],
         'family_analysis' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_AUDITOR],
         'messenger_requests' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER],
-        'financial_analysis' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER],
+        'financial_analysis' => [ROLE_CHIEF_ENGINEER],
         'service_request' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_USER],
         'accreditation_dashboard' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_AUDITOR],
+        'bulk_management' => [ROLE_CHIEF_ENGINEER],
+        'retired_assets' => [ROLE_CHIEF_ENGINEER, ROLE_AUDITOR],
+        'my_work_orders' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN, ROLE_AUDITOR],
     ];
 
     if (!isset($page_permissions[$page])) return true;
     return in_array($userRole, $page_permissions[$page]);
 }
 
+if (!function_exists('canModify')) {
+    /**
+     * Helper: Can current user modify assets/orders?
+     */
+    function canModify(): bool
+    {
+        $role = $_SESSION['user_role'] ?? '';
+        return in_array($role, [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER]);
+    }
+}
+
 /**
- * Helper: Can current user modify assets/orders?
+ * Helper: Is the current user a Chief Engineer (highest authority)?
  */
-function canModify(): bool
+function isChiefEngineer(): bool
 {
-    $role = $_SESSION['user_role'] ?? '';
-    return in_array($role, [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER]);
+    return ($_SESSION['user_role'] ?? '') === ROLE_CHIEF_ENGINEER;
 }
 
 /**

@@ -9,32 +9,34 @@ use DateTime;
 /**
  * Entidad Inmutable para Activos (PHP 8.2+)
  */
-readonly class AssetEntity
+class AssetEntity
 {
     public function __construct(
-        public string $id,
+        public int $id,
         public string $name,
+        public string $inventoryId,
         public ?string $serialNumber = null,
         public ?string $brand = null,
         public ?string $model = null,
-        public ?string $location = null,
-        public ?string $subLocation = null,
+        public ?string $location = '',
+        public ?string $subLocation = '',
         public AssetStatus $status = AssetStatus::OPERATIVE,
         public Criticality $criticality = Criticality::RELEVANT,
         public float $acquisitionCost = 0.0,
         public ?DateTime $fechaInstalacion = null,
         public ?int $yearsRemaining = null,
         public int $usefulLifePct = 0,
-        public ?string $imageUrl = null,
-        public ?string $observations = null,
-        public ?string $vendor = null,
-        public ?string $ownership = null,
+        public ?string $vendor = '',
+        public ?string $contractId = '',
+        public ?string $ownership = 'PROPIO',
         public ?string $warrantyExpiration = null,
         public bool $underMaintenancePlan = false,
         public ?int $purchasedYear = null,
         public ?int $totalUsefulLife = null,
         public ?int $categoryId = null,
         public ?string $categoryName = null,
+        public ?string $imageUrl = null,
+        public ?string $observations = null,
         public ?string $riesgoGe = null,
         public ?string $codigoUmdns = null,
         public int $funcionGeScore = 0,
@@ -43,7 +45,15 @@ readonly class AssetEntity
         public ?string $claseRiesgo = 'I',
         public ?string $riesgoBiomedico = 'Medio',
         public float $valorReposicion = 0.0,
-        public int $frecuenciaMpMeses = 6
+        public float $annualMaintCost = 0.0,
+        public int $frecuenciaMpMeses = 6,
+        public ?string $hecId = null,
+        public ?string $subclase = null,
+        public ?string $ipAddress = null,
+        public ?string $macAddress = null,
+        public ?string $firmwareVersion = null,
+        public ?string $osVersion = null,
+        public bool $isAem = false
     ) {}
 
     /**
@@ -52,29 +62,31 @@ readonly class AssetEntity
     public static function fromArray(array $data): self
     {
         return new self(
-            id: $data['id'],
+            id: (int)$data['id'],
             name: $data['name'],
+            inventoryId: $data['inventory_id'] ?? ($data['id'] ?? ''),
             serialNumber: $data['serial_number'] ?? null,
             brand: $data['brand'] ?? null,
             model: $data['model'] ?? null,
-            location: $data['location'] ?? null,
-            subLocation: $data['sub_location'] ?? null,
             status: AssetStatus::tryFrom($data['status']) ?? AssetStatus::OPERATIVE,
-            criticality: Criticality::tryFrom($data['criticality']) ?? Criticality::RELEVANT,
+            criticality: Criticality::tryFrom($data['criticality'] ?? '') ?? Criticality::LOW,
             acquisitionCost: (float) ($data['acquisition_cost'] ?? 0.0),
             fechaInstalacion: isset($data['fecha_instalacion']) ? new DateTime($data['fecha_instalacion']) : null,
             yearsRemaining: isset($data['years_remaining']) ? (int) $data['years_remaining'] : null,
             usefulLifePct: (int) ($data['useful_life_pct'] ?? 0),
-            imageUrl: $data['image_url'] ?? null,
-            observations: $data['observations'] ?? null,
-            vendor: $data['vendor'] ?? null,
-            ownership: $data['ownership'] ?? null,
+            location: $data['location'] ?? '',
+            subLocation: $data['sub_location'] ?? '',
+            vendor: $data['vendor'] ?? '',
+            contractId: $data['contract_id'] ?? '',
+            ownership: $data['ownership'] ?? 'PROPIO',
             warrantyExpiration: $data['warranty_expiration'] ?? null,
             underMaintenancePlan: (bool) ($data['under_maintenance_plan'] ?? false),
             purchasedYear: isset($data['purchased_year']) ? (int) $data['purchased_year'] : null,
             totalUsefulLife: isset($data['total_useful_life']) ? (int) $data['total_useful_life'] : null,
             categoryId: isset($data['category_id']) ? (int) $data['category_id'] : null,
             categoryName: $data['category_name'] ?? null,
+            imageUrl: $data['image_url'] ?? null,
+            observations: $data['observations'] ?? null,
             riesgoGe: $data['riesgo_ge'] ?? null,
             codigoUmdns: $data['codigo_umdns'] ?? null,
             funcionGeScore: (int) ($data['funcion_ge'] ?? 0),
@@ -83,7 +95,15 @@ readonly class AssetEntity
             claseRiesgo: $data['clase_riesgo'] ?? 'I',
             riesgoBiomedico: $data['riesgo_biomedico'] ?? 'Medio',
             valorReposicion: (float) ($data['valor_reposicion'] ?? 0.0),
-            frecuenciaMpMeses: (int) ($data['frecuencia_mp_meses'] ?? 6)
+            annualMaintCost: (float) ($data['annual_maint_cost'] ?? 0.0),
+            frecuenciaMpMeses: (int) ($data['frecuencia_mp_meses'] ?? 6),
+            hecId: $data['hec_id'] ?? null,
+            subclase: $data['subclase'] ?? null,
+            ipAddress: $data['ip_address'] ?? null,
+            macAddress: $data['mac_address'] ?? null,
+            firmwareVersion: $data['firmware_version'] ?? null,
+            osVersion: $data['os_version'] ?? null,
+            isAem: (bool)($data['is_aem'] ?? false)
         );
     }
 
@@ -95,20 +115,20 @@ readonly class AssetEntity
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'inventory_id' => $this->inventoryId,
             'serial_number' => $this->serialNumber,
             'brand' => $this->brand,
             'model' => $this->model,
-            'location' => $this->location,
-            'sub_location' => $this->subLocation,
             'status' => $this->status->value,
             'criticality' => $this->criticality->value,
             'acquisition_cost' => $this->acquisitionCost,
             'fecha_instalacion' => $this->fechaInstalacion?->format('Y-m-d'),
             'years_remaining' => $this->yearsRemaining,
             'useful_life_pct' => $this->usefulLifePct,
-            'image_url' => $this->imageUrl,
-            'observations' => $this->observations,
+            'location' => $this->location,
+            'sub_location' => $this->subLocation,
             'vendor' => $this->vendor,
+            'contract_id' => $this->contractId,
             'ownership' => $this->ownership,
             'warranty_expiration' => $this->warrantyExpiration,
             'under_maintenance_plan' => $this->underMaintenancePlan,
@@ -124,7 +144,17 @@ readonly class AssetEntity
             'clase_riesgo' => $this->claseRiesgo,
             'riesgo_biomedico' => $this->riesgoBiomedico,
             'valor_reposicion' => $this->valorReposicion,
-            'frecuencia_mp_meses' => $this->frecuenciaMpMeses
+            'annual_maint_cost' => $this->annualMaintCost,
+            'frecuencia_mp_meses' => $this->frecuenciaMpMeses,
+            'image_url' => $this->imageUrl,
+            'observations' => $this->observations,
+            'hec_id' => $this->hecId,
+            'subclase' => $this->subclase,
+            'ip_address' => $this->ipAddress,
+            'mac_address' => $this->macAddress,
+            'firmware_version' => $this->firmwareVersion,
+            'os_version' => $this->osVersion,
+            'is_aem' => $this->isAem
         ];
     }
 }

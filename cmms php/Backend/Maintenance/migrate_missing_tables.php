@@ -42,12 +42,14 @@ $migrations = [
     // ──────────────────────────────────────────────────────────────
     'ot_attachments' => "CREATE TABLE IF NOT EXISTS ot_attachments (
         id          INT AUTO_INCREMENT PRIMARY KEY,
-        asset_id    VARCHAR(50) NULL,
-        work_order_id VARCHAR(50) NULL,
+        ot_id       VARCHAR(50) NOT NULL,
         filename    VARCHAR(255) NOT NULL,
         filepath    VARCHAR(512) NOT NULL,
         filetype    VARCHAR(100) NULL,
-        uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        uploaded_by INT NOT NULL,
+        uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (ot_id) REFERENCES work_orders(id) ON DELETE CASCADE,
+        FOREIGN KEY (uploaded_by) REFERENCES users(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
 
     // ──────────────────────────────────────────────────────────────
@@ -85,7 +87,7 @@ $migrations = [
         floor       VARCHAR(50) NULL,
         contact     VARCHAR(100) NULL,
         created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
 ];
 
 echo "<hr style='border-color:#1e293b;margin-bottom:1rem;'>";
@@ -96,6 +98,23 @@ foreach ($migrations as $table => $sql) {
     } catch (Exception $e) {
         echo "<span class='err'>❌ Error en <b>$table</b>: " . $e->getMessage() . "</span><br>";
     }
+}
+
+// ──────────────────────────────────────────────────────────────
+// Modificadores estructurales: Módulo Messenger a Service Requests
+// ──────────────────────────────────────────────────────────────
+try {
+    $db->exec("ALTER TABLE service_requests ADD COLUMN IF NOT EXISTS requester_email VARCHAR(180) NULL AFTER requested_by");
+    $db->exec("ALTER TABLE service_requests ADD COLUMN IF NOT EXISTS asset_name_fallback VARCHAR(255) NULL AFTER asset_id");
+
+    // Convert to NULL allowed
+    $db->exec("ALTER TABLE service_requests MODIFY COLUMN requested_by INT NULL");
+    $db->exec("ALTER TABLE service_requests MODIFY COLUMN asset_id VARCHAR(30) NULL");
+    $db->exec("ALTER TABLE service_requests MODIFY COLUMN status ENUM('Pendiente','Revisada','Convertida_OT','Finalizada','Rechazada') NOT NULL DEFAULT 'Pendiente'");
+    echo "<span class='ok'>✅ Migración de esquema 'service_requests' completada (Módulo Correos)</span><br>";
+} catch (Exception $e) {
+    // Si la tabla no existe o error en alter, ignoramos (mostrar warning si queremos)
+    echo "<span class='skip'>⚠️ Skiped 'service_requests' updates: " . $e->getMessage() . "</span><br>";
 }
 
 echo "<hr style='border-color:#1e293b;margin-top:1rem;'>";

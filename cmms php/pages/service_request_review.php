@@ -70,13 +70,13 @@ if (isset($_POST['action']) && $_POST['action'] === 'convert' && isset($_POST['r
     </div>
 
     <?php if ($convertedId): ?>
-        <div class="bg-blue-500/10 border border-blue-500/20 p-6 rounded-2xl flex items-center gap-4 text-blue-500 shadow-xl shadow-blue-500/5 animate-in slide-in-from-top-4 duration-300">
+        <div class="bg-emerald-500/10 border border-emerald-500/20 p-6 rounded-2xl flex items-center gap-4 text-emerald-500 shadow-xl shadow-emerald-500/5 animate-in slide-in-from-top-4 duration-300">
             <span class="material-symbols-outlined text-4xl">task_alt</span>
             <div>
                 <p class="font-black uppercase tracking-widest text-sm">Solicitud Convertida a OT</p>
-                <p class="text-blue-500/80 text-xs mt-1">La solicitud ha sido procesada con éxito. ID Generado: <span class="font-mono font-bold"><?= $convertedId ?></span>.</p>
+                <p class="text-emerald-500/80 text-xs mt-1">La solicitud ha sido procesada con éxito. ID Generado: <span class="font-mono font-bold"><?= $convertedId ?></span>.</p>
             </div>
-            <button onclick="window.location.href='?page=work_orders'" class="ml-auto px-4 py-2 bg-blue-500 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-600 transition-all">Ver Órdenes</button>
+            <button onclick="window.location.href='?page=work_orders'" class="ml-auto px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-emerald-600 transition-all">Ver Órdenes</button>
         </div>
     <?php endif; ?>
 
@@ -87,7 +87,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'convert' && isset($_POST['r
                     <!-- Basic Info -->
                     <div class="md:w-1/3 space-y-4">
                         <div class="flex items-center gap-3">
-                            <span class="px-2 py-0.5 bg-panel-dark text-text-muted text-[10px] font-black rounded uppercase border border-border-dark/50"><?= $req['id'] ?></span>
+                            <span class="px-2 py-0.5 bg-[var(--input-bg)] border-[var(--border-color)]"><?= $req['id'] ?></span>
                             <span class="text-xs text-text-muted font-bold"><?= $req['date'] ?></span>
                         </div>
                         <div>
@@ -101,7 +101,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'convert' && isset($_POST['r
                     </div>
 
                     <!-- Problem Description -->
-                    <div class="flex-1 bg-medical-dark/20 rounded-2xl p-6 border border-border-dark/30">
+                    <div class="flex-1 bg-medical-dark/20 rounded-2xl p-6 border border-[var(--border-color)]">>
                         <label class="text-[10px] font-black uppercase text-text-muted/60 tracking-widest mb-3 block">Problema Reportado</label>
                         <p class="text-sm text-text-main/80 leading-relaxed font-medium italic">"<?= $req['problem'] ?>"</p>
 
@@ -133,12 +133,12 @@ if (isset($_POST['action']) && $_POST['action'] === 'convert' && isset($_POST['r
                         <div class="space-y-4">
                             <div>
                                 <label class="text-[10px] font-black uppercase text-text-muted tracking-widest mb-2 block">Antecedentes y Diagnóstico Preliminar</label>
-                                <textarea name="diagnosis" placeholder="Ingeniero: Agregue antecedentes técnicos aquí..." class="w-full bg-medical-dark/50 border border-border-dark rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:border-medical-blue h-24 resize-none"></textarea>
+                                <textarea name="diagnosis" placeholder="Ingeniero: Agregue antecedentes técnicos aquí..." class="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl px-4 py-3 text-sm text-[var(--text-main)] focus:outline-none focus:border-medical-blue h-24 resize-none font-medium"></textarea>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="space-y-2">
                                     <label class="text-[10px] font-black uppercase text-text-muted tracking-widest mb-2 block">Asignar Técnico</label>
-                                    <select name="tech" class="w-full bg-medical-dark/50 border border-border-dark rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:border-medical-blue appearance-none">
+                                    <select name="tech" class="w-full bg-[var(--input-bg)] border-[var(--border-color)] rounded-xl px-4 py-3 text-sm text-[var(--text-main)] focus:outline-none focus:border-medical-blue appearance-none font-medium">
                                         <option>Mario Gómez (Senior)</option>
                                         <option>Pablo Rojas (Especialista)</option>
                                         <option>Ana Muñoz (Calibración)</option>
@@ -146,7 +146,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'convert' && isset($_POST['r
                                 </div>
                                 <div class="space-y-2">
                                     <label class="text-[10px] font-black uppercase text-text-muted tracking-widest mb-2 block">Tipo de Intervención</label>
-                                    <select name="intervention_type" class="w-full bg-medical-dark/50 border border-border-dark rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:border-medical-blue appearance-none">
+                                    <select name="intervention_type" class="w-full bg-[var(--input-bg)] border-[var(--border-color)] rounded-xl px-4 py-3 text-sm text-[var(--text-main)] focus:outline-none focus:border-medical-blue appearance-none font-medium">
                                         <option>Mantenimiento Correctivo</option>
                                         <option>Revisión Técnica</option>
                                         <option>Validación Operativa</option>
