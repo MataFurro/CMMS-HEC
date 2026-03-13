@@ -64,6 +64,14 @@ $activeFilters = [
     'family' => $familyFilter
 ];
 
+// Define Status Labels for UI consistency
+$statusLabels = [
+    STATUS_OPERATIVE => 'Operativo',
+    STATUS_MAINTENANCE => 'Mantención',
+    STATUS_NO_OPERATIVE => 'Fuera de Servicio',
+    STATUS_OPERATIVE_WITH_OBS => 'Observado'
+];
+
 $totalAssetsCount = countAssets($searchTerm, $statusFilter, $activeFilters);
 $totalPages = ceil($totalAssetsCount / $limit);
 $filteredAssets = searchAssets($searchTerm, $statusFilter, $limit, $offset, $activeFilters);
@@ -74,8 +82,8 @@ $inventoryValue = getTotalInventoryValue();
 $operativePct = $globalStatus['total'] > 0 ? round(($globalStatus['operative'] / $globalStatus['total']) * 100, 1) : 0;
 
 // Get options for filters
-$allBrands = getBrandOptions();
-$allLocations = getAllLocations();
+$allBrandsCount = getBrandCounts();
+$allLocationsCount = getLocationCounts();
 $allCategories = getCategoryOptions();
 $allCriticalities = getCriticalityOptions();
 
@@ -422,7 +430,8 @@ $buildUrl = function ($p, $overrides = []) use ($filterParams) {
                         <select name="status" onchange="this.form.submit()"
                             class="w-full h-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl px-6 py-4 text-xs font-bold uppercase tracking-widest outline-none appearance-none cursor-pointer text-[var(--text-main)] focus:border-medical-blue transition-all">
                             <option value="ALL">Todos los Estados</option>
-                            <option value="<?= STATUS_OPERATIVE ?>" <?= $statusFilter === STATUS_OPERATIVE ? 'selected' : '' ?>>Operativo</option>
+                            <option value="<?= STATUS_OPERATIVE ?>" <?= $statusFilter === STATUS_OPERATIVE ? 'selected' : '' ?>>Operativos</option>
+                            <option value="<?= STATUS_OPERATIVE_WITH_OBS ?>" <?= $statusFilter === STATUS_OPERATIVE_WITH_OBS ? 'selected' : '' ?>>Con Observaciones</option>
                             <option value="<?= STATUS_MAINTENANCE ?>" <?= $statusFilter === STATUS_MAINTENANCE ? 'selected' : '' ?>>En Mantención</option>
                             <option value="<?= STATUS_NO_OPERATIVE ?>" <?= $statusFilter === STATUS_NO_OPERATIVE ? 'selected' : '' ?>>Fuera de Servicio</option>
                         </select>
@@ -452,10 +461,12 @@ $buildUrl = function ($p, $overrides = []) use ($filterParams) {
                         <label class="text-[10px] font-black uppercase tracking-widest text-text-muted px-2 flex items-center gap-2">
                             <span class="material-symbols-outlined text-xs">location_on</span> Servicio Clínico
                         </label>
-                        <select name="location" class="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl px-5 py-3.5 text-xs font-bold outline-none appearance-none text-[var(--text-main)] focus:border-medical-blue">
+                        <select name="location" onchange="this.form.submit()" class="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl px-5 py-3.5 text-xs font-bold outline-none appearance-none text-[var(--text-main)] focus:border-medical-blue">
                             <option value="ALL">Cualquiera</option>
-                            <?php foreach ($allLocations as $loc): ?>
-                                <option value="<?= htmlspecialchars($loc) ?>" <?= $locationFilter === $loc ? 'selected' : '' ?>><?= htmlspecialchars($loc) ?></option>
+                            <?php foreach ($allLocationsCount as $loc): ?>
+                                <option value="<?= htmlspecialchars($loc['location']) ?>" <?= $locationFilter === $loc['location'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($loc['location']) ?> (<?= $loc['count'] ?>)
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -478,10 +489,12 @@ $buildUrl = function ($p, $overrides = []) use ($filterParams) {
                         <label class="text-[10px] font-black uppercase tracking-widest text-text-muted px-2 flex items-center gap-2">
                             <span class="material-symbols-outlined text-xs">factory</span> Marca
                         </label>
-                        <select name="brand" class="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl px-5 py-3.5 text-xs font-bold outline-none appearance-none text-[var(--text-main)] focus:border-medical-blue">
+                        <select name="brand" onchange="this.form.submit()" class="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl px-5 py-3.5 text-xs font-bold outline-none appearance-none text-[var(--text-main)] focus:border-medical-blue">
                             <option value="ALL">Todas las Marcas</option>
-                            <?php foreach ($allBrands as $brand): ?>
-                                <option value="<?= htmlspecialchars($brand) ?>" <?= $brandFilter === $brand ? 'selected' : '' ?>><?= htmlspecialchars($brand) ?></option>
+                            <?php foreach ($allBrandsCount as $b): ?>
+                                <option value="<?= htmlspecialchars($b['brand']) ?>" <?= $brandFilter === $b['brand'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($b['brand']) ?> (<?= $b['count'] ?>)
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -508,160 +521,198 @@ $buildUrl = function ($p, $overrides = []) use ($filterParams) {
                     </div>
                 </div>
             </div>
+            <!-- Active Filter Chips -->
+            <?php
+            $activeChips = [];
+            if ($statusFilter !== 'ALL') {
+                $statusVal = $statusLabels[$statusFilter] ?? $statusFilter;
+                $activeChips['status'] = ['label' => 'Estado', 'value' => $statusVal];
+            }
+            if ($locationFilter !== 'ALL') $activeChips['location'] = ['label' => 'Ubicación', 'value' => $locationFilter];
+            if ($brandFilter !== 'ALL') $activeChips['brand'] = ['label' => 'Marca', 'value' => $brandFilter];
+            if ($familyFilter !== 'ALL') $activeChips['family'] = ['label' => 'Clase', 'value' => $familyFilter];
+            if ($criticalityFilter !== 'ALL') $activeChips['criticality'] = ['label' => 'Criticidad', 'value' => $criticalityFilter];
+            ?>
+
+            <?php if (!empty($activeChips)): ?>
+                <div class="flex flex-wrap gap-2 pt-4 border-t border-border-color/10">
+                    <span class="text-[9px] font-black text-text-muted uppercase tracking-widest flex items-center mr-2">Filtros Activos:</span>
+                    <?php foreach ($activeChips as $key => $chip): ?>
+                        <div class="flex items-center gap-2 px-3 py-1 bg-medical-blue/5 border border-medical-blue/20 rounded-full group hover:bg-medical-blue/10 transition-colors">
+                            <span class="text-[10px] font-bold text-text-muted"><?= $chip['label'] ?>:</span>
+                            <span class="text-[10px] font-black text-medical-blue"><?= htmlspecialchars($chip['value'] ?? '') ?></span>
+                            <a href="<?= $buildUrl(1, [$key => 'ALL']) ?>" class="flex items-center justify-center w-4 h-4 rounded-full text-medical-blue/40 group-hover:text-red-500 hover:bg-red-50 transition-all">
+                                <span class="material-symbols-outlined text-[14px]">close</span>
+                            </a>
+                        </div>
+                    <?php endforeach; ?>
+                    <a href="?page=inventory" class="text-[9px] font-black text-red-500 uppercase tracking-widest hover:underline ml-auto flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">filter_alt_off</span> Limpiar Todo
+                    </a>
+                </div>
+            <?php endif; ?>
         </form>
     </div>
 
-    <!-- Inventory Table -->
-    <div class="card-glass overflow-hidden shadow-2xl">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-medical-dark/50 border-b border-border-color/30">
-                        <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-muted">Activo Biomédico</th>
-                        <th class="px-6 py-6 text-[10px] font-black uppercase tracking-widest text-text-muted">Identificación</th>
-                        <th class="px-6 py-6 text-[10px] font-black uppercase tracking-widest text-text-muted text-center">Estado Técnico</th>
-                        <th class="px-6 py-6 text-[10px] font-black uppercase tracking-widest text-text-muted">Ubicación</th>
-                        <th class="px-6 py-6 text-[10px] font-black uppercase tracking-widest text-text-muted text-center">Vida Útil</th>
-                        <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-muted text-right">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-border-color/10">
-                    <?php if (empty($filteredAssets)): ?>
-                        <tr>
-                            <td colspan="6" class="px-8 py-20 text-center">
-                                <span class="material-symbols-outlined text-6xl text-text-muted/20 mb-4">search_off</span>
-                                <p class="text-text-muted font-bold tracking-widest uppercase text-xs">No se encontraron activos con estos criterios</p>
-                            </td>
+    <!-- Inventory Table Container (for AJAX) -->
+    <div id="inventory-container" class="space-y-8">
+        <div class="card-glass overflow-hidden shadow-2xl relative">
+            <div id="table-loader" class="absolute inset-0 bg-white/50 dark:bg-panel-dark/50 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+                <div class="flex flex-col items-center gap-3">
+                    <div class="w-10 h-10 border-4 border-medical-blue border-t-transparent rounded-full animate-spin"></div>
+                    <span class="text-[10px] font-black text-medical-blue uppercase tracking-[0.2em]">Actualizando...</span>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-medical-dark/50 border-b border-border-color/30">
+                            <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-muted">Activo Biomédico</th>
+                            <th class="px-6 py-6 text-[10px] font-black uppercase tracking-widest text-text-muted">Identificación</th>
+                            <th class="px-6 py-6 text-[10px] font-black uppercase tracking-widest text-text-muted text-center">Estado Técnico</th>
+                            <th class="px-6 py-6 text-[10px] font-black uppercase tracking-widest text-text-muted">Ubicación</th>
+                            <th class="px-6 py-6 text-[10px] font-black uppercase tracking-widest text-text-muted text-center">Vida Útil</th>
+                            <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-muted text-right">Acciones</th>
                         </tr>
-                    <?php endif; ?>
+                    </thead>
+                    <tbody class="divide-y divide-border-color/10">
+                        <?php if (empty($filteredAssets)): ?>
+                            <tr>
+                                <td colspan="6" class="px-8 py-20 text-center">
+                                    <span class="material-symbols-outlined text-6xl text-text-muted/20 mb-4">search_off</span>
+                                    <p class="text-text-muted font-bold tracking-widest uppercase text-xs">No se encontraron activos con estos criterios</p>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
 
-                    <?php foreach ($filteredAssets as $asset): ?>
-                        <tr class="hover:bg-medical-blue/5 transition-all duration-300 group">
-                            <!-- Name & Brand -->
-                            <td class="px-8 py-7">
-                                <div class="flex items-center gap-5">
-                                    <div class="w-16 h-16 rounded-2xl border border-border-color/30 overflow-hidden bg-medical-dark group-hover:scale-105 transition-transform duration-500 shadow-sm relative">
-                                        <img src="<?= $asset['image_url'] ?>" class="w-full h-full object-cover p-1 opacity-90" alt="<?= $asset['name'] ?>">
-                                        <div class="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-2xl"></div>
-                                    </div>
-                                    <div>
-                                        <a href="?page=asset&id=<?= $asset['id'] ?>" class="font-black text-lg text-text-main hover:text-medical-blue transition-colors block leading-none mb-1.5">
-                                            <?= highlight($asset['name'], $searchTerm) ?>
-                                        </a>
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-[10px] font-black uppercase tracking-widest text-text-muted bg-text-muted/5 px-2 py-0.5 rounded"><?= highlight($asset['brand'], $searchTerm) ?></span>
-                                            <span class="text-[10px] font-bold text-text-muted/50"><?= highlight($asset['model'], $searchTerm) ?></span>
+                        <?php foreach ($filteredAssets as $asset): ?>
+                            <tr class="hover:bg-medical-blue/5 transition-all duration-300 group">
+                                <!-- Name & Brand -->
+                                <td class="px-8 py-7">
+                                    <div class="flex items-center gap-5">
+                                        <div class="w-16 h-16 rounded-2xl border border-border-color/30 overflow-hidden bg-medical-dark group-hover:scale-105 transition-transform duration-500 shadow-sm relative">
+                                            <img src="<?= $asset['image_url'] ?>" class="w-full h-full object-cover p-1 opacity-90" alt="<?= $asset['name'] ?>">
+                                            <div class="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-2xl"></div>
+                                        </div>
+                                        <div>
+                                            <a href="?page=asset&id=<?= $asset['id'] ?>" class="font-black text-lg text-text-main hover:text-medical-blue transition-colors block leading-none mb-1.5">
+                                                <?= highlight($asset['name'], $searchTerm) ?>
+                                            </a>
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-[10px] font-black uppercase tracking-widest text-text-muted bg-text-muted/5 px-2 py-0.5 rounded"><?= highlight($asset['brand'], $searchTerm) ?></span>
+                                                <span class="text-[10px] font-bold text-text-muted/50"><?= highlight($asset['model'], $searchTerm) ?></span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </td>
+                                </td>
 
-                            <!-- ID, Serial & Criticality -->
-                            <td class="px-6 py-7">
-                                <div class="space-y-2">
-                                    <?php if (!empty($asset['hec_id'])): ?>
-                                        <div class="flex items-center gap-2">
-                                            <span class="px-1.5 py-0.5 rounded-md bg-medical-blue/10 text-[10px] font-black text-medical-blue uppercase tracking-widest shadow-sm border border-medical-blue/20" title="ID Propio HEC">HEC</span>
-                                            <span class="font-mono text-sm font-black text-text-main"><?= highlight($asset['hec_id'], $searchTerm) ?></span>
-                                        </div>
-                                    <?php endif; ?>
+                                <!-- ID, Serial & Criticality -->
+                                <td class="px-6 py-7">
+                                    <div class="space-y-2">
+                                        <?php if (!empty($asset['hec_id'])): ?>
+                                            <div class="flex items-center gap-2">
+                                                <span class="px-1.5 py-0.5 rounded-md bg-medical-blue/10 text-[10px] font-black text-medical-blue uppercase tracking-widest shadow-sm border border-medical-blue/20" title="ID Propio HEC">HEC</span>
+                                                <span class="font-mono text-sm font-black text-text-main"><?= highlight($asset['hec_id'], $searchTerm) ?></span>
+                                            </div>
+                                        <?php endif; ?>
 
-                                    <div class="grid grid-cols-1 gap-1">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-[9px] font-black text-text-muted/70 uppercase w-9">INV:</span>
-                                            <span class="font-mono text-[10px] font-bold text-text-muted"><?= highlight($asset['inventory_id'] ?? '-', $searchTerm) ?></span>
+                                        <div class="grid grid-cols-1 gap-1">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-[9px] font-black text-text-muted/70 uppercase w-9">INV:</span>
+                                                <span class="font-mono text-[10px] font-bold text-text-muted"><?= highlight($asset['inventory_id'] ?? '-', $searchTerm) ?></span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-[9px] font-black text-text-muted/70 uppercase w-9">SERIE:</span>
+                                                <span class="font-mono text-[10px] font-bold text-text-muted"><?= highlight($asset['serial_number'] ?? 'S/N', $searchTerm) ?></span>
+                                            </div>
                                         </div>
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-[9px] font-black text-text-muted/70 uppercase w-9">SERIE:</span>
-                                            <span class="font-mono text-[10px] font-bold text-text-muted"><?= highlight($asset['serial_number'] ?? 'S/N', $searchTerm) ?></span>
-                                        </div>
+
                                     </div>
+                                </td>
 
-                                </div>
-                            </td>
-
-                            <!-- Status & Criticality -->
-                            <td class="px-6 py-7 text-center">
-                                <?php
-                                $statusConf = match ($asset['status']) {
-                                    STATUS_OPERATIVE => ['label' => 'Operativo', 'class' => 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'],
-                                    STATUS_MAINTENANCE => ['label' => 'Mantención', 'class' => 'bg-amber-500/10 text-amber-600 border-amber-500/20'],
-                                    STATUS_NO_OPERATIVE => ['label' => 'Fuera de Servicio', 'class' => 'bg-red-500/10 text-red-600 border-red-500/20'],
-                                    STATUS_OPERATIVE_WITH_OBS => ['label' => 'Observado', 'class' => 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20'],
-                                    default => ['label' => $asset['status'], 'class' => 'bg-slate-500/10 text-slate-600 border-slate-500/20']
-                                };
-                                ?>
-                                <div class="flex flex-col items-center gap-2">
-                                    <span class="px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider border shadow-sm <?= $statusConf['class'] ?>">
-                                        <?= $statusConf['label'] ?>
-                                    </span>
-
+                                <!-- Status & Criticality -->
+                                <td class="px-6 py-7 text-center">
                                     <?php
-                                    $critValue = strtoupper($asset['criticality'] ?? 'NA');
-                                    $displayCrit = in_array($critValue, ['LOW', 'NA', 'NO APLICA']) ? 'NA' : $critValue;
-
-                                    $critClasses = match ($critValue) {
-                                        'CRITICAL', 'CRITICO', 'CRÍTICO' => 'text-red-600 bg-red-50 border-red-200',
-                                        'RELEVANT', 'RELEVANTE' => 'text-amber-600 bg-amber-50 border-amber-200',
-                                        default => 'text-slate-500 bg-slate-50 border-slate-200'
+                                    $statusConf = match ($asset['status']) {
+                                        STATUS_OPERATIVE => ['label' => 'Operativo', 'class' => 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'],
+                                        STATUS_MAINTENANCE => ['label' => 'Mantención', 'class' => 'bg-amber-500/10 text-amber-600 border-amber-500/20'],
+                                        STATUS_NO_OPERATIVE => ['label' => 'Fuera de Servicio', 'class' => 'bg-red-500/10 text-red-600 border-red-500/20'],
+                                        STATUS_OPERATIVE_WITH_OBS => ['label' => 'Observado', 'class' => 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20'],
+                                        default => ['label' => $asset['status'], 'class' => 'bg-slate-500/10 text-slate-600 border-slate-500/20']
                                     };
                                     ?>
-                                    <span class="px-2 py-0.5 rounded-md text-[9px] font-black border shadow-xs <?= $critClasses ?> uppercase">
-                                        <?= $displayCrit ?>
-                                    </span>
-
-                                    <?php if (in_array($critValue, ['CRITICAL', 'CRITICO', 'CRÍTICO'])): ?>
-                                        <span class="flex items-center gap-1 text-[8px] font-black text-red-500 uppercase tracking-widest animate-pulse">
-                                            <span class="w-1 h-1 rounded-full bg-red-500"></span> Prioridad Crítica
+                                    <div class="flex flex-col items-center gap-2">
+                                        <span class="px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider border shadow-sm <?= $statusConf['class'] ?>">
+                                            <?= $statusConf['label'] ?>
                                         </span>
-                                    <?php endif; ?>
-                                </div>
-                            </td>
 
-                            <!-- Location -->
-                            <td class="px-6 py-7">
-                                <div class="flex flex-col">
-                                    <span class="font-bold text-text-main text-sm"><?= $asset['location'] ?: 'Cualquiera' ?></span>
-                                    <span class="text-[10px] text-text-muted uppercase font-bold tracking-tight"><?= $asset['sub_location'] ?: 'Sin Especificar' ?></span>
-                                </div>
-                            </td>
-
-                            <!-- Life Cycle -->
-                            <td class="px-6 py-7">
-                                <div class="w-32 mx-auto space-y-2">
-                                    <div class="flex justify-between items-end">
-                                        <span class="text-[9px] font-black text-text-muted uppercase">Vida Restante</span>
-                                        <span class="text-xs font-black text-text-main"><?= max(0, $asset['useful_life_pct']) ?>%</span>
-                                    </div>
-                                    <div class="h-2 w-full bg-medical-dark rounded-full overflow-hidden border border-border-color/20 p-0.5 shadow-inner">
                                         <?php
-                                        $barColor = $asset['useful_life_pct'] > 50 ? 'bg-emerald-500' : ($asset['useful_life_pct'] > 20 ? 'bg-amber-500' : 'bg-red-500 animate-pulse');
-                                        ?>
-                                        <div class="h-full rounded-full transition-all duration-1000 shadow-lg <?= $barColor ?>" style="width: <?= max(0, min(100, $asset['useful_life_pct'])) ?>%"></div>
-                                    </div>
-                                    <p class="text-[8px] font-bold text-text-muted/60 text-right uppercase"><?= $asset['years_remaining'] > 0 ? $asset['years_remaining'] . ' años restantes' : 'Vencido' ?></p>
-                                </div>
-                            </td>
+                                        $critValue = strtoupper($asset['criticality'] ?? 'NA');
+                                        $displayCrit = in_array($critValue, ['LOW', 'NA', 'NO APLICA']) ? 'NA' : $critValue;
 
-                            <!-- Actions -->
-                            <td class="px-8 py-7 text-right">
-                                <div class="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-all duration-300">
-                                    <a href="?page=asset&id=<?= $asset['id'] ?>"
-                                        class="p-2.5 bg-medical-blue/10 text-medical-blue rounded-2xl hover:bg-medical-blue hover:text-white transition-all shadow-lg active:scale-95" title="Ficha Técnica">
-                                        <span class="material-symbols-outlined text-xl">visibility</span>
-                                    </a>
-                                    <?php if (canModify()): ?>
-                                        <button onclick="confirmDeletion(event, '?page=inventory&delete_id=<?= $asset['id'] ?>')"
-                                            class="p-2.5 bg-red-500/10 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all shadow-lg active:scale-95" title="Dar de baja">
-                                            <span class="material-symbols-outlined text-xl">delete</span>
-                                        </button>
-                                    <?php endif; ?>
-                                </div>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                                        $critClasses = match ($critValue) {
+                                            'CRITICAL', 'CRITICO', 'CRÍTICO' => 'text-red-600 bg-red-50 border-red-200',
+                                            'RELEVANT', 'RELEVANTE' => 'text-amber-600 bg-amber-50 border-amber-200',
+                                            default => 'text-slate-500 bg-slate-50 border-slate-200'
+                                        };
+                                        ?>
+                                        <span class="px-2 py-0.5 rounded-md text-[9px] font-black border shadow-xs <?= $critClasses ?> uppercase">
+                                            <?= $displayCrit ?>
+                                        </span>
+
+                                        <?php if (in_array($critValue, ['CRITICAL', 'CRITICO', 'CRÍTICO'])): ?>
+                                            <span class="flex items-center gap-1 text-[8px] font-black text-red-500 uppercase tracking-widest animate-pulse">
+                                                <span class="w-1 h-1 rounded-full bg-red-500"></span> Prioridad Crítica
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+
+                                <!-- Location -->
+                                <td class="px-6 py-7">
+                                    <div class="flex flex-col">
+                                        <span class="font-bold text-text-main text-sm"><?= $asset['location'] ?: 'Cualquiera' ?></span>
+                                        <span class="text-[10px] text-text-muted uppercase font-bold tracking-tight"><?= $asset['sub_location'] ?: 'Sin Especificar' ?></span>
+                                    </div>
+                                </td>
+
+                                <!-- Life Cycle -->
+                                <td class="px-6 py-7">
+                                    <div class="w-32 mx-auto space-y-2">
+                                        <div class="flex justify-between items-end">
+                                            <span class="text-[9px] font-black text-text-muted uppercase">Vida Restante</span>
+                                            <span class="text-xs font-black text-text-main"><?= max(0, $asset['useful_life_pct']) ?>%</span>
+                                        </div>
+                                        <div class="h-2 w-full bg-medical-dark rounded-full overflow-hidden border border-border-color/20 p-0.5 shadow-inner">
+                                            <?php
+                                            $barColor = $asset['useful_life_pct'] > 50 ? 'bg-emerald-500' : ($asset['useful_life_pct'] > 20 ? 'bg-amber-500' : 'bg-red-500 animate-pulse');
+                                            ?>
+                                            <div class="h-full rounded-full transition-all duration-1000 shadow-lg <?= $barColor ?>" style="width: <?= max(0, min(100, $asset['useful_life_pct'])) ?>%"></div>
+                                        </div>
+                                        <p class="text-[8px] font-bold text-text-muted/60 text-right uppercase"><?= $asset['years_remaining'] > 0 ? $asset['years_remaining'] . ' años restantes' : 'Vencido' ?></p>
+                                    </div>
+                                </td>
+
+                                <!-- Actions -->
+                                <td class="px-8 py-7 text-right">
+                                    <div class="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-all duration-300">
+                                        <a href="?page=asset&id=<?= $asset['id'] ?>"
+                                            class="p-2.5 bg-medical-blue/10 text-medical-blue rounded-2xl hover:bg-medical-blue hover:text-white transition-all shadow-lg active:scale-95" title="Ficha Técnica">
+                                            <span class="material-symbols-outlined text-xl">visibility</span>
+                                        </a>
+                                        <?php if (canModify()): ?>
+                                            <button onclick="confirmDeletion(event, '?page=inventory&delete_id=<?= $asset['id'] ?>')"
+                                                class="p-2.5 bg-red-500/10 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all shadow-lg active:scale-95" title="Dar de baja">
+                                                <span class="material-symbols-outlined text-xl">delete</span>
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -703,6 +754,48 @@ $buildUrl = function ($p, $overrides = []) use ($filterParams) {
 
         // Post-action notifications
         document.addEventListener('DOMContentLoaded', function() {
+            // --- Live Search & dynamic filtering ---
+            const filterForm = document.querySelector('form[method="GET"]');
+            const searchInput = filterForm.querySelector('input[name="search"]');
+            const container = document.getElementById('inventory-container');
+            const loader = document.getElementById('table-loader');
+            let searchTimeout;
+
+            const updateTable = async () => {
+                loader.classList.remove('opacity-0', 'pointer-events-none');
+                const formData = new FormData(filterForm);
+                const params = new URLSearchParams(formData);
+                params.set('p', '1'); // Reset to page 1 on search
+
+                try {
+                    const response = await fetch(`?${params.toString()}&ajax=1`);
+                    const html = await response.text();
+
+                    // Create temporary div to parse HTML
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+
+                    const newContent = temp.querySelector('#inventory-container').innerHTML;
+                    container.innerHTML = newContent;
+
+                    // Update URL without reload
+                    window.history.pushState({}, '', `?${params.toString()}`);
+                } catch (error) {
+                    console.error('Error updating inventory:', error);
+                } finally {
+                    loader.classList.add('opacity-0', 'pointer-events-none');
+                }
+            };
+
+            // Event listener for main search (with debounce)
+            if (searchInput) {
+                searchInput.addEventListener('input', () => {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(updateTable, 400);
+                });
+            }
+
+            // --- Existing popups ---
             <?php if (isset($_GET['action']) && $_GET['action'] === 'deleted'): ?>
                 if (typeof Swal !== 'undefined') {
                     Swal.fire({

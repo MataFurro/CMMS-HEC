@@ -184,9 +184,18 @@ class AssetRepository
         $params[':q6'] = "%$query%";
 
         if ($status !== 'ALL') {
-            $sql .= " AND status = :status";
-            $params[':status'] = $status;
+            if ($status === 'OPERATIVE') {
+                $sql .= " AND status IN ('OPERATIVE', 'BUENO')";
+            } elseif ($status === 'NO_OPERATIVE') {
+                $sql .= " AND status IN ('NO_OPERATIVE', 'MALO')";
+            } elseif ($status === 'OPERATIVE_WITH_OBS') {
+                $sql .= " AND status IN ('OPERATIVE_WITH_OBS', 'REGULAR')";
+            } else {
+                $sql .= " AND status = :status";
+                $params[':status'] = $status;
+            }
         }
+
 
         if (!empty($filters['location']) && $filters['location'] !== 'ALL') {
             $sql .= " AND location = :location";
@@ -258,8 +267,16 @@ class AssetRepository
         $params[':q6'] = "%$query%";
 
         if ($status !== 'ALL') {
-            $sql .= " AND status = :status";
-            $params[':status'] = $status;
+            if ($status === 'OPERATIVE') {
+                $sql .= " AND status IN ('OPERATIVE', 'BUENO')";
+            } elseif ($status === 'NO_OPERATIVE') {
+                $sql .= " AND status IN ('NO_OPERATIVE', 'MALO')";
+            } elseif ($status === 'OPERATIVE_WITH_OBS') {
+                $sql .= " AND status IN ('OPERATIVE_WITH_OBS', 'REGULAR')";
+            } else {
+                $sql .= " AND status = :status";
+                $params[':status'] = $status;
+            }
         }
 
         if (!empty($filters['location']) && $filters['location'] !== 'ALL') {
@@ -319,7 +336,33 @@ class AssetRepository
     }
 
     /**
-     * Obtener ubicaciones únicas desde la tabla de activos
+     * Obtener ubicaciones únicas desde la tabla de activos con sus conteos
+     */
+    public function getCountsByLocation(): array
+    {
+        $sql = "SELECT location, COUNT(*) as count 
+                FROM assets 
+                WHERE en_uso = 1 AND location IS NOT NULL AND location != '' 
+                GROUP BY location 
+                ORDER BY location ASC";
+        return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Obtener marcas únicas desde la tabla de activos con sus conteos
+     */
+    public function getCountsByBrand(): array
+    {
+        $sql = "SELECT brand, COUNT(*) as count 
+                FROM assets 
+                WHERE en_uso = 1 AND brand IS NOT NULL AND brand != '' 
+                GROUP BY brand 
+                ORDER BY brand ASC";
+        return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Obtener ubicaciones únicas desde la tabla de activos (legacy support)
      */
     public function getUniqueLocations(): array
     {

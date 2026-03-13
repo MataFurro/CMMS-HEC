@@ -79,7 +79,25 @@ function countAssets(string $search = '', string $statusFilter = 'ALL', array $f
 }
 
 /**
- * Obtener marcas únicas
+ * Obtener marcas únicas con sus respectivos conteos
+ */
+function getBrandCounts(): array
+{
+    $repo = new AssetRepository();
+    return $repo->getCountsByBrand();
+}
+
+/**
+ * Obtener ubicaciones únicas con sus respectivos conteos
+ */
+function getLocationCounts(): array
+{
+    $repo = new AssetRepository();
+    return $repo->getCountsByLocation();
+}
+
+/**
+ * Obtener marcas únicas (legacy)
  */
 function getBrandOptions(): array
 {
