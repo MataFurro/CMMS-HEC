@@ -953,6 +953,23 @@ $techComparisonData = array_map(function ($t) {
                             legend: {
                                 display: false
                             }
+                        },
+                        onClick: (e, activeEls) => {
+                            if (activeEls.length > 0) {
+                                const index = activeEls[0].index;
+                                const label = e.chart.data.labels[index];
+                                const mapping = {
+                                    'Operativos': 'OPERATIVE',
+                                    'Mantenimiento': 'MAINTENANCE',
+                                    'No Operativos': 'NO_OPERATIVE',
+                                    'Con Observaciones': 'OPERATIVE_WITH_OBS'
+                                };
+                                const status = mapping[label] || 'ALL';
+                                window.location.href = '?page=inventory&status=' + status;
+                            }
+                        },
+                        onHover: (event, chartElement) => {
+                            event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
                         }
                     })
                 });
@@ -975,7 +992,25 @@ $techComparisonData = array_map(function ($t) {
                             borderWidth: 0
                         }]
                     },
-                    options: commonOptions
+                    options: Object.assign({}, commonOptions, {
+                        onClick: (e, activeEls) => {
+                            if (activeEls.length > 0) {
+                                const index = activeEls[0].index;
+                                const label = e.chart.data.labels[index];
+                                const mapping = {
+                                    'Críticos': 'CRITICAL',
+                                    'Relevantes': 'RELEVANT',
+                                    'Baja': 'LOW',
+                                    'No Aplica': 'NA'
+                                };
+                                const crit = mapping[label] || 'ALL';
+                                window.location.href = '?page=inventory&criticality=' + crit;
+                            }
+                        },
+                        onHover: (event, chartElement) => {
+                            event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                        }
+                    })
                 });
             }
         } catch (e) {
@@ -999,6 +1034,16 @@ $techComparisonData = array_map(function ($t) {
                     },
                     options: Object.assign({}, commonOptions, {
                         indexAxis: 'y',
+                        onClick: (e, activeEls) => {
+                            if (activeEls.length > 0) {
+                                const index = activeEls[0].index;
+                                const label = e.chart.data.labels[index];
+                                window.location.href = '?page=work_orders&search=' + encodeURIComponent(label);
+                            }
+                        },
+                        onHover: (event, chartElement) => {
+                            event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                        },
                         scales: {
                             x: {
                                 display: false
@@ -1022,5 +1067,6 @@ $techComparisonData = array_map(function ($t) {
         } catch (e) {
             console.warn("Error en otPorTipoChart:", e);
         }
+
     });
 </script>
