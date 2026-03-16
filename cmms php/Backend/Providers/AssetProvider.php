@@ -228,13 +228,13 @@ function getPMCoverageStats(): array
         $now = date('Y-m-d');
         
         $sql = "SELECT 
-                    SUM(CASE WHEN next_maintenance_date >= :now THEN 1 ELSE 0 END) as al_dia,
-                    SUM(CASE WHEN next_maintenance_date < :now THEN 1 ELSE 0 END) as atrasado,
+                    SUM(CASE WHEN next_maintenance_date >= :now1 THEN 1 ELSE 0 END) as al_dia,
+                    SUM(CASE WHEN next_maintenance_date < :now2 THEN 1 ELSE 0 END) as atrasado,
                     SUM(CASE WHEN next_maintenance_date IS NULL OR next_maintenance_date = '' THEN 1 ELSE 0 END) as sin_plan
                 FROM assets WHERE en_uso = 1";
         
         $stmt = $db->prepare($sql);
-        $stmt->execute(['now' => $now]);
+        $stmt->execute(['now1' => $now, 'now2' => $now]);
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: ['al_dia' => 0, 'atrasado' => 0, 'sin_plan' => 0];
     } catch (Exception $e) {
         return ['al_dia' => 0, 'atrasado' => 0, 'sin_plan' => 0];
