@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 /**
  * Backend/providers/WorkOrderProvider.php
@@ -98,24 +98,33 @@ function getAssetFailureHistory($assetId): array
         $db = \Backend\Core\DatabaseService::getInstance();
         $sql = "SELECT completed_date FROM work_orders 
                 WHERE asset_id = :asset_id 
-                AND type = 'Correctiva' 
-                AND status = 'Terminada' 
+                  AND type = 'Correctiva' 
+                  AND status = 'Terminada'
                 ORDER BY completed_date ASC";
         $stmt = $db->prepare($sql);
         $stmt->execute(['asset_id' => $assetId]);
-        $dates = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        return [];
+    }
+}
 
-        if (count($dates) < 2) return [];
-
-        $tbfs = [];
-        for ($i = 1; $i < count($dates); $i++) {
-            $d1 = new DateTime($dates[$i - 1]);
-            $d2 = new DateTime($dates[$i]);
-            $diff = $d1->diff($d2)->days;
-            if ($diff > 0) $tbfs[] = $diff;
-        }
-
-        return $tbfs;
+/**
+ * [FLUJO 7] Obtiene OTs preventivas pendientes para un activo.
+ */
+function getPendingPreventivesForAsset(string $assetId): array
+{
+    try {
+        $db = \Backend\Core\DatabaseService::getInstance();
+        $sql = "SELECT id, created_date, observations 
+                FROM work_orders 
+                WHERE asset_id = :asset_id 
+                  AND type = 'Preventiva' 
+                  AND status IN ('En Curso', 'Abierta')
+                ORDER BY created_date ASC";
+        $stmt = $db->prepare($sql);
+        $stmt->execute(['asset_id' => $assetId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
         return [];
     }
@@ -243,6 +252,9 @@ function getWorkloadSaturation(): int
  */
 function createWorkOrder(array $data): string
 {
+    if (isReadOnly()) {
+        throw new Exception("ACCESO_DENEGADO: El perfil actual no tiene permisos para crear órdenes de trabajo.");
+    }
     $repo = new WorkOrderRepository();
     $db = \Backend\Core\DatabaseService::getInstance();
 
@@ -316,9 +328,14 @@ function createWorkOrderFromRequest(array $data): string
 
 /**
  * Finalizar una OT y enviar notificación si aplica (Feedback Loop)
+ * @param array $unifyOtIds [FLUJO 7] Lista de IDs de OTs preventivas a unificar
  */
-function completeWorkOrder(string $otId, array $executionData = []): bool
+function completeWorkOrder(string $otId, array $executionData = [], array $unifyOtIds = []): bool
 {
+    // El Técnico SÍ puede completar, el Auditor NO.
+    if (isReadOnly()) {
+        throw new Exception("ACCESO_DENEGADO: El perfil actual no tiene permisos para cerrar órdenes de trabajo.");
+    }
     $repo = new WorkOrderRepository();
     $order = $repo->findById($otId);
 
@@ -359,12 +376,24 @@ function completeWorkOrder(string $otId, array $executionData = []): bool
         // Sincronización automática de estado del Activo si se proporcionó un estado final
         if (!empty($executionData['final_asset_status'])) {
             require_once __DIR__ . '/AssetProvider.php';
-            // Mapeo defensivo: Si viene del frontend como 'OUT_OF_SERVICE' o 'Fuera de Servicio', convertir a 'NO_OPERATIVE'
+            // Mapeo defensivo
             $finalStatus = $executionData['final_asset_status'];
-            if ($finalStatus === 'OUT_OF_SERVICE' || $finalStatus === 'Fuera de Servicio') {
+            
+            // Scenario 3: Corregir mapeo de estado 'Degradado'
+            if ($finalStatus === 'DEGRADED' || $finalStatus === 'REGULAR') {
+                $finalStatus = 'OPERATIVE_WITH_OBS';
+            } elseif ($finalStatus === 'OUT_OF_SERVICE' || $finalStatus === 'Fuera de Servicio') {
                 $finalStatus = 'NO_OPERATIVE';
             }
-            updateAssetInfo($order->assetId, ['status' => $finalStatus]);
+            
+            $assetUpdate = ['status' => $finalStatus];
+
+            // Flujo 2 & 7: Si es preventiva o se unificaron preventivas, actualizar la fecha del próximo mantenimiento
+            if (($order->type ?? '') === 'Preventiva' || !empty($unifyOtIds) || ((float)($updateData['duration_hours'] ?? 0) >= 4.0 && ($order->type ?? '') === 'Correctiva')) {
+                $assetUpdate['next_maintenance_date'] = date('Y-m-d', strtotime("+6 months"));
+            }
+
+            updateAssetInfo($order->assetId, $assetUpdate);
         }
 
         if ($order instanceof \Backend\Models\WorkOrderEntity && $order->msRequestId) {
@@ -397,8 +426,16 @@ function completeWorkOrder(string $otId, array $executionData = []): bool
         }
 
         // Cierre automático de preventivas por intervención mayor.
-        if (($order->type ?? '') === 'Correctiva' && (float)($updateData['duration_hours'] ?? 0) >= 4.0) {
-            cascadeClosePreventives($order->assetId, $otId);
+        if (($order->type ?? '') === 'Correctiva') {
+            if (!empty($unifyOtIds)) {
+                // [FLUJO 7] Unificación manual solicitada
+                foreach ($unifyOtIds as $prevId) {
+                    closePreventiveByUnification($prevId, $otId);
+                }
+            } elseif ((float)($updateData['duration_hours'] ?? 0) >= 4.0) {
+                // Cierre en cascada automático por duración (>=4h)
+                cascadeClosePreventives($order->assetId, $otId);
+            }
         }
     }
 
@@ -425,33 +462,35 @@ function cascadeClosePreventives($assetId, string $triggerOtId): void
 
         if (empty($pendings)) return;
 
-        // 2. Cerrar cada una con observación técnica
-        $closeStmt = $db->prepare("
-            UPDATE work_orders 
-            SET status = 'Terminada', 
-                completed_date = CURRENT_DATE,
-                observations = CONCAT(IFNULL(observations,''), '\n\n[BITÁCORA]: OT cerrada automáticamente por intervención técnica mayor (OT Origen: ', :trigger_id, '). Verificación realizada durante reparación.'),
-                updated_at = NOW()
-            WHERE id = :id
-        ");
-
         foreach ($pendings as $p) {
-            $closeStmt->execute([
-                ':id' => $p['id'],
-                ':trigger_id' => $triggerOtId
-            ]);
-
-            // Auditoría de la cascada
-            require_once __DIR__ . '/AuditProvider.php';
-            \Backend\Providers\logAuditAction('AUTO_CASCADE_CLOSURE', 'WORK_ORDER', $p['id'], "Cierre preventivo automático gatillado por OT Correctiva mayor ($triggerOtId).", [
-                'trigger_ot' => $triggerOtId,
-                'asset_id' => $assetId
-            ]);
-
-            \Backend\Core\LoggerService::info("SISTEMA: OT Preventiva cerrada automáticamente", ['id' => $p['id'], 'trigger' => $triggerOtId]);
+            closePreventiveByUnification($p['id'], $triggerOtId);
         }
     } catch (Exception $e) {
-        \Backend\Core\LoggerService::error("ERROR EN CIERRE AUTOMÁTICO", ['asset' => $assetId, 'error' => $e->getMessage()]);
+        \Backend\Core\LoggerService::error("ERROR CASCADE CLOSE", ['error' => $e->getMessage()]);
+    }
+}
+
+/**
+ * [FLUJO 7] Cierra una OT preventiva por unificación con una correctiva.
+ */
+function closePreventiveByUnification(string $otId, string $triggerOtId): bool
+{
+    try {
+        $db = \Backend\Core\DatabaseService::getInstance();
+        $sql = "UPDATE work_orders 
+                SET status = 'Terminada', 
+                    completed_date = CURRENT_DATE,
+                    observations = CONCAT(IFNULL(observations,''), '\n\n[UNIFICACIÓN]: OT cerrada automáticamente por unificación con intervención técnica (OT Origen: ', :trigger_id, ').'),
+                    updated_at = NOW()
+                WHERE id = :id";
+        $stmt = $db->prepare($sql);
+        return $stmt->execute([
+            ':id' => $otId,
+            ':trigger_id' => $triggerOtId
+        ]);
+    } catch (Exception $e) {
+        \Backend\Core\LoggerService::error("ERROR UNIFYING OT", ['id' => $otId, 'error' => $e->getMessage()]);
+        return false;
     }
 }
 
@@ -573,6 +612,30 @@ function getTotalDowntimeHours(): float
 }
 
 /**
+ * Obtiene la evolución del MTTR en los últimos 6 meses
+ */
+function getMTTREvolutionData(): array
+{
+    try {
+        $db = \Backend\Core\DatabaseService::getInstance();
+        $sql = "SELECT 
+                    DATE_FORMAT(completed_date, '%Y-%m') as mes,
+                    AVG(duration_hours) as mttr
+                FROM work_orders 
+                WHERE status = 'Terminada' 
+                  AND type = 'Correctiva'
+                  AND completed_date >= DATE_SUB(CURRENT_DATE, INTERVAL 6 MONTH)
+                GROUP BY mes
+                ORDER BY mes ASC";
+        
+        $stmt = $db->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+/**
  * Guarda el progreso parcial de una OT sin cerrarla.
  */
 function saveWorkOrderProgress(string $otId, array $executionData = []): bool
@@ -665,6 +728,9 @@ function getOtAttachments(string $otId): array
  */
 function cancelWorkOrder($id, $reason = '')
 {
+    if (isReadOnly()) {
+        throw new Exception("ACCESO_DENEGADO: El perfil actual no tiene permisos para cancelar órdenes de trabajo.");
+    }
     try {
         $db = \Backend\Core\DatabaseService::getInstance();
         $db->beginTransaction();

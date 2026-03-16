@@ -1249,11 +1249,16 @@ $statMap = [
                     <option value="status">Estado operativo</option>
                     <option value="maintenance_frequency">Frecuencia de Mantenimiento</option>
                     <option value="under_maintenance_plan">Plan de mantenimiento</option>
+                    <option value="annual_maint_cost">Costo Anual de Mantenimiento</option>
                     <option value="ownership">Tipo de propiedad</option>
                     <option value="riesgo_ge">Clase / Especialidad</option>
                     <option value="location">Ubicación / Servicio</option>
                     <option value="sub_location">Sub-ubicación</option>
                     <option value="acquisition_cost">Precio de Adquisición (CLP)</option>
+                    <option value="brand">Marca del Equipo</option>
+                    <option value="model">Modelo del Equipo</option>
+                    <option value="vendor">Proveedor / Servicio Técnico</option>
+                    <option value="purchased_year">Año de Adquisición</option>
                 </select>
             </div>
             <div>
@@ -1389,9 +1394,38 @@ $statMap = [
                     <input type="number" id="ef_value" min="0" step="1" placeholder="Ej: 1500000" class="dr-input pl-8" oninput="document.getElementById('price_preview').textContent = 'CLP: $' + (parseInt(this.value||0)).toLocaleString('es-CL')">
                 </div>
                 <p id="price_preview" class="text-[11px] font-bold text-amber-500 mt-2 text-right">CLP: $0</p>
-            `
+                <div class="mt-4 p-3 rounded-xl bg-medical-dark border border-border-dark/30">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-text-muted opacity-60 mb-2">Valores Promedio Referenciales</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="setMassValue(450000)" class="px-2 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-[9px] font-bold hover:bg-blue-500/20 transition-all">BOMBA INF: $450k</button>
+                        <button onclick="setMassValue(750000)" class="px-2 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-[9px] font-bold hover:bg-blue-500/20 transition-all">BOMBA JER: $750k</button>
+                        <button onclick="setMassValue(1200000)" class="px-2 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-[9px] font-bold hover:bg-blue-500/20 transition-all">MONITOR MULT: $1.2M</button>
+                        <button onclick="setMassValue(4500000)" class="px-2 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-[9px] font-bold hover:bg-blue-500/20 transition-all">ECO GRAF (STD): $4.5M</button>
+                        <button onclick="setMassValue(225000)" class="px-2 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-[9px] font-bold hover:bg-blue-500/20 transition-all">SIG. VITALES: $225k</button>
+                        <button onclick="setMassValue(18000000)" class="px-2 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-[9px] font-bold hover:bg-blue-500/20 transition-all">VENTILADOR: $18M</button>
+                    </div>
+                </div>
+            `,
+            annual_maint_cost: `
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted font-bold">$</span>
+                    <input type="number" id="ef_value" min="0" step="1" placeholder="Ej: 80000" class="dr-input pl-8">
+                </div>
+            `,
+            brand: `<input type="text" id="ef_value" placeholder="Ej: MINDRAY, PHILIPS, GE" class="dr-input">`,
+            model: `<input type="text" id="ef_value" placeholder="Ej: BeneView T8, Infinity V500" class="dr-input">`,
+            vendor: `<input type="text" id="ef_value" placeholder="Ej: Proveedor Médico S.A." class="dr-input">`,
+            purchased_year: `<input type="number" id="ef_value" min="1980" max="${new Date().getFullYear()}" value="${new Date().getFullYear()}" class="dr-input text-center font-bold">`
         };
         document.getElementById('efValWrap').innerHTML = m[field] || '';
+    }
+
+    function setMassValue(val) {
+        const input = document.getElementById('ef_value');
+        if (input) {
+            input.value = val;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
     }
 
     // ── Execute ─────────────────────────────────────────────────────────────

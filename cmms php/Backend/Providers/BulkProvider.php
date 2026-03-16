@@ -31,7 +31,11 @@ function bulkUpdateField(array $ids, string $field, $value): array
     $stats = ['success' => 0, 'errors' => []];
 
     // Whitelist de campos seguros para actualización masiva
-    $allowedFields = ['criticality', 'status', 'location', 'sub_location', 'under_maintenance_plan', 'ownership', 'riesgo_ge', 'annual_maint_cost', 'acquisition_cost'];
+    $allowedFields = [
+        'criticality', 'status', 'location', 'sub_location', 'under_maintenance_plan', 
+        'ownership', 'riesgo_ge', 'annual_maint_cost', 'acquisition_cost',
+        'brand', 'model', 'vendor', 'purchased_year'
+    ];
     if (!in_array($field, $allowedFields)) {
         $stats['errors'][] = "Campo '$field' no permitido para edición masiva.";
         return $stats;
@@ -168,7 +172,11 @@ function bulkUndo(): array
         return $stats;
     }
 
-    $allowedFields = ['criticality', 'status', 'location', 'sub_location', 'under_maintenance_plan', 'ownership', 'riesgo_ge', 'annual_maint_cost'];
+    $allowedFields = [
+        'criticality', 'status', 'location', 'sub_location', 'under_maintenance_plan', 
+        'ownership', 'riesgo_ge', 'annual_maint_cost', 'acquisition_cost',
+        'brand', 'model', 'vendor', 'purchased_year'
+    ];
     if (!in_array($field, $allowedFields)) {
         $stats['errors'][] = "Campo '$field' no permitido.";
         return $stats;

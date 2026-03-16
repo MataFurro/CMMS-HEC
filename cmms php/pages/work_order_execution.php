@@ -70,7 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!empty($assetUpdateData)) updateAssetInfo($_POST['asset_id'], $assetUpdateData);
         }
 
-        if (completeWorkOrder($id, $executionData)) {
+        $unifyOtIds = $_POST['unify_ot_ids'] ?? [];
+
+        if (completeWorkOrder($id, $executionData, $unifyOtIds)) {
             echo "<script>window.location.href = '?page=work_order_execution&id=$id&completed=1';</script>";
             exit;
         }
@@ -743,6 +745,49 @@ $templateVersion = $template['version'] ?? 'V1';
                         <?= isReadOnly() ? 'readonly' : '' ?>><?= htmlspecialchars($ot['observations'] ?? '') ?></textarea>
                 <?php endif; ?>
             </div>
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!-- [FLUJO 7] SECCIÓN 7: Unificación de Mantenimiento        -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <?php if (!$isCompleted && ($ot['type'] ?? '') === 'Correctiva'): 
+                $pendingPreventives = getPendingPreventivesForAsset($ot['asset_id']);
+                if (!empty($pendingPreventives)):
+            ?>
+            <div class="bg-medical-surface p-10 rounded-3xl border border-medical-blue/30 shadow-xl relative overflow-hidden mb-6">
+                <div class="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+                    <span class="material-symbols-outlined text-8xl text-medical-blue font-variation-fill">merge</span>
+                </div>
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="p-2.5 bg-medical-blue/10 text-medical-blue rounded-xl border border-medical-blue/20">
+                        <span class="material-symbols-outlined font-variation-fill">inventory_2</span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-[var(--text-main)]">Unificación de Mantenimiento</h3>
+                        <p class="text-xs text-medical-blue font-black uppercase tracking-widest mt-1">Optimización de Intervención</p>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-medical-blue/5 border border-medical-blue/20 rounded-2xl mb-6">
+                    <p class="text-sm text-[var(--text-main)] font-medium leading-relaxed">
+                        Existen mantenimientos preventivos pendientes para este equipo. Si ya realizó las tareas preventivas durante esta reparación, puede unificarlas para optimizar la disponibilidad del activo.
+                    </p>
+                </div>
+
+                <div class="space-y-3">
+                    <?php foreach ($pendingPreventives as $prev): ?>
+                    <label class="flex items-center justify-between p-4 border border-[var(--border-color)] rounded-2xl hover:bg-medical-blue/5 transition-all cursor-pointer group">
+                        <div class="flex items-center gap-4">
+                            <input type="checkbox" name="unify_ot_ids[]" value="<?= $prev['id'] ?>" class="size-5 rounded border-medical-blue text-medical-blue focus:ring-medical-blue">
+                            <div>
+                                <p class="text-sm font-bold text-[var(--text-main)]">Checklist Preventivo #<?= $prev['id'] ?></p>
+                                <p class="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider">Apertura: <?= $prev['created_date'] ?></p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-all">link</span>
+                    </label>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; endif; ?>
         </div>
 
         <!-- SIDEBAR STICKY (Vuelve a su posición lateral derecha) -->

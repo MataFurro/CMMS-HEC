@@ -219,6 +219,29 @@ function getPMComplianceRate(): float
 }
 
 /**
+ * Obtiene estadísticas de cobertura de mantenimiento preventivo (NotebookLM)
+ */
+function getPMCoverageStats(): array
+{
+    try {
+        $db = \Backend\Core\DatabaseService::getInstance();
+        $now = date('Y-m-d');
+        
+        $sql = "SELECT 
+                    SUM(CASE WHEN next_maintenance_date >= :now THEN 1 ELSE 0 END) as al_dia,
+                    SUM(CASE WHEN next_maintenance_date < :now THEN 1 ELSE 0 END) as atrasado,
+                    SUM(CASE WHEN next_maintenance_date IS NULL OR next_maintenance_date = '' THEN 1 ELSE 0 END) as sin_plan
+                FROM assets WHERE en_uso = 1";
+        
+        $stmt = $db->prepare($sql);
+        $stmt->execute(['now' => $now]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: ['al_dia' => 0, 'atrasado' => 0, 'sin_plan' => 0];
+    } catch (Exception $e) {
+        return ['al_dia' => 0, 'atrasado' => 0, 'sin_plan' => 0];
+    }
+}
+
+/**
  * Contar activos por estado - OPTIMIZADO
  */
 function countAssetsByStatus(?array $assets = null): array
@@ -569,6 +592,9 @@ function generateAssetHecId(array $data): string
  */
 function saveAsset(array $data): string|int|bool
 {
+    if (isReadOnly()) {
+        throw new Exception("ACCESO_DENEGADO: El perfil actual no tiene permisos para crear activos.");
+    }
     if (empty($data['hec_id'])) {
         $data['hec_id'] = generateAssetHecId($data);
     }
@@ -582,6 +608,9 @@ function saveAsset(array $data): string|int|bool
  */
 function updateAssetInfo($id, array $data): bool
 {
+    if (isReadOnly()) {
+        throw new Exception("ACCESO_DENEGADO: El perfil actual no tiene permisos para modificar activos.");
+    }
     $repo = new AssetRepository();
     return $repo->partialUpdate($id, $data);
 }
@@ -600,6 +629,9 @@ function deleteAsset($id): bool
  */
 function softDeleteAsset($id): bool
 {
+    if (isReadOnly()) {
+        throw new Exception("ACCESO_DENEGADO: El perfil actual no tiene permisos para dar de baja activos.");
+    }
     $repo = new AssetRepository();
     // Al dar de baja, marcamos como RETIRED y en_uso=0 vía repositorio
     return $repo->softDelete((string)$id);
