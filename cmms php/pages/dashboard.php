@@ -20,6 +20,12 @@ require_once __DIR__ . '/../Backend/Providers/EventProvider.php';
 // --- FILTRADO POR CLASE (CROSS-FILTERING) ---
 $selectedClass = $_GET['class'] ?? 'all';
 
+// --- CONFIGURACIÓN DE CACHÉ ---
+$cacheEnabled = true;
+$cacheFile = __DIR__ . '/../storage/reliability_cache.json';
+$cacheTime = 3600; // 1 hora
+$isCached = false;
+
 // --- DATOS DESDE PROVIDERS ---
 $assetsEntities = getAllAssets();
 $assets = array_map(function ($a) {
@@ -37,7 +43,15 @@ $otCorrectivas = getCorrectiveWorkOrders();
 $technicians = getTechnicianProductivity();
 $recentEvents = getRecentEvents();
 
-// --- CÁLCULO DINÁMICO DE MÉTRICAS - OPTIMIZADO ---
+// --- CÁLCULO DINÁMICO DE MÉTRICAS - OPTIMIZADO CON CACHÉ ---
+if ($cacheEnabled && $selectedClass === 'all' && file_exists($cacheFile) && (time() - filemtime($cacheFile) < $cacheTime)) {
+    $cacheData = json_decode(file_get_contents($cacheFile), true);
+    if ($cacheData) {
+        $reliabilityByFamily = $cacheData['reliabilityByFamily'] ?? [];
+        $claseGroups = $cacheData['claseGroups'] ?? [];
+        $isCached = true;
+    }
+}
 $totalEquipos = count($assets);
 
 // Equipos por estado - OPTIMIZADO: pasar $assets
@@ -59,46 +73,55 @@ $otEnEspera = $woCounts['En Espera'] ?? 0;
 $otPorTipo = countWorkOrdersByType();
 
 // --- CÁLCULO DE MÉTRICAS POR CLASE (ESPECIALIDAD) - OPTIMIZADO ---
-// Agrupar OTs por activo una sola vez en el Dashboard
-$otsPorActivo = [];
-foreach ($otCorrectivas as $ot) {
-    if (!empty($ot['asset_id'])) {
-        $otsPorActivo[$ot['asset_id']][] = $ot;
+if (!$isCached) {
+    // Agrupar OTs por activo una sola vez en el Dashboard
+    $otsPorActivo = [];
+    foreach ($otCorrectivas as $ot) {
+        if (!empty($ot['asset_id'])) {
+            $otsPorActivo[$ot['asset_id']][] = $ot;
+        }
     }
-}
 
-$claseGroups = [];
-foreach ($assets as $asset) {
-    // Agrupar por Especialidad (riesgo_ge) para coincidir con el Excel importado
-    $claveGrupo = $asset['riesgo_ge'] ?? ($asset['criticality'] ?? 'Sin Clase');
-    if (!isset($claseGroups[$claveGrupo])) {
-        $claseGroups[$claveGrupo] = [
-            'count'      => 0,
-            'mtbf_sum'   => 0,
-            'mttr_sum'   => 0,
-            'valid_mtbf' => 0
+    $claseGroups = [];
+    foreach ($assets as $asset) {
+        // Agrupar por Especialidad (riesgo_ge) para coincidir con el Excel importado
+        $claveGrupo = $asset['riesgo_ge'] ?? ($asset['criticality'] ?? 'Sin Clase');
+        if (!isset($claseGroups[$claveGrupo])) {
+            $claseGroups[$claveGrupo] = [
+                'count'      => 0,
+                'mtbf_sum'   => 0,
+                'mttr_sum'   => 0,
+                'valid_mtbf' => 0
+            ];
+        }
+
+        $otsActivo = $otsPorActivo[$asset['id']] ?? [];
+        $mtbf = calcularMTBF_Internal($asset['id'], $otsActivo);
+        $mttr = calcularMTTR_Internal($asset['id'], $otsActivo);
+
+        $claseGroups[$claveGrupo]['count']++;
+        $claseGroups[$claveGrupo]['mttr_sum'] += $mttr;
+        if ($mtbf !== null) {
+            $claseGroups[$claveGrupo]['mtbf_sum'] += $mtbf;
+            $claseGroups[$claveGrupo]['valid_mtbf']++;
+        }
+    }
+
+    $reliabilityByFamily = [];
+    foreach ($claseGroups as $nombre => $datos) {
+        $reliabilityByFamily[] = [
+            'name' => 'Clase ' . $nombre,
+            'mtbf' => $datos['valid_mtbf'] > 0 ? round($datos['mtbf_sum'] / $datos['valid_mtbf'], 1) : 0,
+            'mttr' => $datos['count'] > 0 ? round($datos['mttr_sum'] / $datos['count'], 1) : 0
         ];
     }
 
-    $otsActivo = $otsPorActivo[$asset['id']] ?? [];
-    $mtbf = calcularMTBF_Internal($asset['id'], $otsActivo);
-    $mttr = calcularMTTR_Internal($asset['id'], $otsActivo);
-
-    $claseGroups[$claveGrupo]['count']++;
-    $claseGroups[$claveGrupo]['mttr_sum'] += $mttr;
-    if ($mtbf !== null) {
-        $claseGroups[$claveGrupo]['mtbf_sum'] += $mtbf;
-        $claseGroups[$claveGrupo]['valid_mtbf']++;
+    if ($cacheEnabled && $selectedClass === 'all') {
+        @file_put_contents($cacheFile, json_encode([
+            'reliabilityByFamily' => $reliabilityByFamily,
+            'claseGroups' => $claseGroups
+        ]));
     }
-}
-
-$reliabilityByFamily = [];
-foreach ($claseGroups as $nombre => $datos) {
-    $reliabilityByFamily[] = [
-        'name' => 'Clase ' . $nombre,
-        'mtbf' => $datos['valid_mtbf'] > 0 ? round($datos['mtbf_sum'] / $datos['valid_mtbf'], 1) : 0,
-        'mttr' => $datos['count'] > 0 ? round($datos['mttr_sum'] / $datos['count'], 1) : 0
-    ];
 }
 // Limitar a 8 clases para el gráfico
 $reliabilityByFamily = array_slice($reliabilityByFamily, 0, 8);
@@ -147,38 +170,6 @@ $cosr = $totalAcquisitionValue > 0 ? ($totalMaintenanceCost / $totalAcquisitionV
 // KPIs calculados dinámicamente
 $kpiCards = [
     [
-        'label' => 'Total Activos',
-        'value' => number_format($totalEquipos, 0, ',', '.'),
-        'trend' => 'Parque Biomédico',
-        'color' => 'border-l-medical-blue',
-        'icon' => 'medical_services',
-        'sub' => $equiposOperativos . ' Operativos / ' . $equiposNoOperativos . ' Baja'
-    ],
-    [
-        'label' => 'Valor Inventario',
-        'value' => '$' . number_format($totalAcquisitionValue, 0, ',', '.') . ' CLP',
-        'trend' => 'CAPEX',
-        'color' => 'border-l-medical-blue',
-        'icon' => 'inventory_2',
-        'sub' => 'Valorización de Activos'
-    ],
-    [
-        'label' => 'Continuidad Operativa',
-        'value' => round($mtbf_global, 1) . ' d',
-        'trend' => '$\\beta=' . $beta . '$',
-        'color' => 'border-l-emerald-500',
-        'icon' => 'timeline',
-        'sub' => 'MTBF (Weibull)'
-    ],
-    [
-        'label' => 'COSR',
-        'value' => round($cosr, 1) . '%',
-        'trend' => 'Meta < 7%',
-        'color' => $cosr < 7 ? 'border-l-emerald-500' : 'border-l-amber-500',
-        'icon' => 'payments',
-        'sub' => 'Costo de Servicio'
-    ],
-    [
         'label' => 'Disponibilidad',
         'value' => $metricasGlobales['disponibilidad_promedio'] > 0 ? round($metricasGlobales['disponibilidad_promedio'] * 100, 1) . '%' : 'N/A',
         'trend' => 'Uptime Clínico',
@@ -187,20 +178,36 @@ $kpiCards = [
         'sub' => 'Operatividad Real'
     ],
     [
-        'label' => 'Vencidos Operativos',
-        'value' => getExpiredOperativeCount($assets),
-        'trend' => 'Audit Contable',
-        'color' => getExpiredOperativeCount($assets) > 0 ? 'border-l-amber-500' : 'border-l-slate-400',
-        'icon' => 'history_toggle_off',
-        'sub' => 'Vida Útil Excedida'
+        'label' => 'Fuera de Servicio',
+        'value' => $equiposNoOperativos,
+        'trend' => 'Inactividad',
+        'color' => $equiposNoOperativos > 0 ? 'border-l-red-500' : 'border-l-emerald-500',
+        'icon' => 'error',
+        'sub' => 'Requieren Intervención'
     ],
     [
-        'label' => 'Adherencia',
-        'value' => getAdherenceRate() . '%',
-        'trend' => 'Meta > 90%',
+        'label' => 'Tiempo de Retorno',
+        'value' => round($metricasGlobales['mttr_promedio'], 1) . ' h',
+        'trend' => 'Meta < 4h',
+        'color' => $metricasGlobales['mttr_promedio'] <= 4 ? 'border-l-emerald-500' : 'border-l-amber-500',
+        'icon' => 'pacing',
+        'sub' => 'MTTR Promedio'
+    ],
+    [
+        'label' => 'Cobertura PM',
+        'value' => getPMComplianceRate() . '%',
+        'trend' => 'Cumplimiento',
         'color' => 'border-l-indigo-500',
-        'icon' => 'check_circle',
+        'icon' => 'event_available',
         'sub' => 'Mora: $' . number_format($financialStats['mantenimiento_mora'], 0, ',', '.') . ' CLP'
+    ],
+    [
+        'label' => 'Valor Inventario',
+        'value' => '$' . number_format($totalAcquisitionValue / 1000000, 1, ',', '.') . 'M',
+        'trend' => 'CLP (Millones)',
+        'color' => 'border-l-medical-blue',
+        'icon' => 'inventory_2',
+        'sub' => 'Valorización CAPEX'
     ]
 ];
 
@@ -246,6 +253,10 @@ $techComparisonData = array_map(function ($t) {
         'terminadas' => $t['ot_terminadas']
     ];
 }, $technicians);
+
+// --- MÉTRICAS OPERATIVAS (FLOW 10) ---
+$pmCoverage = getPMCoverageStats();
+$mttrTrend = getMTTREvolutionData();
 ?>
 
 <div class="space-y-8 animate-in fade-in duration-500">
@@ -327,6 +338,45 @@ $techComparisonData = array_map(function ($t) {
             include __DIR__ . '/../includes/components/metric_card.php';
         }
         ?>
+    </div>
+
+    <!-- Control Operativo (Flow 10) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card-glass p-6 border-l-4 border-l-indigo-500">
+            <h3 class="text-[10px] font-black text-text-muted uppercase tracking-widest mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">event_repeat</span>
+                Cobertura de Mantenimiento Preventivo
+            </h3>
+            <div class="h-64">
+                <canvas id="pmCoverageChart"></canvas>
+            </div>
+            <div class="mt-4 grid grid-cols-3 gap-2 text-center">
+                <div class="p-2 bg-emerald-500/5 rounded-xl border border-emerald-500/10">
+                    <p class="text-[9px] text-emerald-500 font-bold uppercase">Al Día</p>
+                    <p class="text-xs font-black text-emerald-500"><?= $pmCoverage['al_dia'] ?></p>
+                </div>
+                <div class="p-2 bg-amber-500/5 rounded-xl border border-amber-500/10">
+                    <p class="text-[9px] text-amber-500 font-bold uppercase">Atrasado</p>
+                    <p class="text-xs font-black text-amber-500"><?= $pmCoverage['atrasado'] ?></p>
+                </div>
+                <div class="p-2 bg-slate-500/5 rounded-xl border border-slate-500/10">
+                    <p class="text-[9px] text-slate-500 font-bold uppercase">Sin Plan</p>
+                    <p class="text-xs font-black text-slate-500"><?= $pmCoverage['sin_plan'] ?></p>
+                </div>
+            </div>
+        </div>
+        <div class="card-glass p-6 border-l-4 border-l-medical-blue">
+            <h3 class="text-[10px] font-black text-text-muted uppercase tracking-widest mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">trending_up</span>
+                Evolución de MTTR (Tiempo de Retorno)
+            </h3>
+            <div class="h-64">
+                <canvas id="mttrTrendChart"></canvas>
+            </div>
+            <p class="text-[9px] text-text-muted italic mt-4 text-center uppercase tracking-widest">
+                Media histórica de horas de reparación (Últimos 6 meses)
+            </p>
+        </div>
     </div>
 
     <!-- Distribution Charts Row -->
@@ -843,6 +893,76 @@ $techComparisonData = array_map(function ($t) {
                 }
             }
         };
+
+        // 0.1 Cobertura de Mantenimiento Preventivo (Doughnut) - FLOW 10
+        try {
+            const ctxPM = document.getElementById('pmCoverageChart');
+            if (ctxPM) {
+                new Chart(ctxPM, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Al Día', 'Atrasado', 'Sin Plan'],
+                        datasets: [{
+                            data: [<?= $pmCoverage['al_dia'] ?>, <?= $pmCoverage['atrasado'] ?>, <?= $pmCoverage['sin_plan'] ?>],
+                            backgroundColor: ['#10b981', '#f59e0b', '#94a3b8'],
+                            borderWidth: 0,
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: Object.assign({}, commonOptions, {
+                        cutout: '75%',
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom',
+                                labels: {
+                                    color: mutedText,
+                                    font: { size: 10, weight: 'bold' }
+                                }
+                            }
+                        }
+                    })
+                });
+            }
+        } catch (e) { console.warn("Error en pmCoverageChart:", e); }
+
+        // 0.2 Evolución de MTTR (Line Chart) - FLOW 10
+        try {
+            const ctxMTTR = document.getElementById('mttrTrendChart');
+            if (ctxMTTR) {
+                new Chart(ctxMTTR, {
+                    type: 'line',
+                    data: {
+                        labels: <?= json_encode(array_column($mttrTrend, 'mes')) ?>,
+                        datasets: [{
+                            label: 'MTTR (Hrs)',
+                            data: <?= json_encode(array_column($mttrTrend, 'mttr')) ?>,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#3b82f6'
+                        }]
+                    },
+                    options: Object.assign({}, commonOptions, {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: gridColor },
+                                ticks: { color: mutedText, font: { weight: 'bold' } },
+                                title: { display: true, text: 'Horas', color: mutedText, font: { size: 10 } }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: mutedText, font: { weight: 'bold' } }
+                            }
+                        }
+                    })
+                });
+            }
+        } catch (e) { console.warn("Error en mttrTrendChart:", e); }
 
         // 0. Curva de Probabilidad de Falla Exponencial F(t)
         try {

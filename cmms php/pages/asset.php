@@ -584,8 +584,23 @@ require_once 'includes/audit_trail.php';
                             </div>
                             <div>
                                 <span class="text-xs text-text-muted font-bold uppercase tracking-wider">Garantía</span>
-                                <p class="text-xs font-bold text-amber-500 mt-1 uppercase">Vence:
-                                    <?= $asset['warranty_expiration'] ?? '-' ?>
+                                <?php
+                                $warrantyDate = $asset['warranty_expiration'] ?? null;
+                                $warrantyClass = 'text-amber-500';
+                                if ($warrantyDate && $warrantyDate !== '-') {
+                                    $expTimestamp = strtotime($warrantyDate);
+                                    $daysLeft = ($expTimestamp - time()) / 86400;
+                                    if ($daysLeft < 0) {
+                                        $warrantyClass = 'text-red-500';
+                                    } elseif ($daysLeft < 30) {
+                                        $warrantyClass = 'text-orange-500';
+                                    } else {
+                                        $warrantyClass = 'text-emerald-500';
+                                    }
+                                }
+                                ?>
+                                <p class="text-xs font-bold <?= $warrantyClass ?> mt-1 uppercase">Vence:
+                                    <?= $warrantyDate ?: '-' ?>
                                 </p>
                             </div>
                         </div>

@@ -508,7 +508,8 @@ class AssetRepository
                 'mac_address',
                 'firmware_version',
                 'os_version',
-                'is_aem'
+                'is_aem',
+                'next_maintenance_date'
             ];
             foreach ($allowedFields as $field) {
                 if (isset($data[$field])) {

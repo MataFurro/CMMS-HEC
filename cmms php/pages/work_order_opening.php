@@ -231,6 +231,23 @@ if (isset($_GET['from_request'])) {
                     </div>
                 </div>
 
+                <!-- Asignación de Técnico -->
+                <div class="space-y-2 pt-4 border-t border-border-dark/30">
+                    <label class="text-xs font-bold text-text-muted uppercase tracking-wider flex items-center gap-2">
+                        <span class="material-symbols-outlined text-medical-blue text-sm">person</span>
+                        Técnico Asignado
+                    </label>
+                    <select name="assigned_tech_id" class="w-full bg-medical-dark/50 border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-text-main appearance-none">
+                        <option value="">-- Seleccionar Técnico (Opcional) --</option>
+                        <?php 
+                        require_once __DIR__ . '/../Backend/Providers/UserProvider.php';
+                        foreach (getActiveTechnicians() as $tech): 
+                        ?>
+                            <option value="<?= htmlspecialchars($tech['id']) ?>"><?= htmlspecialchars($tech['name']) ?> (<?= htmlspecialchars($tech['specialty'] ?? 'General') ?>)</option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
                 <!-- Selector de Plantilla de Checklist (Siempre Visible) -->
                 <div x-transition class="space-y-2 pt-4 border-t border-border-dark/30">
                     <label class="text-xs font-bold text-text-muted uppercase tracking-wider flex items-center gap-2">

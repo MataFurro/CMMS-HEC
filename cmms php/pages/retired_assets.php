@@ -149,13 +149,11 @@ $retired = $db->query($sql)->fetchAll();
                                         class="px-4 py-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-black transition-all">
                                         Restaurar
                                     </button>
-                                    <?php if ($isPending): ?>
-                                        <button onclick="finalizeNow('<?= addslashes($a['id']) ?>', '<?= addslashes($a['name']) ?>')"
-                                            class="px-4 py-2 rounded-xl bg-orange-500/10 text-orange-400 border border-orange-500/20 text-[10px] font-black uppercase tracking-widest hover:bg-orange-500 hover:text-black transition-all"
-                                            title="Finalizar baja ahora">
-                                            Baja Directa
-                                        </button>
-                                    <?php endif; ?>
+                                    <a href="?page=asset&id=<?= urlencode($a['id']) ?>"
+                                        class="px-4 py-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] font-black uppercase tracking-widest hover:bg-blue-500 hover:text-black transition-all"
+                                        title="Ver Historial">
+                                        Historial
+                                    </a>
                                 </div>
                             </td>
                         </tr>

@@ -36,8 +36,8 @@ function authenticateUser(string $email): ?array
 function getSidebarMenu(string $userRole): array
 {
     $allMenuItems = [
-        ['name' => 'Panel de Actividades', 'path' => 'my_work_orders', 'icon' => 'fact_check', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN, ROLE_AUDITOR]],
-        ['name' => SIDEBAR_DASHBOARD, 'path' => 'dashboard', 'icon' => 'dashboard', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER]],
+        ['name' => 'Panel de Actividades', 'path' => 'my_work_orders', 'icon' => 'fact_check', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN]],
+        ['name' => SIDEBAR_DASHBOARD, 'path' => 'dashboard', 'icon' => 'dashboard', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_AUDITOR]],
         ['name' => SIDEBAR_CALENDAR, 'path' => 'calendar', 'icon' => 'calendar_month', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN]],
         ['name' => SIDEBAR_WORK_ORDERS, 'path' => 'work_orders', 'icon' => 'assignment', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN]],
         ['name' => SIDEBAR_INVENTORY, 'path' => 'inventory', 'icon' => 'precision_manufacturing', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN, ROLE_AUDITOR]],
@@ -46,6 +46,7 @@ function getSidebarMenu(string $userRole): array
         ['name' => 'Business Intelligence', 'path' => 'financial_analysis', 'icon' => 'payments', 'roles' => [ROLE_CHIEF_ENGINEER]],
         ['name' => 'Optimización Masiva', 'path' => 'bulk_management', 'icon' => 'tune', 'roles' => [ROLE_CHIEF_ENGINEER]],
         ['name' => 'Archivo Histórico (Bajas)', 'path' => 'retired_assets', 'icon' => 'skull', 'roles' => [ROLE_CHIEF_ENGINEER]],
+        ['name' => 'Gestión de Solicitudes (GOS)', 'path' => 'service_request', 'icon' => 'add_alert', 'roles' => [ROLE_USER, ROLE_CHIEF_ENGINEER, ROLE_ENGINEER]],
     ];
 
     return array_filter($allMenuItems, function ($item) use ($userRole) {
@@ -59,7 +60,7 @@ function getSidebarMenu(string $userRole): array
 function userHasPermission(string $userRole, string $page): bool
 {
     $page_permissions = [
-        'dashboard' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER],
+        'dashboard' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_AUDITOR],
         'calendar' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN],
         'work_orders' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN],
         'inventory' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN, ROLE_AUDITOR],
@@ -67,10 +68,10 @@ function userHasPermission(string $userRole, string $page): bool
         'messenger_requests' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER],
         'financial_analysis' => [ROLE_CHIEF_ENGINEER],
         'service_request' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_USER],
-        'accreditation_dashboard' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_AUDITOR],
         'bulk_management' => [ROLE_CHIEF_ENGINEER],
-        'retired_assets' => [ROLE_CHIEF_ENGINEER, ROLE_AUDITOR],
-        'my_work_orders' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN, ROLE_AUDITOR],
+        'retired_assets' => [ROLE_CHIEF_ENGINEER],
+        'my_work_orders' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN],
+        'work_order_execution' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN],
     ];
 
     if (!isset($page_permissions[$page])) return true;
