@@ -239,7 +239,7 @@ $criticidadData = [
 $otPorTipoData = [
     ['name' => 'Preventivo', 'value' => $otPorTipo['Preventiva'] ?? 0],
     ['name' => 'Correctivo', 'value' => $otPorTipo['Correctiva'] ?? 0],
-    ['name' => 'Calibración', 'value' => $otPorTipo['Calibración'] ?? 0]
+    ['name' => 'Calibración', 'value' => ($otPorTipo['Calibración'] ?? 0) + ($otPorTipo['Calibracion'] ?? 0)]
 ];
 
 // Datos de técnicos para gráfico
