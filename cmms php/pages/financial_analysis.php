@@ -49,10 +49,10 @@ $formula_tinc = "Veq = Vo - [Pu + (At * Pt) + (At * Pm) + (At * Pv) + Ps + Pi]";
         </div>
 
         <div class="flex gap-3">
-            <a href="?page=financial_analysis&action=export_minsal"
-                class="px-6 py-3 bg-panel-dark border border-border-dark text-text-main rounded-2xl font-bold text-sm flex items-center gap-3 hover:bg-panel-dark/80 transition-all active:scale-95">
-                <span class="material-symbols-outlined text-xl">file_download</span>
-                Exportar Reporte MINSAL
+            <a href="?page=financial_analysis&action=export" download="reporte_minsal_financiero.csv" target="_blank" rel="noopener noreferrer" data-turbo="false" hx-disable
+                class="h-12 flex items-center gap-3 px-6 bg-white/80 dark:bg-white/10 backdrop-blur-xl text-text-main dark:text-white border border-border-color dark:border-white/10 rounded-2xl hover:border-medical-blue/50 hover:bg-medical-blue/5 dark:hover:bg-white/20 transition-all duration-300 font-bold shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] active:scale-95 group">
+                <span class="material-symbols-outlined text-xl text-medical-blue group-hover:-translate-y-0.5 transition-transform">download</span>
+                <span class="text-xs uppercase tracking-widest text-left leading-tight">Exportar Reporte<br><span class="opacity-70 text-[10px]">MINSAL (CSV)</span></span>
             </a>
         </div>
     </div>

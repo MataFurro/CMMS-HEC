@@ -8,15 +8,15 @@ require_once __DIR__ . '/../Repositories/AssetRepository.php';
 use Backend\Repositories\AssetRepository;
 
 /**
- * Gestiona la exportación e importación de datos en formato CSV y XLSX.
+ * Gestiona la exportaciÃ³n e importaciÃ³n de datos en formato CSV y XLSX.
  * Utiliza ZipArchive para lectura nativa de Excel sin dependencias externas.
- * ─────────────────────────────────────────────────────
+ * â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
  */
 
 /**
  * Importa activos desde un archivo (CSV o XLSX) subido.
- * @param array $fileData Información de $_FILES['excel_file'].
- * @return array Estadísticas de la importación [success, errors, count].
+ * @param array $fileData InformaciÃ³n de $_FILES['excel_file'].
+ * @return array EstadÃ­sticas de la importaciÃ³n [success, errors, count].
  */
 function importAssetsFromFile(array $fileData): array
 {
@@ -50,26 +50,28 @@ function importAssetsFromFile(array $fileData): array
     $headersRaw = array_shift($rows);
     if (!$headersRaw) return $stats;
 
-    // 2. Mapeo inteligente de cabeceras (Sinónimos)
+    // 2. Mapeo inteligente de cabeceras (SinÃ³nimos)
     $synonyms = [
-        'id' => ['id', 'id inventario', 'codigo', 'identificador', 'asset id', 'tag', 'n de inventario', 'n° de inventario', 'n° inventario', 'numero de inventario'],
+        'id' => ['id', 'id inventario', 'codigo', 'identificador', 'asset id', 'tag', 'n de inventario', 'nÂ° de inventario', 'nÂ° inventario', 'numero de inventario'],
         'name' => ['nombre', 'equipo', 'descripcion', 'activo', 'nombre del equipo'],
         'model' => ['modelo', 'model'],
         'brand' => ['marca', 'fabricante', 'brand'],
-        'serial_number' => ['serie', 'n de serie', 'n° de serie', 'serial', 's/n', 'numero de serie'],
+        'serial_number' => ['serie', 'n de serie', 'nÂ° de serie', 'serial', 's/n', 'numero de serie'],
         'risk_class' => ['clase', 'familia', 'especialidad', 'categoria', 'subclase', 'sub-clase', 'grupo'],
         'criticality' => ['criticidad', 'criticality', 'prioridad', 'clasificacion', 'criticorelevanteim12noaplica'],
-        'location' => ['ubicacion', 'servicio', 'area', 'unidad', 'departamento', 'servicio clínico', 'servicio clinico'],
+        'location' => ['ubicacion', 'servicio', 'area', 'unidad', 'departamento', 'servicio clÃ­nico', 'servicio clinico'],
         'sub_location' => ['sub-ubicacion', 'sububicacion', 'recinto', 'piso', 'sala', 'oficina', 'nivel'],
         'status' => ['estado', 'status', 'situacion', 'estadobuenoregularmalobaja'],
-        'purchased_year' => ['año compra', 'fecha compra', 'año', 'adquisicion', 'año de adquisición', 'adquisición'],
-        'total_useful_life' => ['vida útil', 'vida util (total)', 'vida util', 'vida util completa', 'vida util total'],
-        'years_remaining' => ['vida útil residual', 'vida util residual', 'años restantes', 'años residuales', 'vida residual'],
+        'purchased_year' => ['aÃ±o compra', 'fecha compra', 'aÃ±o', 'adquisicion', 'aÃ±o de adquisiciÃ³n', 'adquisiciÃ³n'],
+        'total_useful_life' => ['vida Ãºtil', 'vida util (total)', 'vida util', 'vida util completa', 'vida util total'],
+        'years_remaining' => ['vida Ãºtil residual', 'vida util residual', 'aÃ±os restantes', 'aÃ±os residuales', 'vida residual'],
         'acquisition_cost' => ['costo adquisicion', 'valor adquisicion', 'precio adquisicion', 'valor de adquisicion', 'costo de adquisicion', 'acquisition cost', 'valor comercial', 'precio unitario'],
-        'annual_maint_cost' => ['costo anual de mantenimiento', 'mantenimiento anual', 'precio de referencia mantenimiento anual', 'costo anual de mantenimiento segun convenio', 'presupuesto mantenimiento']
+        'annual_maint_cost' => ['costo anual de mantenimiento', 'mantenimiento anual', 'precio de referencia mantenimiento anual', 'costo anual de mantenimiento segun convenio', 'presupuesto mantenimiento'],
+        'system_id' => ['id sistema', 'codigo sistema', 'biocmms id', 'hec id', 'codigo sistema (id)', 'id (sistema)'],
+        'annual_frequency' => ['frecuencia anual de mantenimiento', 'frecuencia anual', 'veces al aÃ±o', 'frecuencia anual de mantencion']
     ];
 
-    // Función de limpieza estándar para comparación (Convertir a ASCII básico)
+    // FunciÃ³n de limpieza estÃ¡ndar para comparaciÃ³n (Convertir a ASCII bÃ¡sico)
     $cleaner = function ($str) {
         if (!$str) return "";
         // Asegurar UTF-8
@@ -77,22 +79,22 @@ function importAssetsFromFile(array $fileData): array
             $str = @mb_convert_encoding($str, 'UTF-8', 'ISO-8859-1');
         }
         $str = mb_strtolower(trim($str), 'UTF-8');
-        // Mapa de normalización extendido
+        // Mapa de normalizaciÃ³n extendido
         $normalize = [
-            'á' => 'a',
-            'é' => 'e',
-            'í' => 'i',
-            'ó' => 'o',
-            'ú' => 'u',
-            'ñ' => 'n',
-            'ü' => 'u',
-            'Á' => 'a',
-            'É' => 'e',
-            'Í' => 'i',
-            'Ó' => 'o',
-            'Ú' => 'u',
-            'Ñ' => 'n',
-            'Ü' => 'u'
+            'Ã¡' => 'a',
+            'Ã©' => 'e',
+            'Ã­' => 'i',
+            'Ã³' => 'o',
+            'Ãº' => 'u',
+            'Ã±' => 'n',
+            'Ã¼' => 'u',
+            'Ã' => 'a',
+            'Ã‰' => 'e',
+            'Ã' => 'i',
+            'Ã“' => 'o',
+            'Ãš' => 'u',
+            'Ã‘' => 'n',
+            'Ãœ' => 'u'
         ];
         $str = strtr($str, $normalize);
         return preg_replace('/[^a-z0-9]/', '', $str);
@@ -106,7 +108,7 @@ function importAssetsFromFile(array $fileData): array
         $hClean = $cleaner($h);
         $mapped = null;
 
-        // 1. Intentar Coincidencia EXACTA primero (Mayor precisión)
+        // 1. Intentar Coincidencia EXACTA primero (Mayor precisiÃ³n)
         foreach ($synonyms as $key => $list) {
             if (in_array($key, $usedKeys)) continue;
             foreach ($list as $s) {
@@ -148,16 +150,16 @@ function importAssetsFromFile(array $fileData): array
     file_put_contents(__DIR__ . '/debug_import.txt', $debugInfo);
     // -------------------
 
-    // Heurística Fallback if mapping fails
+    // HeurÃ­stica Fallback if mapping fails
     if ($mappedCount < 3 && count($headersRaw) > 10) {
         $headers = ['location', 'sub_location', 'risk_class', 'category', 'name', 'brand', 'model', 'serial_number', 'id', 'purchased_year', 'total_useful_life', 'years_remaining', 'criticality', 'acquisition_cost'];
     }
 
-    // --- NORMALIZACIÓN DE CRITICIDAD (según estándar MINSAL acreditación) ---
-    // EMC = Equipos Médicos Críticos (soporte vital, monitoreo, anestesia)
-    // EMR = Equipos Médicos Relevantes (apoyo transversal a seguridad)
-    // EMI = Equipos de Interés (F&S >= 12) -> mapeado a RELEVANT
-    // LOW = No Aplica / Fuera de clasificación
+    // --- NORMALIZACIÃ“N DE CRITICIDAD (segÃºn estÃ¡ndar MINSAL acreditaciÃ³n) ---
+    // EMC = Equipos MÃ©dicos CrÃ­ticos (soporte vital, monitoreo, anestesia)
+    // EMR = Equipos MÃ©dicos Relevantes (apoyo transversal a seguridad)
+    // EMI = Equipos de InterÃ©s (F&S >= 12) -> mapeado a RELEVANT
+    // LOW = No Aplica / Fuera de clasificaciÃ³n
     $normalizeCriticality = function ($val) use ($cleaner) {
         $c = $cleaner($val);
         $map = [
@@ -205,7 +207,7 @@ function importAssetsFromFile(array $fileData): array
         $row = array_combine(array_slice($headers, 0, count($data)), array_slice($data, 0, count($headers)));
         if (empty(trim($row['name'] ?? ''))) {
             $row['name'] = 'SIN NOMBRE';
-            $stats['details'][] = "⚠️ Fila $rowIndex: Equipo sin nombre en el archivo Excel se importó como 'SIN NOMBRE'.";
+            $stats['details'][] = "âš ï¸ Fila $rowIndex: Equipo sin nombre en el archivo Excel se importÃ³ como 'SIN NOMBRE'.";
         }
         $stats['total']++;
 
@@ -215,31 +217,41 @@ function importAssetsFromFile(array $fileData): array
             $row['criticality'] = $normalizeCriticality($row['criticality']);
         }
 
-        // --- MAPEO CLASE → riesgo_ge (catálogo oficial HEC) ---
+        // --- GESTIÃ“N DE FRECUENCIA ANUAL ---
+        if (isset($row['annual_frequency'])) {
+            $freq = preg_replace('/[^0-9.]/', '', (string)$row['annual_frequency']);
+            $freqNum = (float)$freq;
+            if ($freqNum > 0) {
+                // ConversiÃ³n: Frecuencia 2 veces/aÃ±o -> Cada 6 meses
+                $row['frecuencia_mp_meses'] = (int)round(12 / $freqNum);
+            }
+        }
+
+        // --- MAPEO CLASE â†’ riesgo_ge (catÃ¡logo oficial HEC) ---
         if (isset($row['risk_class'])) {
             $claseRaw = mb_strtoupper(trim($row['risk_class']), 'UTF-8');
 
-            // Usar el cleaner para normalización insensible a acentos/encoding
+            // Usar el cleaner para normalizaciÃ³n insensible a acentos/encoding
             $claseClean = $cleaner($row['risk_class']);
 
             // Mapeo basado en llaves "limpias" (sin acentos, sin espacios)
             $claseMap = [
-                'apoyodiagnostico'            => 'APOYO DIAGNÓSTICO',
-                'apoyoendoscopico'            => 'APOYO ENDOSCÓPICO',
+                'apoyodiagnostico'            => 'APOYO DIAGNÃ“STICO',
+                'apoyoendoscopico'            => 'APOYO ENDOSCÃ“PICO',
                 'apoyoindustrial'             => 'APOYO INDUSTRIAL',
-                'apoyoquirurgico'             => 'APOYO QUIRÚRGICO',
-                'apoyoterapeutico'            => 'APOYO TERAPÉUTICO',
-                'apoyoterapeuticobajocosto'   => 'APOYO TERAPÉUTICO',
-                'esterilizacion'              => 'ESTERILIZACIÓN',
-                'imagenologia'                => 'IMAGENOLOGÍA',
+                'apoyoquirurgico'             => 'APOYO QUIRÃšRGICO',
+                'apoyoterapeutico'            => 'APOYO TERAPÃ‰UTICO',
+                'apoyoterapeuticobajocosto'   => 'APOYO TERAPÃ‰UTICO',
+                'esterilizacion'              => 'ESTERILIZACIÃ“N',
+                'imagenologia'                => 'IMAGENOLOGÃA',
                 'laboratorio'                 => 'LABORATORIO / FARMACIA',
                 'farmacia'                    => 'LABORATORIO / FARMACIA',
                 'laboratoriofarmacia'         => 'LABORATORIO / FARMACIA',
-                'medfisrehabilitacion'        => 'MED. FIS. REHABILITACIÓN',
-                'rehabilitacion'              => 'MED. FIS. REHABILITACIÓN',
+                'medfisrehabilitacion'        => 'MED. FIS. REHABILITACIÃ“N',
+                'rehabilitacion'              => 'MED. FIS. REHABILITACIÃ“N',
                 'mobiliario'                  => 'MOBILIARIO',
                 'monitoreo'                   => 'MONITOREO',
-                'odontologia'                 => 'ODONTOLOGÍA',
+                'odontologia'                 => 'ODONTOLOGÃA',
                 'bajocosto'                   => 'BAJO COSTO',
                 'equiposmedicos'              => 'GENERAL',
                 'equipomedico'                => 'GENERAL',
@@ -256,7 +268,7 @@ function importAssetsFromFile(array $fileData): array
             unset($row['risk_class']);
         }
 
-        // --- LÓGICA DE VIDA ÚTIL ---
+        // --- LÃ“GICA DE VIDA ÃšTIL ---
         $row['useful_life_pct'] = 100; // Por defecto
         if (isset($row['total_useful_life']) && isset($row['years_remaining'])) {
             $total = (float)$row['total_useful_life'];
@@ -266,8 +278,8 @@ function importAssetsFromFile(array $fileData): array
             }
         }
 
-        // --- SALVAGUARDAS CRÍTICAS ---
-        // Si no se mapeó location/sub_location, intentar por posición o heurística específica
+        // --- SALVAGUARDAS CRÃTICAS ---
+        // Si no se mapeÃ³ location/sub_location, intentar por posiciÃ³n o heurÃ­stica especÃ­fica
         foreach ($headersRaw as $idx => $hr) {
             $hrC = $cleaner($hr);
             if (empty($row['location']) && strpos($hrC, 'servicioclinico') !== false) $row['location'] = $data[$idx];
@@ -291,10 +303,10 @@ function importAssetsFromFile(array $fileData): array
         $inventoryId = $rawId;
 
 
-        // --- SANITIZACIÓN DE CAMPOS CRÍTICOS ---
+        // --- SANITIZACIÃ“N DE CAMPOS CRÃTICOS ---
         // MySQL NO_ZERO_DATE rechaza '0000' en YEAR/DATE.
-        // PDO envía '' (string vacío) para campos no mapeados → falla silenciosa.
-        // Convertir strings vacíos a null para YEAR, DATE y DECIMAL.
+        // PDO envÃ­a '' (string vacÃ­o) para campos no mapeados â†’ falla silenciosa.
+        // Convertir strings vacÃ­os a null para YEAR, DATE y DECIMAL.
         $cleanYear = function ($v): ?int {
             $v = preg_replace('/[^0-9]/', '', (string)$v);
             $v = (int)$v;
@@ -337,8 +349,8 @@ function importAssetsFromFile(array $fileData): array
 
         try {
             $serialNum  = trim((string)($row['serial_number'] ?? ''));
-            $cleanSn    = mb_strtoupper($serialNum);
-            $cleanInvId = mb_strtoupper($inventoryId);
+            $cleanSn    = mb_strtoupper((string)$serialNum);
+            $cleanInvId = mb_strtoupper((string)$inventoryId);
 
             // Generic serial values that should NOT be used as unique keys
             $genericSns = ['S/S', 'S/I', 'S/N', 'N/A', 'SIN SERIE', 'COMODATO', '0', '-', '', 'NULL', 'SIN NUMERO'];
@@ -380,7 +392,7 @@ function importAssetsFromFile(array $fileData): array
             // Register identity key for future duplicate detection
             $seenInventoryIds[$identityKey] = $rowIndex;
 
-            // Warn when both identity fields are missing/generic — asset has no reliable key.
+            // Warn when both identity fields are missing/generic â€” asset has no reliable key.
             if ($isGeneric && !$hasValidSn) {
                 $stats['conflicts'][] = [
                     'type'         => 'NO_ID',
@@ -392,13 +404,21 @@ function importAssetsFromFile(array $fileData): array
                 ];
             }
 
-            // DB LOOKUP by Inventory ID + SN confirmation.
-            // If ID is generic or empty, we SKIP lookup and always CREATE to avoid merging different physical assets.
+            // DB LOOKUP STRATEGY:
+            // 1. Prioridad: CÃ“DIGO SISTEMA (ID) -> Si existe, es la Ãºnica fuente de verdad.
+            // 2. Fallback: NÂ° Inventario + SN confirmation.
             $exactMatch   = null;
             $partialMatch = null;
             $candidates   = [];
 
-            if (!$isGeneric) {
+            // A. BÃºsqueda por ID de Sistema (HEC ID)
+            $systemId = trim((string)($row['system_id'] ?? ''));
+            if (!empty($systemId) && !in_array(strtoupper($systemId), $genericSns)) {
+                $exactMatch = $repo->findById($systemId);
+            }
+
+            // B. Fallback a Inventory ID si no hay exactMatch por System ID
+            if (!$exactMatch && !$isGeneric) {
                 $candidates = $repo->findAllByInventoryId($inventoryId);
                 foreach ($candidates as $c) {
                     $dbSerial = mb_strtoupper(trim((string)($c->serialNumber ?? '')));
@@ -461,7 +481,7 @@ function importAssetsFromFile(array $fileData): array
             }
         } catch (\Exception $e) {
             $stats['errors']++;
-            $stats['details'][] = "❌ Fila $rowIndex '{$row['name']}': " . $e->getMessage();
+            $stats['details'][] = "âŒ Fila $rowIndex '{$row['name']}': " . $e->getMessage();
         }
     }
 
@@ -474,7 +494,7 @@ function importAssetsFromFile(array $fileData): array
 function parseXlsxToArray(string $filePath): array
 {
     if (!class_exists('ZipArchive')) {
-        throw new \Exception("ERROR_ZIP_EXTENSION_MISSING: La extensión 'zip' no está habilitada en tu servidor PHP. Es necesaria para leer archivos .xlsx.");
+        throw new \Exception("ERROR_ZIP_EXTENSION_MISSING: La extensiÃ³n 'zip' no estÃ¡ habilitada en tu servidor PHP. Es necesaria para leer archivos .xlsx.");
     }
     $zip = new \ZipArchive();
     if ($zip->open($filePath) !== TRUE) return [];
@@ -515,7 +535,7 @@ function parseXlsxToArray(string $filePath): array
                     $val = $sharedStrings[(int)$val] ?? "";
                 }
 
-                // Manejo de índices de columnas (Excel salta celdas vacías)
+                // Manejo de Ã­ndices de columnas (Excel salta celdas vacÃ­as)
                 $ref = (string)$cell['r']; // E.g. "A1"
                 $colIndex = 0;
                 for ($i = 0; $i < strlen($ref); $i++) {
@@ -526,7 +546,7 @@ function parseXlsxToArray(string $filePath): array
                 $currentRow[$colIndex - 1] = $val;
             }
 
-            // Rellenar huecos si Excel omitió celdas vacías en medio
+            // Rellenar huecos si Excel omitiÃ³ celdas vacÃ­as en medio
             if (!empty($currentRow)) {
                 $maxCol = max(array_keys($currentRow));
                 for ($i = 0; $i <= $maxCol; $i++) {
@@ -566,28 +586,98 @@ function parseCsvToArray(string $filePath): array
 
 
 /**
- * Exporta todos los activos a un archivo CSV descargable.
+ * Exporta todos los activos a un archivo CSV descargable siguiendo el formato de "Prueba 2.csv".
  */
 function exportAssetsToCsv()
 {
     $assets = getAllAssets();
 
-    // Headers para descarga
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+
     header('Content-Type: text/csv; charset=utf-8');
-    header('Content-Disposition: attachment; filename=inventario_biomedico_' . date('Y-m-d') . '.csv');
+    header('Content-Disposition: attachment; filename="inventario_biomedico_' . date('Y-m-d') . '.csv"');
+    header('Cache-Control: max-age=0, no-cache, must-revalidate, proxy-revalidate');
 
     $output = fopen('php://output', 'w');
 
     // Bom para UTF-8 (Excel friendly)
     fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
-    // Cabeceras del CSV
-    if (!empty($assets)) {
-        fputcsv($output, array_keys($assets[0]));
+    // Cabeceras exactas de "Prueba 2.csv" + CÃ³digo Sistema
+    $headersExport = [
+        'CÃ“DIGO SISTEMA (ID)',
+        'SERVICIO CLÃNICO',
+        'RECINTO',
+        'CLASE',
+        'SUBCLASE',
+        'NOMBRE EQUIPO',
+        'MARCA',
+        'MODELO',
+        'SERIE',
+        'NÂ° INVENTARIO',
+        'AÃ‘O DE ADQUISICIÃ“N',
+        'VIDA ÃšTIL',
+        'VIDA ÃšTIL RESIDUAL',
+        'PROPIO / ARRIENDO / COMODATO',
+        'ESTADO (BUENO / REGULAR / MALO / BAJA)',
+        'CRÃTICO/ RELEVANTE / IMâ‰¥12 / NO APLICA',
+        'EN GARANTÃA (SI / NO)',
+        'AÃ‘O VENCIMIENTO GARANTÃA',
+        'BAJO PLAN DE MANTENIMIENTO (SI / NO)',
+        'AÃ‘O INGRESO A PLAN DE MANTENIMIENTO',
+        'MANTENIMIENTO INTERNO O MANTENIMIENTO EXTERNO O CONTRATO',
+        'NOMBRE DE PROVEEDOR O MANTENIMIENTO INTERNO',
+        'ID CONVENIO DE MANTENIMIENTO / ID DE REFERENCIA / COTIZACIÃ“N DE REFERENCIA',
+        'COSTO ANUAL DE MANTENIMIENTO SEGÃšN CONVENIO / PRECIO DE REFERENCIA MANTENIMIENTO ANUAL',
+        'FRECUENCIA ANUAL DE MANTENIMIENTO',
+        // Meses AÃ±o 1
+        'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE',
+        // Meses AÃ±o 2
+        'ENERO_2', 'FEBRERO_2', 'MARZO_2', 'ABRIL_2', 'MAYO_2', 'JUNIO_2', 'JULIO_2', 'AGOSTO_2', 'SEPTIEMBRE_2', 'OCTUBRE_2', 'NOVIEMBRE_2', 'DICIEMBRE_2'
+    ];
 
-        foreach ($assets as $asset) {
-            fputcsv($output, $asset);
+    fputcsv($output, $headersExport, ';');
+
+    foreach ($assets as $asset) {
+        $freq_meses = (int)($asset['frecuencia_mp_meses'] ?? 6);
+        $annual_freq = ($freq_meses > 0) ? round(12 / $freq_meses, 1) : 0;
+        
+        $row = [
+            $asset['hec_id'] ?? $asset['id'], // CÃ“DIGO SISTEMA (ID)
+            $asset['location'] ?? '',
+            $asset['sub_location'] ?? '',
+            $asset['riesgo_ge'] ?? '',
+            $asset['subclase'] ?? '',
+            $asset['name'] ?? '',
+            $asset['brand'] ?? '',
+            $asset['model'] ?? '',
+            $asset['serial_number'] ?? '',
+            $asset['inventory_id'] ?? '',
+            $asset['purchased_year'] ?? '',
+            $asset['total_useful_life'] ?? '',
+            $asset['years_remaining'] ?? '',
+            $asset['ownership'] ?? 'PROPIO',
+            $asset['status'] ?? 'BUENO',
+            $asset['criticality'] ?? 'LOW',
+            ($asset['warranty_expiration'] ? 'SI' : 'NO'),
+            $asset['warranty_expiration'] ?? '',
+            ($asset['under_maintenance_plan'] ? 'SI' : 'NO'),
+            $asset['purchased_year'] ?? '',
+            ($asset['contract_id'] ? 'MANTENIMIENTO EXTERNO' : 'MANTENIMIENTO INTERNO'),
+            $asset['vendor'] ?? '',
+            $asset['contract_id'] ?? '',
+            $asset['annual_maint_cost'] ?? 0,
+            $annual_freq
+        ];
+
+        // Rellenar los 24 meses con vacÃ­o (BioCMMS los gestiona dinÃ¡micamente)
+        for ($i = 0; $i < 24; $i++) {
+            $row[] = '';
         }
+
+        fputcsv($output, $row, ';');
     }
 
     fclose($output);
@@ -606,15 +696,20 @@ function exportFinancialReportToCsv()
     $stats = getFinancialStats();
     $downtime = getDowntimeImpact();
 
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+
     header('Content-Type: text/csv; charset=utf-8');
-    header('Content-Disposition: attachment; filename=reporte_minsal_financiero_' . date('Y-m-d') . '.csv');
+    header('Content-Disposition: attachment; filename="reporte_minsal_financiero_' . date('Y-m-d') . '.csv"');
+    header('Cache-Control: max-age=0, no-cache, must-revalidate, proxy-revalidate');
 
     $output = fopen('php://output', 'w');
     fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
-    // Sección 1: KPIs Globales
+    // SecciÃ³n 1: KPIs Globales
     fputcsv($output, ['REPORTE FINANCIERO CONSOLIDADO - BIO-CMMS']);
-    fputcsv($output, ['Fecha Generación', date('Y-m-d H:i:s')]);
+    fputcsv($output, ['Fecha GeneraciÃ³n', date('Y-m-d H:i:s')]);
     fputcsv($output, []);
 
     fputcsv($output, ['KPI', 'Valor (USD)']);
@@ -632,7 +727,6 @@ function exportFinancialReportToCsv()
             fputcsv($output, [$area['area'], $area['hours'], $area['loss']]);
         }
     }
-
     fclose($output);
     exit;
 }

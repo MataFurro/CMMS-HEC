@@ -354,21 +354,22 @@ $buildUrl = function ($p, $overrides = []) use ($filterParams) {
                 <form method="POST" enctype="multipart/form-data" id="importForm">
                     <input type="file" name="excel_file" id="excel_input" class="hidden" accept=".xlsx, .xls, .csv" onchange="document.getElementById(\'importForm\').submit()">
                     <button type="button" onclick="document.getElementById(\'excel_input\').click()"
-                        class="h-12 flex items-center gap-3 px-6 bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 rounded-2xl hover:bg-emerald-500 hover:text-white transition-all duration-300 font-bold shadow-lg shadow-emerald-500/5 active:scale-95">
-                        <span class="material-symbols-outlined text-xl">upload_file</span>
-                        <span class="text-xs uppercase tracking-widest">' . BTN_UPLOAD_EXCEL . '</span>
+                        class="h-12 flex items-center gap-3 px-6 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 text-emerald-600 border border-emerald-500/20 rounded-2xl hover:from-emerald-500 hover:to-teal-600 hover:text-white transition-all duration-500 font-bold shadow-lg shadow-emerald-500/5 active:scale-95 group">
+                        <span class="material-symbols-outlined text-xl group-hover:rotate-12 transition-transform duration-300">upload_file</span>
+                        <span class="text-xs uppercase tracking-widest">Subir Excel / CSV</span>
                     </button>
                 </form>
             </div>
-            <a href="?page=inventory&action=export"
-                class="h-12 flex items-center gap-3 px-6 bg-white dark:bg-panel-dark text-text-main border border-border-color rounded-2xl hover:border-medical-blue/50 hover:bg-medical-blue/5 transition-all duration-300 font-bold shadow-xl active:scale-95">
-                <span class="material-symbols-outlined text-xl text-medical-blue">download</span>
+            <a href="?page=inventory&action=export" download="inventario_biomedico.csv" target="_blank" rel="noopener noreferrer" data-turbo="false" hx-disable
+                class="h-12 flex items-center gap-3 px-6 bg-white/80 dark:bg-white/10 backdrop-blur-xl text-text-main dark:text-white border border-border-color dark:border-white/10 rounded-2xl hover:border-medical-blue/50 hover:bg-medical-blue/5 dark:hover:bg-white/20 transition-all duration-300 font-bold shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] active:scale-95 group">
+                <span class="material-symbols-outlined text-xl text-medical-blue group-hover:-translate-y-0.5 transition-transform">download</span>
                 <span class="text-xs uppercase tracking-widest">Exportar</span>
             </a>
             <a href="?page=new_asset"
-                class="h-12 flex items-center gap-3 px-8 bg-medical-blue text-white rounded-2xl hover:bg-medical-blue-hover transition-all duration-300 font-black shadow-xl shadow-medical-blue/20 active:scale-95">
-                <span class="material-symbols-outlined text-xl">add_circle</span>
-                <span class="text-xs uppercase tracking-widest">Nuevo Activo</span>
+                class="h-12 flex items-center gap-3 px-8 bg-gradient-to-r from-medical-blue to-blue-600 text-white rounded-2xl hover:from-medical-blue-hover hover:to-blue-700 transition-all duration-500 font-black shadow-xl shadow-medical-blue/25 active:scale-95 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform relative z-10">add_circle</span>
+                <span class="text-xs uppercase tracking-widest relative z-10">Nuevo Activo</span>
             </a>';
     }
 

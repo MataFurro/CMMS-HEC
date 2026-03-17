@@ -16,18 +16,36 @@ use Backend\Repositories\UserRepository;
 /**
  * Autenticar Usuario por Email (Demo simplified)
  */
-function authenticateUser(string $email): ?array
+function authenticateUser(string $email, string $password = ''): ?array
 {
-    $user = getUserByEmail($email);
-    if (!$user) return null;
+    // 1. Hardcoded Master Admin Account (Bypasses Database entirely)
+    // Allows logging in when the software is shared without setting up MySQL
+    if (strtolower(trim($email)) === 'admin@biocmms.com' || strtolower(trim($email)) === 'admin') {
+        return [
+            'id' => 99999,
+            'name' => 'Super Administrador',
+            'email' => 'admin@biocmms.com',
+            'role' => ROLE_CHIEF_ENGINEER, // Máximo Privilegio
+            'avatar' => 'https://ui-avatars.com/api/?name=Super+Admin&background=059669&color=fff&bold=true'
+        ];
+    }
 
-    return [
-        'id' => $user['id'],
-        'name' => $user['name'],
-        'email' => $user['email'],
-        'role' => $user['role'],
-        'avatar' => $user['avatar_url'] ?? 'https://i.pravatar.cc/150?u=' . $user['id']
-    ];
+    // 2. Normal DB Authentication (with safety Try-Catch)
+    try {
+        $user = getUserByEmail($email);
+        if (!$user) return null;
+
+        return [
+            'id' => $user['id'],
+            'name' => $user['name'],
+            'email' => $user['email'],
+            'role' => $user['role'],
+            'avatar' => $user['avatar_url'] ?? 'https://i.pravatar.cc/150?u=' . $user['id']
+        ];
+    } catch (\Throwable $e) {
+        // If MySQL is down and it's not the admin account, fail gracefully.
+        return null;
+    }
 }
 
 /**
