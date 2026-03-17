@@ -265,10 +265,10 @@ $mttrTrend = getMTTREvolutionData();
     $headerActions = '';
     if (canModify()) {
         $headerActions = '
-            <button class="h-11 px-6 border border-border-color text-text-main rounded-xl text-sm font-bold hover:bg-medical-blue/10 flex items-center gap-2 transition-all active:scale-95 bg-medical-surface">
+            <a href="?page=inventory&action=export" download="inventario_biomedico.csv" target="_blank" rel="noopener noreferrer" data-turbo="false" hx-disable class="h-11 px-6 border border-border-color dark:border-white/10 text-text-main dark:text-white rounded-xl text-sm font-bold hover:bg-medical-blue/10 dark:hover:bg-white/10 flex items-center gap-2 transition-all active:scale-95 bg-medical-surface dark:bg-white/5 backdrop-blur-md cursor-pointer">
                 <span class="material-symbols-outlined text-xl">file_download</span>
-                Exportar Reporte
-            </button>';
+                Exportar
+            </a>';
     }
 
     $preTitle = 'BioCMMS Engine';
