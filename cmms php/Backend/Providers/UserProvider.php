@@ -61,7 +61,7 @@ function getSidebarMenu(string $userRole): array
         ['name' => SIDEBAR_INVENTORY, 'path' => 'inventory', 'icon' => 'precision_manufacturing', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_TECHNICIAN, ROLE_AUDITOR]],
         ['name' => SIDEBAR_FAMILY_ANALYSIS, 'path' => 'family_analysis', 'icon' => 'analytics', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER, ROLE_AUDITOR]],
         ['name' => SIDEBAR_MESSENGER, 'path' => 'messenger_requests', 'icon' => 'mail', 'roles' => [ROLE_CHIEF_ENGINEER, ROLE_ENGINEER]],
-        ['name' => 'Business Intelligence', 'path' => 'financial_analysis', 'icon' => 'payments', 'roles' => [ROLE_CHIEF_ENGINEER]],
+        ['name' => 'Gestión Financiera', 'path' => 'financial_analysis', 'icon' => 'payments', 'roles' => [ROLE_CHIEF_ENGINEER]],
         ['name' => 'Optimización Masiva', 'path' => 'bulk_management', 'icon' => 'tune', 'roles' => [ROLE_CHIEF_ENGINEER]],
         ['name' => 'Archivo Histórico (Bajas)', 'path' => 'retired_assets', 'icon' => 'skull', 'roles' => [ROLE_CHIEF_ENGINEER]],
         ['name' => 'Gestión de Solicitudes (GOS)', 'path' => 'service_request', 'icon' => 'add_alert', 'roles' => [ROLE_USER, ROLE_CHIEF_ENGINEER, ROLE_ENGINEER]],
@@ -210,6 +210,19 @@ function registerNewUser(array $userData, string $specialty = 'General Biomédic
         return $userId;
     } catch (Exception $e) {
         error_log("UserProvider::registerNewUser Error: " . $e->getMessage());
+        return null;
+    }
+}
+/**
+ * Obtener un usuario por su ID
+ */
+function getUserById(int $id): ?array
+{
+    try {
+        $repo = new UserRepository();
+        return $repo->findById($id);
+    } catch (Exception $e) {
+        error_log("UserProvider::getUserById Error: " . $e->getMessage());
         return null;
     }
 }

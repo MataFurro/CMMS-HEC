@@ -176,7 +176,11 @@ function countWorkOrdersByStatus(): array
 
         return [
             'total' => array_sum($results),
-            'En Curso' => (int)($results['En Curso'] ?? 0),
+            'En Curso' => (int)($results['En Curso'] ?? 0) 
+                        + (int)($results['En Proceso'] ?? 0) 
+                        + (int)($results['Pendiente'] ?? 0) 
+                        + (int)($results['Abierta'] ?? 0)
+                        + (int)($results['Asignada'] ?? 0),
             'En Espera' => (int)($results['En Espera'] ?? 0),
             'Terminada' => (int)($results['Terminada'] ?? 0),
             'Cancelada' => (int)($results['Cancelada'] ?? 0)
@@ -269,16 +273,34 @@ function createWorkOrder(array $data): string
     };
 
     // 2. Generar ID con secuencia diaria: [PREFIX]-[YYYYMMDD]-[SEQ]
-    $today = date('Ymd');
-    $dateFilter = date('Y-m-d');
+    $dateObj = isset($data['created_date']) ? new DateTime($data['created_date']) : new DateTime();
+    $idDate = $dateObj->format('Ymd');
+    $dbFilter = $dateObj->format('Y-m-d');
 
-    // Contar cuántas OTs se han creado hoy para este tipo
-    $stmt = $db->prepare("SELECT COUNT(*) FROM work_orders WHERE created_date = :today AND type = :type");
-    $stmt->execute([':today' => $dateFilter, ':type' => $type]);
-    $countToday = (int)$stmt->fetchColumn();
-    $sequence = str_pad($countToday + 1, 3, '0', STR_PAD_LEFT);
+    // Contar cuántas OTs se han creado ese día para este tipo
+    $stmt = $db->prepare("SELECT COUNT(*) FROM work_orders WHERE DATE(created_date) = :d AND type = :t");
+    $stmt->execute([':d' => $dbFilter, ':t' => $type]);
+    $countDay = (int)$stmt->fetchColumn();
+    
+    // Fallback: Si estamos en un bucle cerrado (seeding), el count puede fallar por delay de commit.
+    // En producción esto es raro, pero para seeding es crítico.
+    // Añadimos un micro-random si es necesario o simplemente confiamos en el loop externo?
+    // Mejor: Si el ID existe, incrementamos manualmente en el proveedor o dejamos que falle?
+    // Implementaremos una verificación de existencia.
+    $sequence = str_pad($countDay + 1, 3, '0', STR_PAD_LEFT);
+    $newId = "{$prefix}-{$idDate}-{$sequence}";
 
-    $newId = "{$prefix}-{$today}-{$sequence}";
+    // Verificación de existencia (anti-colisión para seeding masivo)
+    $stmtCheck = $db->prepare("SELECT 1 FROM work_orders WHERE id = ?");
+    $attempts = 0;
+    while ($attempts < 50) {
+        $stmtCheck->execute([$newId]);
+        if (!$stmtCheck->fetch()) break;
+        $countDay++;
+        $sequence = str_pad($countDay + 1, 3, '0', STR_PAD_LEFT);
+        $newId = "{$prefix}-{$idDate}-{$sequence}";
+        $attempts++;
+    }
 
     // 3. Resolución de ID de activo si se proporciona el inventory_id (string)
     $assetId = $data['asset_id'] ?? null;
@@ -305,7 +327,20 @@ function createWorkOrder(array $data): string
         'checklist_template' => $data['checklist_template'] ?? null
     ];
 
-    return $repo->create($dbData);
+    $id = $repo->create($dbData);
+    
+    // [FLUJO 19] Sincronización proactiva: Si la OT inicia activa, el equipo entra a mantenimiento
+    if ($id && in_array($dbData['status'], ['En Curso', 'En Espera'])) {
+        try {
+            require_once __DIR__ . '/AssetProvider.php';
+            updateAssetInfo($assetId, ['status' => 'MAINTENANCE']);
+            \Backend\Core\LoggerService::info("Sincronización Automática: Activo $assetId marcado en MAINTENANCE por nueva OT $id");
+        } catch (\Exception $e) {
+            \Backend\Core\LoggerService::error("Error sincronización MAINTENANCE", ['error' => $e->getMessage()]);
+        }
+    }
+
+    return $id;
 }
 
 /**
@@ -376,10 +411,11 @@ function completeWorkOrder(string $otId, array $executionData = [], array $unify
         // Sincronización automática de estado del Activo si se proporcionó un estado final
         if (!empty($executionData['final_asset_status'])) {
             require_once __DIR__ . '/AssetProvider.php';
+            $asset = getAssetById($order->assetId);
+            
             // Mapeo defensivo
             $finalStatus = $executionData['final_asset_status'];
             
-            // Scenario 3: Corregir mapeo de estado 'Degradado'
             if ($finalStatus === 'DEGRADED' || $finalStatus === 'REGULAR') {
                 $finalStatus = 'OPERATIVE_WITH_OBS';
             } elseif ($finalStatus === 'OUT_OF_SERVICE' || $finalStatus === 'Fuera de Servicio') {
@@ -388,9 +424,12 @@ function completeWorkOrder(string $otId, array $executionData = [], array $unify
             
             $assetUpdate = ['status' => $finalStatus];
 
-            // Flujo 2 & 7: Si es preventiva o se unificaron preventivas, actualizar la fecha del próximo mantenimiento
-            if (($order->type ?? '') === 'Preventiva' || !empty($unifyOtIds) || ((float)($updateData['duration_hours'] ?? 0) >= 4.0 && ($order->type ?? '') === 'Correctiva')) {
-                $assetUpdate['next_maintenance_date'] = date('Y-m-d', strtotime("+6 months"));
+            // [FLUJO 17] Recurrencia dinámica basada en frecuencia o 6 meses por defecto
+            if (($order->type ?? '') === 'Preventiva' || !empty($unifyOtIds) || ($order->type ?? '') === 'Correctiva') {
+                $freq = (isset($asset['frecuencia_mp_meses']) && (int)$asset['frecuencia_mp_meses'] > 0) 
+                        ? (int)$asset['frecuencia_mp_meses'] 
+                        : 6;
+                $assetUpdate['next_maintenance_date'] = date('Y-m-d', strtotime("+{$freq} months"));
             }
 
             updateAssetInfo($order->assetId, $assetUpdate);
@@ -425,17 +464,16 @@ function completeWorkOrder(string $otId, array $executionData = [], array $unify
             }
         }
 
-        // Cierre automático de preventivas por intervención mayor.
+        // [FLUJO 17] Cierre automático de preventivas por intervención técnica (Unificación).
         if (($order->type ?? '') === 'Correctiva') {
             if (!empty($unifyOtIds)) {
-                // [FLUJO 7] Unificación manual solicitada
+                // Unificación manual solicitada
                 foreach ($unifyOtIds as $prevId) {
                     closePreventiveByUnification($prevId, $otId);
                 }
-            } elseif ((float)($updateData['duration_hours'] ?? 0) >= 4.0) {
-                // Cierre en cascada automático por duración (>=4h)
-                cascadeClosePreventives($order->assetId, $otId);
             }
+            // Siempre intentar cierre en cascada para unificación implícita por intervención real
+            cascadeClosePreventives($order->assetId, $otId);
         }
     }
 
@@ -455,7 +493,7 @@ function cascadeClosePreventives($assetId, string $triggerOtId): void
             SELECT id FROM work_orders 
             WHERE asset_id = :asset_id 
               AND type = 'Preventiva' 
-              AND status = 'En Curso'
+              AND status IN ('En Curso', 'Abierta')
         ");
         $stmt->execute([':asset_id' => $assetId]);
         $pendings = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -507,6 +545,15 @@ function stallWorkOrderByCoordination(string $otId, string $reason): bool
     ]);
 
     if ($success) {
+        // [FLUJO 19] Asegurar que el activo siga en mantenimiento aunque la OT se posponga
+        try {
+            $order = $repo->findById($otId);
+            if ($order) {
+                require_once __DIR__ . '/AssetProvider.php';
+                updateAssetInfo($order->assetId, ['status' => 'MAINTENANCE']);
+            }
+        } catch (\Exception $e) { /* Silencioso */ }
+
         // Log opcional — no debe bloquear la pausa si la tabla no existe
         try {
             $db = \Backend\Core\DatabaseService::getInstance();

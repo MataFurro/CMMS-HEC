@@ -118,8 +118,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         "medical-dark": "#0b0f1a",
                         "medical-surface": "var(--medical-surface)",
                         "border-dark": "var(--border-color)",
-                        "text-main": "#0f172a",
-                        "text-muted": "#64748b"
+                        "text-main": "var(--text-main)",
+                        "text-muted": "var(--text-muted)"
                     },
                     fontFamily: {
                         "display": ["Inter", "sans-serif"]
@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <style>
         :root {
             --medical-surface: #ffffff;
-            --border-color: #e2e8f0;
+            --border-color: #cbd5e1;
             --input-bg: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
@@ -148,10 +148,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .dark {
             --medical-surface: #0b0f1a;
-            --border-color: #1e293b;
+            --border-color: #334155;
             --input-bg: #0f172a;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
+            --text-main: #f8fafc;
+            --text-muted: #cbd5e1;
         }
 
         body {

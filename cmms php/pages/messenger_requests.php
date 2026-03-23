@@ -50,7 +50,7 @@ try {
     }
 
     // Solo traer solicitudes PENDIENTES
-    $requests = $db->query("SELECT * FROM service_requests WHERE status = 'En Curso' ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+    $requests = $db->query("SELECT * FROM service_requests WHERE status = 'Pendiente' ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     $requests = [];
     $error = "Error de Conexión MySQL (Módulo Integración Clínico): " . $e->getMessage();

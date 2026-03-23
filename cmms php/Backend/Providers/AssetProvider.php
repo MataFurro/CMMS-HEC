@@ -11,6 +11,7 @@
 
 require_once __DIR__ . '/../Core/DatabaseService.php';
 require_once __DIR__ . '/../Repositories/AssetRepository.php';
+require_once __DIR__ . '/../Repositories/WorkOrderRepository.php';
 require_once __DIR__ . '/../Repositories/UserRepository.php';
 require_once __DIR__ . '/../Models/AssetStatus.php';
 require_once __DIR__ . '/../Models/Criticality.php';
@@ -178,10 +179,10 @@ function getFinancialStats(?array $assets = null): array
 
     $totalReposicion = $totalVal * REPLACEMENT_COST_FACTOR;
 
-    // "Mantenimiento Mora" -> Detectar preventivos antiguos (>30 días)
+    // "Mantenimiento Mora" -> Detectar preventivos antiguos (HEC_MORA_DAYS)
     // Sincronizado con los estados reales: 'En Curso', 'En Espera'
     $db = \Backend\Core\DatabaseService::getInstance();
-    $thresholdDate = date('Y-m-d', strtotime('-30 days'));
+    $thresholdDate = date('Y-m-d', strtotime('-' . HEC_MORA_DAYS . ' days'));
     $stmt = $db->prepare("SELECT COUNT(*) FROM work_orders WHERE type = 'Preventiva' AND status IN ('En Curso', 'En Espera') AND created_date < :threshold");
     $stmt->execute(['threshold' => $thresholdDate]);
     $missedPMs = (int)$stmt->fetchColumn();
@@ -242,7 +243,15 @@ function getPMCoverageStats(): array
 }
 
 /**
- * Contar activos por estado - OPTIMIZADO
+ * Obtiene los IDs de activos que tienen OTs activas (En Curso o En Espera)
+ */
+function getActiveWorkOrderAssetIds(): array
+{
+    return (new \Backend\Repositories\WorkOrderRepository())->getActiveWorkOrderAssetIds();
+}
+
+/**
+ * Contar activos por estado - OPTIMIZADO y UNIFICADO
  */
 function countAssetsByStatus(?array $assets = null): array
 {
@@ -256,12 +265,15 @@ function countAssetsByStatus(?array $assets = null): array
         ];
     }
 
+    $activeOtAssetIds = getActiveWorkOrderAssetIds();
+
     if (!$assets) {
-        $repo = new AssetRepository();
-        return $repo->getStatusCounts();
+        // Si no hay assets en memoria, usamos el repo pero ajustamos dinámicamente si es posible
+        // Por simplicidad en este paso, cargamos todos y procesamos, o podríamos inyectar el ajuste en el repo.
+        // Dado que son ~3000 assets, cargarlos es aceptable.
+        $assets = getAllAssets();
     }
 
-    // Contar en memoria si ya tenemos la data cargada (evita N+1 y reloads)
     $counts = [
         'total' => count($assets),
         'operative' => 0,
@@ -272,6 +284,14 @@ function countAssetsByStatus(?array $assets = null): array
 
     foreach ($assets as $a) {
         $status = $a['status'] ?? '';
+        $id = (int)($a['id'] ?? 0);
+        
+        // INTERVENCIÓN ACTIVA: Si tiene OT en curso, reportamos como mantenimiento
+        if ($id > 0 && in_array($id, $activeOtAssetIds)) {
+            $counts['maintenance']++;
+            continue;
+        }
+
         if (in_array($status, ['OPERATIVE', 'BUENO'])) $counts['operative']++;
         elseif ($status === 'MAINTENANCE') $counts['maintenance']++;
         elseif (in_array($status, ['NO_OPERATIVE', 'MALO'])) $counts['no_operative']++;
@@ -313,8 +333,9 @@ function getExpiredOperativeCount(?array $assets = null): int
 {
     $assets = $assets ?: getAllAssets();
     return count(array_filter($assets, function ($a) {
+        $status = $a['status'] ?? '';
         return ($a['useful_life_pct'] ?? 0) <= 0
-            && ($a['status'] ?? '') === 'OPERATIVE';
+            && ($status === 'OPERATIVE' || $status === 'BUENO');
     }));
 }
 
@@ -487,8 +508,9 @@ function getTopRiskAssets(int $limit = 5): array
     $riskList = [];
 
     foreach ($assets as $asset) {
-        // Filtrar activos que pueden tener riesgo (en uso y críticos/operativos)
-        if (($asset['status'] ?? '') === 'OPERATIVE') {
+        // Filtrar activos que pueden tener riesgo (en uso y operativos)
+        $status = $asset['status'] ?? '';
+        if ($status === 'OPERATIVE' || $status === 'BUENO') {
             // Pasamos el array $asset directamente para evitar N+1
             $metrics = getAssetReliabilityMetrics($asset['id'], $asset);
             $riskList[] = array_merge($asset, [
@@ -670,12 +692,14 @@ function getAssetsByClase(): array
     ];
 
     $assets = getAllAssets();
+    $activeOtAssetIds = (new \Backend\Repositories\WorkOrderRepository())->getActiveWorkOrderAssetIds();
     $grupos = [];
 
     // Priorizar clases oficiales
     $clasesOficiales = getCategoryOptions();
     foreach ($clasesOficiales as $c) {
-        $grupos[$c] = [
+        $key = mb_strtoupper(trim($c), 'UTF-8');
+        $grupos[$key] = [
             'clase'       => $c,
             'total'       => 0,
             'operativos'  => 0,
@@ -688,30 +712,89 @@ function getAssetsByClase(): array
     }
 
     // Grupo para los que no tengan clase asignada o sea inválida
-    $grupos['OTROS'] = [
-        'clase'       => 'OTROS',
-        'total'       => 0,
-        'operativos'  => 0,
-        'criticos'    => 0,
-        'relevantes'  => 0,
-        'valor_total' => 0.0,
-        'obsoletos'   => 0,
-        'equipos'     => [],
-    ];
+    if (!isset($grupos['OTROS'])) {
+        $grupos['OTROS'] = [
+            'clase'       => 'OTROS',
+            'total'       => 0,
+            'operativos'  => 0,
+            'criticos'    => 0,
+            'relevantes'  => 0,
+            'valor_total' => 0.0,
+            'obsoletos'   => 0,
+            'equipos'     => [],
+        ];
+    }
 
     foreach ($assets as $asset) {
-        $grupo = mb_strtoupper(trim($asset['riesgo_ge'] ?? 'OTROS'), 'UTF-8');
+        $origGrupo = mb_strtoupper(trim($asset['riesgo_ge'] ?? 'OTROS'), 'UTF-8');
+        $grupo = $origGrupo;
 
-        if (!isset($grupos[$grupo])) {
-            $grupo = 'OTROS';
+        // REFINAMIENTO ESPECIALIDAD: Si es OTROS o no existe en catálogo, probamos con subclase
+        if ($grupo === 'OTROS' || !isset($grupos[$grupo])) {
+            $fallback = mb_strtoupper(trim($asset['subclase'] ?? ''), 'UTF-8');
+            if ($fallback && isset($grupos[$fallback])) {
+                $grupo = $fallback;
+            } else {
+                // [HEURÍSTICA AVANZADA] Si sigue sin reconocerse, buscamos por nombre de equipo
+                $nameLower = mb_strtoupper(trim($asset['name'] ?? ''), 'UTF-8');
+                
+                if (str_contains($nameLower, 'MONITOR') || str_contains($nameLower, 'OXIMETRO') || str_contains($nameLower, 'PULSI') || str_contains($nameLower, 'VITALES') || str_contains($nameLower, 'DESFIBR') || str_contains($nameLower, 'CARDIO') || str_contains($nameLower, 'ECG') || str_contains($nameLower, 'EKG')) {
+                    $grupo = 'MONITOREO';
+                } elseif (str_contains($nameLower, 'RAYOS') || str_contains($nameLower, 'ECOGRAFO') || str_contains($nameLower, 'MAMOGRAFO') || str_contains($nameLower, 'ARCO EN C') || str_contains($nameLower, 'IMAGEN') || str_contains($nameLower, 'RX') || str_contains($nameLower, 'RESONANCIA') || str_contains($nameLower, 'TOMO') || str_contains($nameLower, 'SCANNER')) {
+                    $grupo = 'IMAGENOLOGÍA';
+                } elseif (str_contains($nameLower, 'ESTERIL') || str_contains($nameLower, 'AUTOCLAVE') || str_contains($nameLower, 'LAVADORA') || str_contains($nameLower, 'SECADORA') || str_contains($nameLower, 'TERMO') || str_contains($nameLower, 'SELLADORA')) {
+                    $grupo = 'ESTERILIZACIÓN';
+                } elseif (str_contains($nameLower, 'DENTAL') || str_contains($nameLower, 'SILLON') || str_contains($nameLower, 'CURADO') || str_contains($nameLower, 'EQUIPO DENTAL')) {
+                    $grupo = 'ODONTOLOGÍA';
+                } elseif (str_contains($nameLower, 'LABORATORIO') || str_contains($nameLower, 'FARMACIA') || str_contains($nameLower, 'CENTRIFUGA') || str_contains($nameLower, 'REFRIGERADOR') || str_contains($nameLower, 'BAÑO') || str_contains($nameLower, 'ANALIZADOR') || str_contains($nameLower, 'COAGULO') || str_contains($nameLower, 'MICROSC') || str_contains($nameLower, 'EXTRACTOR') || str_contains($nameLower, 'CONGELADOR') || str_contains($nameLower, 'AGITADOR') || str_contains($nameLower, 'GABINETE')) {
+                    $grupo = 'LABORATORIO / FARMACIA';
+                } elseif (str_contains($nameLower, 'QUIRURGI') || str_contains($nameLower, 'BISTURI') || str_contains($nameLower, 'ANESTESIA') || str_contains($nameLower, 'MESA CX') || str_contains($nameLower, 'VAPORIZA') || str_contains($nameLower, 'LARINGOS') || str_contains($nameLower, 'LAMPARA') || str_contains($nameLower, 'LASER') || str_contains($nameLower, 'ELECTROBISTURI')) {
+                    $grupo = 'APOYO QUIRÚRGICO';
+                } elseif (str_contains($nameLower, 'TERAPIA') || str_contains($nameLower, 'VENTILADOR') || str_contains($nameLower, 'BOMBA') || str_contains($nameLower, 'INFUSION') || str_contains($nameLower, 'JERINGA') || str_contains($nameLower, 'PCP') || str_contains($nameLower, 'INCUBADORA') || str_contains($nameLower, 'FOTO') || str_contains($nameLower, 'HUMIDIF') || str_contains($nameLower, 'HIPOTERMIA') || str_contains($nameLower, 'DIALISIS')) {
+                    $grupo = 'APOYO TERAPÉUTICO';
+                } elseif (str_contains($nameLower, 'DIAGNOSTICO') || str_contains($nameLower, 'ELECTROCARDI') || str_contains($nameLower, 'OFTAL') || str_contains($nameLower, 'AUDI') || str_contains($nameLower, 'POTENCIAL') || str_contains($nameLower, 'HOLTER') || str_contains($nameLower, 'BERA')) {
+                    $grupo = 'APOYO DIAGNÓSTICO';
+                } elseif (str_contains($nameLower, 'INDUS') || str_contains($nameLower, 'PLANTA') || str_contains($nameLower, 'AIRE') || str_contains($nameLower, 'AGUA') || str_contains($nameLower, 'GRUPO') || str_contains($nameLower, 'CLIMA') || str_contains($nameLower, 'CALDERA')) {
+                    $grupo = 'APOYO INDUSTRIAL';
+                } elseif (str_contains($nameLower, 'REHAB') || str_contains($nameLower, 'FISIO') || str_contains($nameLower, 'ULTRASONIDO') || str_contains($nameLower, 'MESA DE TRAC') || str_contains($nameLower, 'TENS')) {
+                    $grupo = 'MED. FIS. REHABILITACIÓ';
+                } elseif (str_contains($nameLower, 'CAMILLA') || str_contains($nameLower, 'MOBILIARIO') || str_contains($nameLower, 'SILLA')) {
+                    $grupo = 'MOBILIARIO';
+                } else {
+                    $grupo = 'OTROS';
+                }
+
+                // Verificación final del grupo heurístico contra el catálogo
+                if ($grupo !== 'OTROS' && !isset($grupos[$grupo])) {
+                    // Si no existe tal cual, intentamos búsqueda fuzzy en las llaves del catálogo
+                    foreach (array_keys($grupos) as $key) {
+                        if (str_contains($key, $grupo) || str_contains($grupo, $key)) {
+                            $grupo = $key;
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         $grupos[$grupo]['total']++;
         $grupos[$grupo]['valor_total'] += (float)($asset['acquisition_cost'] ?? 0);
 
-        if (($asset['status'] ?? '')      === 'OPERATIVE') $grupos[$grupo]['operativos']++;
+        // DINAMISMO DE ESTADO: Si tiene OT activa, reportamos como MAINTENANCE
+        $id = $asset['id'] ?? ($asset['inventory_id'] ?? null);
+        $status = $asset['status'] ?? '';
+        $isUnderMaintenance = in_array($id, $activeOtAssetIds);
+
+        if ($isUnderMaintenance) {
+            // No incrementamos operativos si está en mantenimiento dinámico
+        } elseif (in_array($status, ['OPERATIVE', 'BUENO'])) {
+            $grupos[$grupo]['operativos']++;
+        }
+
         if (($asset['criticality'] ?? '') === 'CRITICAL')  $grupos[$grupo]['criticos']++;
         if (($asset['criticality'] ?? '') === 'RELEVANT')  $grupos[$grupo]['relevantes']++;
+        
+        // OBSOLETOS: % Vida Útil <= 0
         if (($asset['useful_life_pct'] ?? 100) <= 0)       $grupos[$grupo]['obsoletos']++;
 
         $grupos[$grupo]['equipos'][] = [
@@ -720,7 +803,7 @@ function getAssetsByClase(): array
             'brand'       => $asset['brand'] ?? '-',
             'model'       => $asset['model'] ?? '-',
             'location'    => $asset['location'] ?? '-',
-            'status'      => $asset['status'] ?? '-',
+            'status'      => $isUnderMaintenance ? 'MAINTENANCE' : ($asset['status'] ?? '-'),
             'criticality' => $asset['criticality'] ?? '-',
             'crit_label'  => $critLabel[$asset['criticality']] ?? ($asset['criticality'] ?? '-'),
             'vida_util'   => $asset['useful_life_pct'] ?? 0,
@@ -729,7 +812,7 @@ function getAssetsByClase(): array
         ];
     }
 
-    // Eliminar grupos vacíos (menos los oficiales si se desea mantener la estructura)
+    // Eliminar grupos vacíos (menos los oficiales)
     foreach ($grupos as $k => $v) {
         if ($v['total'] === 0 && $k === 'OTROS') unset($grupos[$k]);
     }

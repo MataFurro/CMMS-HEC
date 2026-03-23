@@ -42,7 +42,18 @@ class WorkOrderEntity
             id: $data['id'],
             assetId: $data['asset_id'],
             type: $data['type'],
-            status: WorkOrderStatus::tryFrom($data['status'] ?? '') ?? WorkOrderStatus::IN_PROGRESS,
+            status: (function($s) {
+                $status = WorkOrderStatus::tryFrom($s);
+                if ($status) return $status;
+                // Mapeo defensivo para estados legacy/alias
+                return match (strtolower($s)) {
+                    'abierta', 'pendiente', 'asignada', 'in_progress', 'open' => WorkOrderStatus::IN_PROGRESS,
+                    'en espera', 'on_hold', 'waiting' => WorkOrderStatus::ON_HOLD,
+                    'terminada', 'cerrada', 'completed', 'closed' => WorkOrderStatus::COMPLETED,
+                    'cancelada', 'canceled', 'cancelled' => WorkOrderStatus::CANCELED,
+                    default => WorkOrderStatus::IN_PROGRESS
+                };
+            })($data['status'] ?? ''),
             priority: $data['priority'] ?? 'Media',
             assignedTechName: $data['assigned_tech_name'] ?? null,
             createdDate: isset($data['created_date']) ? new DateTime($data['created_date']) : null,

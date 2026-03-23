@@ -11,8 +11,9 @@
     --medical-surface: #ffffff;
     --panel-dark: #f1f5f9;
     /* Slate 100 */
-    --border-color: #b1b9c5;
+    --border-color: #cbd5e1;
     /* Stronger definition */
+    --border-dark: #cbd5e1;
     --text-main: #0f172a;
     /* Slate 900 */
     --text-muted: #334155;
@@ -36,8 +37,9 @@
     --medical-surface: #0f172a;
     /* Slate 900 */
     --panel-dark: #020617;
-    --border-color: #1e293b;
-    /* Slate 800 */
+    --border-color: #334155;
+    /* Slate 700 to provide contrast against Slate 800/900 bg */
+    --border-dark: #334155;
     --text-main: #f8fafc;
     /* Slate 50 */
     --text-muted: #cbd5e1;

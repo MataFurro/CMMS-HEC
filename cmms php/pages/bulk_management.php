@@ -737,7 +737,7 @@ $statMap = [
                 </div>
             </button>
             <button class="bm-act group" onclick="triggerAction('reassign')">
-                <div class="bm-act-icon bg-purple-500/10 border border-purple-500/20 group-hover:bg-purple-500 group-hover:text-white transition-all duration-300">
+                <div class="bm-act-icon bg-emerald-500/10 border border-emerald-500/20 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
                     <span class="material-symbols-outlined text-xl">supervised_user_circle</span>
                 </div>
                 <div class="text-left min-w-0">

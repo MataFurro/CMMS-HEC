@@ -33,14 +33,25 @@ $critBadge  = [
 ];
 
 $claseColors = [
-    'Monitoreo'       => ['hex' => '#10b981', 'badge' => 'bg-emerald-600/10 text-emerald-500',   'icon' => 'monitor_heart'],
-    'No Monitoreo'    => ['hex' => '#0ea5e9', 'badge' => 'bg-sky-600/10 text-sky-500', 'icon' => 'build'],
-    'Sin Clasificar'  => ['hex' => 'var(--text-muted)', 'badge' => 'bg-panel-dark text-[var(--text-muted)]', 'icon' => 'device_unknown'],
+    'APOYO DIAGNÓSTICO'         => ['hex' => '#10b981', 'badge' => 'bg-emerald-600/10 text-emerald-500', 'icon' => 'medical_services'],
+    'APOYO ENDOSCÓPICO'         => ['hex' => '#0ea5e9', 'badge' => 'bg-sky-600/10 text-sky-500', 'icon' => 'biotech'],
+    'APOYO INDUSTRIAL'          => ['hex' => '#6366f1', 'badge' => 'bg-indigo-600/10 text-indigo-500', 'icon' => 'precision_manufacturing'],
+    'APOYO QUIRÚRGICO'          => ['hex' => '#f43f5e', 'badge' => 'bg-rose-600/10 text-rose-500', 'icon' => 'surgery'],
+    'APOYO TERAPÉUTICO'         => ['hex' => '#f59e0b', 'badge' => 'bg-amber-600/10 text-amber-500', 'icon' => 'personal_injury'],
+    'ESTERILIZACIÓN'            => ['hex' => '#8b5cf6', 'badge' => 'bg-violet-600/10 text-violet-500', 'icon' => 'sanitizer'],
+    'IMAGENOLOGÍA'              => ['hex' => '#ec4899', 'badge' => 'bg-pink-600/10 text-pink-500', 'icon' => 'radiology'],
+    'LABORATORIO / FARMACIA'    => ['hex' => '#06b6d4', 'badge' => 'bg-cyan-600/10 text-cyan-500', 'icon' => 'science'],
+    'MED. FIS. REHABILITACIÓN'   => ['hex' => '#22c55e', 'badge' => 'bg-green-600/10 text-green-500', 'icon' => 'fitness_center'],
+    'MOBILIARIO'                => ['hex' => '#94a3b8', 'badge' => 'bg-slate-600/10 text-slate-500', 'icon' => 'chair_alt'],
+    'MONITOREO'                 => ['hex' => '#06b6d4', 'badge' => 'bg-cyan-600/10 text-cyan-400', 'icon' => 'monitor_heart'],
+    'ODONTOLOGÍA'               => ['hex' => '#14b8a6', 'badge' => 'bg-teal-600/10 text-teal-500', 'icon' => 'dentistry'],
+    'BAJO COSTO'                => ['hex' => '#475569', 'badge' => 'bg-slate-600/10 text-slate-400', 'icon' => 'devices'],
+    'OTROS'                     => ['hex' => '#64748b', 'badge' => 'bg-gray-600/10 text-gray-400', 'icon' => 'more_horiz']
 ];
-$defaultColor = ['hex' => 'var(--text-muted)', 'badge' => 'bg-panel-dark text-[var(--text-muted)]', 'icon' => 'devices'];
+$defaultColor = ['hex' => '#64748b', 'badge' => 'bg-gray-600/10 text-white', 'icon' => 'devices'];
 
 $claseLabels = json_encode(array_column($clasesData, 'clase'));
-$claseHexes  = json_encode(array_map(fn($c) => ($claseColors[$c['clase']] ?? $defaultColor)['hex'], $clasesData));
+$claseHexes  = json_encode(array_map(fn($c) => ($claseColors[mb_strtoupper($c['clase'], 'UTF-8')] ?? $defaultColor)['hex'], $clasesData));
 
 // Datos para Doughnut (Ahora por CRITICIDAD)
 $critChartData = [
@@ -113,9 +124,9 @@ $critChartData = [
         <div class="card-glass p-6 border-l-4 border-l-amber-600">
             <div class="flex justify-between items-start">
                 <span class="material-symbols-outlined text-amber-600 text-2xl">history_toggle_off</span>
-                <span class="text-[9px] font-black text-amber-600 bg-amber-600/10 px-2 py-0.5 rounded-full uppercase">Inactivos</span>
+                <span class="text-[9px] font-black text-amber-600 bg-amber-600/10 px-2 py-0.5 rounded-full uppercase">Obsoletos</span>
             </div>
-            <p class="stat-label mt-4 text-[var(--text-muted)] font-bold uppercase tracking-tighter text-[10px]">Fuera de Servicio</p>
+            <p class="stat-label mt-4 text-[var(--text-muted)] font-bold uppercase tracking-tighter text-[10px]">Vida Útil Excedida</p>
             <h3 class="stat-value text-3xl font-black text-[var(--text-main)] mt-1" id="kpi-obsoletos"><?= $totalObsoletos ?></h3>
         </div>
 
@@ -335,6 +346,7 @@ $critChartData = [
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                indexAxis: 'y', // Flipped for better readability
                 onClick: (e, elements) => {
                     if (elements.length > 0) {
                         const clicked = claseChart.data.labels[elements[0].index];
@@ -349,15 +361,23 @@ $critChartData = [
                         display: false
                     },
                     tooltip: {
+                        enabled: true,
                         backgroundColor: isDark ? '#0f172a' : '#ffffff',
                         titleColor: isDark ? '#ffffff' : '#0f172a',
                         bodyColor: labelColor,
                         borderColor: isDark ? '#1e293b' : '#e2e8f0',
-                        borderWidth: 1
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                return ' ' + (context.label || '') + ': ' + context.parsed.x + ' activos';
+                            }
+                        }
                     }
                 },
                 scales: {
-                    y: {
+                    x: {
                         grid: {
                             color: gridColor,
                             drawBorder: false
@@ -366,14 +386,16 @@ $critChartData = [
                             color: labelColor
                         }
                     },
-                    x: {
+                    y: {
                         grid: {
                             display: false
                         },
                         ticks: {
                             color: labelColor,
-                            maxRotation: 45,
-                            minRotation: 45
+                            autoSkip: false,
+                            font: {
+                                size: 11
+                            }
                         }
                     }
                 }
@@ -475,8 +497,14 @@ $critChartData = [
                     x: {
                         ticks: {
                             color: labelColor,
-                            maxRotation: 45,
-                            minRotation: 45
+                            maxRotation: 0,
+                            minRotation: 0,
+                            autoSkip: false,
+                            callback: function(value) {
+                                let label = this.getLabelForValue(value);
+                                if (label.length > 15) return label.slice(0, 13) + '...';
+                                return label;
+                            }
                         }
                     }
                 }
@@ -517,9 +545,9 @@ $critChartData = [
         // Update KPIs
         const stats = {
             total: filtered.length,
-            operativos: filtered.filter(a => a.status === 'OPERATIVE').length,
+            operativos: filtered.filter(a => (a.status === 'OPERATIVE' || a.status === 'BUENO')).length,
             criticos: filtered.filter(a => a.normalizedCrit === 'CRITICAL').length,
-            obsoletos: filtered.filter(a => a.status === 'NO_OPERATIVE').length,
+            obsoletos: filtered.filter(a => (parseFloat(a.vida_util) <= 0)).length,
             valor: filtered.reduce((sum, a) => sum + parseFloat(a.costo || 0), 0)
         };
 

@@ -26,10 +26,4 @@ Esta entrega consolida la evolución del sistema hacia una gestión basada en in
 - [x] Se ha actualizado la documentación (Walkthrough generado).
 - [x] He verificado que no hay conflictos con la rama `main`.
 
-## 👥 Equipo
 
-- **Responsable:** Antigravity AI
-- **Revisor sugerido:** star_ (USER)
-
-## 🔗 Issues Vinculados
-Closes Flow-10, Flow-11, Flow-12
