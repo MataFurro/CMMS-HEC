@@ -134,3 +134,829 @@
 {"timestamp":"2026-03-16 17:46:29","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
 {"timestamp":"2026-03-16 17:46:31","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
 {"timestamp":"2026-03-16 17:46:31","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 18:02:53","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 18:02:53","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 18:02:58","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 18:02:58","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 18:02:58","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 18:02:58","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 18:03:02","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 18:03:02","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 18:08:22","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":"anonymous","ip":"cli"}
+{"timestamp":"2026-03-16 19:32:10","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":"anonymous","ip":"cli"}
+{"timestamp":"2026-03-16 19:58:55","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":"anonymous","ip":"cli"}
+{"timestamp":"2026-03-16 20:07:42","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:07:43","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:07:46","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:07:46","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:08:16","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:08:19","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:08:21","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:08:49","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:08:49","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:09:10","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:09:12","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:09:12","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:09:16","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:09:16","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:09:33","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:09:33","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:09:34","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:09:34","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:09:36","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:09:36","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:09:39","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:09:39","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:09:41","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:09:41","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-16 20:31:05","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99,"ip":"::1"}
+{"timestamp":"2026-03-16 20:35:04","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99,"ip":"::1"}
+{"timestamp":"2026-03-16 20:36:44","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99,"ip":"::1"}
+{"timestamp":"2026-03-17 13:36:57","level":"INFO","message":"Orden de Trabajo finalizada con datos de entrega t\u00e9cnica","context":{"id":"COR-20260317-001"},"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 13:37:21","level":"INFO","message":"Orden de Trabajo finalizada con datos de entrega t\u00e9cnica","context":{"id":"COR-20260317-002"},"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 13:57:45","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:57:45","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:57:47","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:57:48","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:58:17","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:58:19","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:58:22","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:58:22","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:58:24","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:58:24","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:58:26","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:58:26","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:58:34","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:58:36","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:58:36","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:58:40","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:58:40","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:58:44","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:58:44","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:59:41","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:59:41","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:59:44","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 13:59:44","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 14:02:46","level":"ERROR","message":"Error en AssetRepository::create","context":{"id":"N\/A","error":"SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'inventory_id' cannot be null"},"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 14:02:46","level":"ERROR","message":"Error en AssetRepository::create","context":{"id":"N\/A","error":"SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'inventory_id' cannot be null"},"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 14:02:46","level":"ERROR","message":"Error en AssetRepository::create","context":{"id":"N\/A","error":"SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'inventory_id' cannot be null"},"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 14:02:46","level":"ERROR","message":"Error en AssetRepository::create","context":{"id":"N\/A","error":"SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'inventory_id' cannot be null"},"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 14:02:46","level":"ERROR","message":"Error en AssetRepository::create","context":{"id":"N\/A","error":"SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'inventory_id' cannot be null"},"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 14:02:46","level":"ERROR","message":"Error en AssetRepository::create","context":{"id":"N\/A","error":"SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'inventory_id' cannot be null"},"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 14:02:46","level":"ERROR","message":"Error en AssetRepository::create","context":{"id":"N\/A","error":"SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'inventory_id' cannot be null"},"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 14:02:46","level":"ERROR","message":"Error en AssetRepository::create","context":{"id":"N\/A","error":"SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'inventory_id' cannot be null"},"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 14:02:46","level":"ERROR","message":"Error en AssetRepository::create","context":{"id":"N\/A","error":"SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'inventory_id' cannot be null"},"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 14:02:46","level":"ERROR","message":"Error en AssetRepository::create","context":{"id":"N\/A","error":"SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'inventory_id' cannot be null"},"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 14:02:46","level":"ERROR","message":"Error en AssetRepository::create","context":{"id":"N\/A","error":"SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'inventory_id' cannot be null"},"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 14:02:46","level":"ERROR","message":"Error en AssetRepository::create","context":{"id":"N\/A","error":"SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'inventory_id' cannot be null"},"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 14:02:46","level":"ERROR","message":"Error en AssetRepository::create","context":{"id":"N\/A","error":"SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'inventory_id' cannot be null"},"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 14:02:46","level":"ERROR","message":"Error en AssetRepository::create","context":{"id":"N\/A","error":"SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'inventory_id' cannot be null"},"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 14:02:46","level":"ERROR","message":"Error en AssetRepository::create","context":{"id":"N\/A","error":"SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'inventory_id' cannot be null"},"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 14:44:05","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 14:44:05","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 14:44:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 14:44:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 14:44:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 15:52:36","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 15:53:51","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 15:54:00","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 15:54:04","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 15:54:12","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 15:54:43","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 15:54:45","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 15:54:46","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 15:55:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 15:55:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 15:55:29","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 15:55:29","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 16:25:55","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 16:25:59","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 16:26:02","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 16:26:03","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 16:26:03","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 16:26:05","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 16:26:05","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 16:26:15","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1 marcado en MAINTENANCE por nueva OT COR-20260317-061","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 16:26:15","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1 marcado en MAINTENANCE por nueva OT COR-20260317-062","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 16:26:15","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1 marcado en MAINTENANCE por nueva OT COR-20260317-063","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 16:26:15","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1 marcado en MAINTENANCE por nueva OT COR-20260317-064","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 16:26:15","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1 marcado en MAINTENANCE por nueva OT COR-20260317-065","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 16:26:15","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1 marcado en MAINTENANCE por nueva OT COR-20260317-066","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 16:43:40","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1000057 marcado en MAINTENANCE por nueva OT COR-20260317-070","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 16:43:40","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1000058 marcado en MAINTENANCE por nueva OT COR-20260317-071","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 16:43:40","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1000059 marcado en MAINTENANCE por nueva OT COR-20260317-072","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 16:43:40","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1000060 marcado en MAINTENANCE por nueva OT COR-20260317-073","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 16:43:40","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1000061 marcado en MAINTENANCE por nueva OT COR-20260317-074","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-17 16:44:26","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 16:44:26","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 16:44:32","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 16:44:32","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 16:44:44","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 16:44:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 16:44:59","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 16:53:29","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 16:53:30","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 16:53:34","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 16:53:35","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 17:22:31","level":"ERROR","message":"Error en AssetRepository::delete","context":{"id":"1","error":"SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`biocmms`.`checklist_results`, CONSTRAINT `fk_checklist_results_asset_id` FOREIGN KEY (`asset_id`) REFERENCES `assets` (`id`))"},"user":"anonymous","ip":"cli"}
+{"timestamp":"2026-03-17 17:24:48","level":"ERROR","message":"Error en AssetRepository::delete","context":{"id":"1","error":"SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`biocmms`.`checklist_results`, CONSTRAINT `fk_checklist_results_asset_id` FOREIGN KEY (`asset_id`) REFERENCES `assets` (`id`))"},"user":"anonymous","ip":"cli"}
+{"timestamp":"2026-03-17 17:32:18","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 17:32:22","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 17:32:25","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 17:43:50","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 17:43:50","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 17:43:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 17:43:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 17:44:05","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 17:44:45","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 18:02:08","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 18:02:10","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 18:02:13","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 18:03:54","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 18:05:34","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 18:07:41","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 18:07:43","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 18:07:45","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 18:07:48","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 18:11:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 18:12:18","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 18:13:18","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:09:47","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:41:41","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:41:43","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:41:45","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:41:47","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:41:48","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:48:14","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:48:17","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:48:19","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:48:55","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:48:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:50:40","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:53:24","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:53:25","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:53:25","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:53:25","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:53:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:53:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:53:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:53:29","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 19:54:13","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:05:44","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:05:45","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:05:45","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:05:45","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:05:45","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:05:46","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:05:46","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:05:47","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:05:47","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:05:48","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:05:49","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:05:51","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:06:00","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:06:02","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:06:03","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:06:04","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:06:10","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:06:14","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:06:23","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:15:31","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:15:33","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:15:33","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:15:35","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:15:37","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:26:20","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:26:21","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:26:21","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:26:21","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:26:22","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:26:23","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:26:33","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:26:45","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:26:48","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:26:52","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:27:01","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:29:25","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:29:29","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:29:29","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-17 20:29:31","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-18 15:17:49","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 15:17:49","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 15:17:49","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 15:17:51","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 15:17:51","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 15:17:51","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 15:17:51","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 15:17:53","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 15:17:54","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 15:18:01","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 15:18:01","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 15:18:03","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 15:18:03","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 15:18:03","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 15:18:42","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 15:18:44","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 15:20:24","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 15:52:42","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 15:58:20","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 15:58:46","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 16:29:16","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 17:40:03","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 17:41:18","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 18:56:19","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 18:56:41","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:22:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:22:44","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:22:50","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:23:18","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:23:24","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:23:24","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:23:26","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:23:26","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:23:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:23:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:23:29","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:23:29","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:23:47","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:23:50","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:23:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:24:02","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:24:09","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:24:10","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:29:29","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:29:45","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:37:53","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:37:55","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:43:50","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:43:50","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:43:51","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:43:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:44:01","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:44:22","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:53:22","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:53:42","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:53:51","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:54:06","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:54:06","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:54:14","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:54:16","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:54:17","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:56:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:56:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:56:31","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:56:33","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:56:59","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:57:26","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 19:57:39","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:28:51","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:28:52","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:28:52","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:28:54","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:28:54","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:28:54","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:28:54","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:28:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:28:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:28:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:28:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:28:59","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:28:59","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:29:35","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:29:35","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:29:37","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:29:37","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:29:37","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:29:37","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:29:39","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:29:39","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:30:01","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:30:01","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:30:04","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:30:04","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:30:17","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:30:17","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:30:19","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:30:19","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:30:19","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:30:19","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:30:21","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:30:21","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 20:30:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 21:01:05","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 21:01:05","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 21:01:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-18 21:01:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:39:02","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:39:02","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:39:04","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:39:04","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:39:04","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:39:05","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:39:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:39:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:46:10","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:46:12","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:46:13","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:46:14","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:46:22","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:46:22","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:46:25","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:46:25","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:46:25","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:46:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:46:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:46:30","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:46:30","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:46:33","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:46:33","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:46:35","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:46:35","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:47:09","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 13:57:47","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 13:59:48","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 13:59:48","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2981 marcado en MAINTENANCE por nueva OT PRE-20260319-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:05","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:05","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2470 marcado en MAINTENANCE por nueva OT PRE-20260103-002","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:05","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2244 marcado en MAINTENANCE por nueva OT COR-20260202-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:05","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1352 marcado en MAINTENANCE por nueva OT COR-20251001-002","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:06","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2670 marcado en MAINTENANCE por nueva OT COR-20251127-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:06","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1934 marcado en MAINTENANCE por nueva OT COR-20260122-002","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 621 marcado en MAINTENANCE por nueva OT COR-20260120-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2510 marcado en MAINTENANCE por nueva OT COR-20251128-003","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1885 marcado en MAINTENANCE por nueva OT COR-20251118-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 321 marcado en MAINTENANCE por nueva OT COR-20260204-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2896 marcado en MAINTENANCE por nueva OT COR-20260206-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1518 marcado en MAINTENANCE por nueva OT COR-20251121-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2255 marcado en MAINTENANCE por nueva OT COR-20251108-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1904 marcado en MAINTENANCE por nueva OT COR-20260225-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2009 marcado en MAINTENANCE por nueva OT COR-20260202-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2309 marcado en MAINTENANCE por nueva OT COR-20260121-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 556 marcado en MAINTENANCE por nueva OT COR-20251218-002","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2086 marcado en MAINTENANCE por nueva OT PRE-20260131-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2461 marcado en MAINTENANCE por nueva OT PRE-20251206-002","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2382 marcado en MAINTENANCE por nueva OT PRE-20251213-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2626 marcado en MAINTENANCE por nueva OT COR-20251007-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2162 marcado en MAINTENANCE por nueva OT COR-20260102-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 514 marcado en MAINTENANCE por nueva OT COR-20260302-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1872 marcado en MAINTENANCE por nueva OT PRE-20251130-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2650 marcado en MAINTENANCE por nueva OT COR-20260117-004","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1815 marcado en MAINTENANCE por nueva OT PRE-20260222-003","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2554 marcado en MAINTENANCE por nueva OT PRE-20250922-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1452 marcado en MAINTENANCE por nueva OT COR-20251221-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2397 marcado en MAINTENANCE por nueva OT COR-20260121-002","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1271 marcado en MAINTENANCE por nueva OT PRE-20260228-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1455 marcado en MAINTENANCE por nueva OT COR-20260122-002","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1691 marcado en MAINTENANCE por nueva OT PRE-20260130-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 907 marcado en MAINTENANCE por nueva OT COR-20251030-002","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1920 marcado en MAINTENANCE por nueva OT PRE-20251021-004","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1578 marcado en MAINTENANCE por nueva OT COR-20260103-002","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1388 marcado en MAINTENANCE por nueva OT PRE-20260214-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1942 marcado en MAINTENANCE por nueva OT COR-20260129-002","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1372 marcado en MAINTENANCE por nueva OT COR-20260223-002","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 630 marcado en MAINTENANCE por nueva OT PRE-20251214-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 952 marcado en MAINTENANCE por nueva OT COR-20260126-002","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2494 marcado en MAINTENANCE por nueva OT PRE-20260227-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:46","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 1389 marcado en MAINTENANCE por nueva OT PRE-20260310-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:47","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 269 marcado en MAINTENANCE por nueva OT COR-20260228-002","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:47","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2199 marcado en MAINTENANCE por nueva OT COR-20251013-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:47","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 457 marcado en MAINTENANCE por nueva OT COR-20251205-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:47","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 878 marcado en MAINTENANCE por nueva OT COR-20251111-002","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:47","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2435 marcado en MAINTENANCE por nueva OT PRE-20250929-003","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:47","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2894 marcado en MAINTENANCE por nueva OT COR-20251116-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:47","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2595 marcado en MAINTENANCE por nueva OT COR-20260307-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:47","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 270 marcado en MAINTENANCE por nueva OT PRE-20251115-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:47","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 2609 marcado en MAINTENANCE por nueva OT PRE-20251212-002","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:04:47","level":"INFO","message":"Sincronizaci\u00f3n Autom\u00e1tica: Activo 568 marcado en MAINTENANCE por nueva OT COR-20260105-001","context":[],"user":1,"ip":"cli"}
+{"timestamp":"2026-03-19 14:34:46","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 14:34:47","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 14:34:49","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 14:34:49","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 14:35:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 14:35:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 14:35:30","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 14:35:30","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 15:25:08","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 15:25:08","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 15:25:11","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 15:25:11","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 15:25:15","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 15:25:15","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 15:25:17","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 15:25:17","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 16:37:15","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 16:37:15","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 16:37:18","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 16:37:18","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 16:37:34","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 16:47:10","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 16:47:11","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 16:47:11","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 16:47:14","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 16:47:14","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 16:47:14","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 16:47:14","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 16:47:16","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 16:47:16","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 16:54:38","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 17:13:36","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 17:13:36","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 17:13:36","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 17:13:36","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 17:13:36","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 17:13:36","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 17:13:46","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 17:13:46","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 17:13:46","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 17:13:46","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 17:13:46","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 17:13:46","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 17:13:55","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 17:13:55","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 17:13:55","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 17:13:55","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 17:13:55","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 17:13:55","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-19 17:14:16","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-20 16:10:35","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 16:10:35","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 16:10:37","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 16:10:37","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 16:10:40","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 16:10:50","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 16:10:53","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 16:10:53","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 16:10:55","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 16:10:55","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 16:11:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 16:11:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 16:11:35","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 16:11:35","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 16:11:38","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 16:11:38","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:15:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":"anonymous","ip":"cli"}
+{"timestamp":"2026-03-20 18:15:46","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":"anonymous","ip":"cli"}
+{"timestamp":"2026-03-20 18:16:48","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":"anonymous","ip":"cli"}
+{"timestamp":"2026-03-20 18:17:26","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":"anonymous","ip":"cli"}
+{"timestamp":"2026-03-20 18:17:36","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":"anonymous","ip":"cli"}
+{"timestamp":"2026-03-20 18:18:51","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":"anonymous","ip":"cli"}
+{"timestamp":"2026-03-20 18:42:44","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:42:44","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:43:26","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:43:26","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:43:34","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:43:34","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:46:00","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:46:00","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:49:23","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:49:24","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:52:06","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:52:06","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:22","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:22","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:23","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:23","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:30","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:32","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:32","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:35","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:35","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:35","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:35","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:37","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:37","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:40","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:40","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:46","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:46","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:50","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:50","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:52","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:52","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:55","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:55","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:58","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:53:58","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:54:10","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 18:54:10","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:07:03","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:07:03","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:07:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:07:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:07:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:07:08","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:07:11","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:07:11","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:07:21","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:07:21","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:07:35","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:07:36","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:08:41","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:08:42","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:18:24","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":"anonymous","ip":"cli"}
+{"timestamp":"2026-03-20 19:18:24","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":"anonymous","ip":"cli"}
+{"timestamp":"2026-03-20 19:24:31","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:24:31","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:24:33","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:24:33","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:24:35","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:24:35","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:24:37","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:25:12","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:25:13","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:25:15","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:25:15","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:25:16","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:25:16","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:25:19","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:25:19","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:29:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:29:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:30:02","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:30:02","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:30:03","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:30:03","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:30:06","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:30:06","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:47:26","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:47:26","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:49:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:49:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:50:02","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:50:03","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:50:03","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:50:04","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:50:18","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-20 19:50:18","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":1,"ip":"::1"}
+{"timestamp":"2026-03-23 13:56:10","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:56:10","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:56:18","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:56:18","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:58:17","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:58:17","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:58:20","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:58:20","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:58:31","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:58:31","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:58:35","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:58:35","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:58:39","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:58:39","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:59:00","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:59:00","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:59:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:59:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:59:12","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:59:12","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:59:30","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 13:59:30","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:02:30","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:02:30","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:03:41","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:03:41","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:04:33","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:04:33","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:04:38","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:04:38","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:04:58","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:04:58","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:05:04","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:05:04","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:05:58","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:05:58","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:14:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:14:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:15:17","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:15:17","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:15:19","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:15:19","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:15:21","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:15:21","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:15:32","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:15:32","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:31:15","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:31:15","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:36:06","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:36:06","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:36:08","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:36:08","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:36:45","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:36:45","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:37:23","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:37:24","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:37:33","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:37:33","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:38:11","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:38:11","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:38:29","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:38:30","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:38:38","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:38:38","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:38:50","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:38:50","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:39:03","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:39:04","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:43:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:43:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:43:12","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 14:43:12","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:04:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:04:29","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:04:31","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:04:31","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:05:32","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:05:32","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:05:39","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:05:39","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:06:45","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:06:45","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:06:55","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:06:55","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:07:05","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:07:05","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:07:15","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:07:15","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:08:14","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:08:14","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:08:23","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:08:23","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:13:08","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:13:08","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:13:11","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:13:12","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:13:26","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:13:26","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:13:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:13:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:14:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:14:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:15:03","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:15:03","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:15:06","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:15:06","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:15:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:15:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:30:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:30:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:30:29","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:30:29","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:31:11","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:31:11","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:31:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:31:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:31:50","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:31:50","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:31:58","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:31:58","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:32:23","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:32:23","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:32:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:32:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:33:02","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:33:02","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:33:10","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:33:10","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:33:27","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:33:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:33:37","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:33:37","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:33:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:33:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:34:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:34:08","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:34:44","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:34:44","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:34:57","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:34:57","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:35:16","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:35:16","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:35:57","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:35:58","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:36:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:36:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:43:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:43:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:43:09","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:43:09","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:44:38","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:44:38","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:44:49","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:44:50","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:46:03","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:46:03","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:46:06","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:46:06","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:46:06","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:46:06","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:46:08","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:46:08","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:46:17","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:46:17","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:46:20","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:46:20","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:46:24","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:46:25","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:46:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:46:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:47:19","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":"anonymous","ip":"cli"}
+{"timestamp":"2026-03-23 15:48:19","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":"anonymous","ip":"cli"}
+{"timestamp":"2026-03-23 15:49:21","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":"anonymous","ip":"cli"}
+{"timestamp":"2026-03-23 15:49:42","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:49:42","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:49:44","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:49:44","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:50:47","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:50:48","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:51:20","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:51:20","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:51:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:51:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:52:12","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:52:12","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:52:33","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:52:33","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:52:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:52:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:53:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:53:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:53:14","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:53:14","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:54:09","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 15:54:09","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:01:16","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:01:16","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:01:18","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:01:19","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:02:05","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:02:05","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:27:36","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:27:36","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:27:39","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:27:39","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:32:02","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:32:02","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:32:04","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:32:04","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:32:04","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:32:04","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:32:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:32:07","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:33:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:33:56","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:34:12","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:34:12","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:46:39","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:46:40","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:46:42","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:46:42","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:46:47","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:46:47","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:46:49","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:46:49","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:46:49","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:46:49","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:46:52","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:46:52","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:46:52","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:46:52","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:46:52","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:46:52","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:53:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:53:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:53:32","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 16:53:32","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 18:30:16","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 18:30:16","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 18:30:18","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 18:30:18","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 20:35:24","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 20:35:24","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 20:35:26","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 20:35:26","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 20:35:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 20:35:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 20:35:47","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 20:35:47","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 20:35:49","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 20:35:49","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 21:05:10","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 21:05:10","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 21:05:12","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 21:05:12","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 21:05:13","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 21:05:13","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 21:05:15","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 21:05:15","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 21:07:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 21:07:28","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 21:07:30","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 21:07:30","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 21:08:06","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 21:08:06","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 21:08:16","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 21:08:17","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 21:08:44","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 21:08:44","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 21:09:10","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}
+{"timestamp":"2026-03-23 21:09:10","level":"INFO","message":"Consulta exitosa: Lista total de activos generada.","context":[],"user":99999,"ip":"::1"}

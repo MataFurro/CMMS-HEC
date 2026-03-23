@@ -94,7 +94,15 @@ if (!$template) {
     <!-- Header Control -->
     <div class="no-print flex justify-between items-center mb-10 bg-slate-50 p-4 rounded-xl border border-slate-200">
         <p class="text-sm text-slate-500 font-bold italic">Vista previa de impresión oficial.</p>
-        <button onclick="window.print()" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold shadow-lg hover:bg-blue-700 transition-all">Imprimir Reporte</button>
+        <div class="flex gap-3">
+            <a href="?page=report_print_pdf&id=<?= $id ?>" target="_blank" class="bg-emerald-600 text-white px-6 py-2 rounded-lg font-bold shadow-lg hover:bg-emerald-700 transition-all flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+                Exportar PDF
+            </a>
+            <button onclick="window.print()" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold shadow-lg hover:bg-blue-700 transition-all">Imprimir Reporte</button>
+        </div>
     </div>
 
     <!-- Official Header -->

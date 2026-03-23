@@ -87,6 +87,9 @@ $allLocationsCount = getLocationCounts();
 $allCategories = getCategoryOptions();
 $allCriticalities = getCriticalityOptions();
 
+// Pre-fetch active OTs for performance (once per page)
+$activeOtsForBadge = getActiveWorkOrderAssetIds();
+
 // --- HELPER: URL BUILDER ---
 $filterParams = [
     'page' => 'inventory',
@@ -261,7 +264,7 @@ $buildUrl = function ($p, $overrides = []) use ($filterParams) {
                             </div>
                             <ul class="text-xs font-mono text-slate-500 space-y-1 mt-2 pl-9">
                                 <?php foreach ($conflictsA as $c): ?>
-                                    <li>Fila <?= $c['row'] ?>: [<?= htmlspecialchars($c['name']) ?>] ID: <?= htmlspecialchars($c['inventory_id']) ?> &middot; SN: <?= htmlspecialchars($c['serial']) ?></li>
+                                    <li>Fila <?= $c['row'] ?>: [<?= htmlspecialchars($c['name']) ?>] ID: <?= htmlspecialchars($c['inventory_id']) ?> &middot; SN: <?= htmlspecialchars($c['serial_number']) ?></li>
                                 <?php endforeach; ?>
                             </ul>
                         </div>
@@ -272,7 +275,7 @@ $buildUrl = function ($p, $overrides = []) use ($filterParams) {
                             <div class="flex items-start gap-3 mb-3">
                                 <span class="material-symbols-outlined text-orange-500 text-xl mt-0.5">help_outline</span>
                                 <div>
-                                    <p class="text-sm font-black text-orange-700 dark:text-orange-400">Sin Identificadores &mdash; N&deg; Inventario ni N&deg; Serie v&aacute;lidos (<?= count($conflictsNoId) ?> equipos)</p>
+                                    <p class="text-sm font-black text-orange-700 dark:text-orange-400">Sin Identificadores &mdash; Identidad No Confiable (<?= count($conflictsNoId) ?> equipos)</p>
                                     <p class="text-xs text-orange-600/80 mt-0.5">Estos equipos no tienen N&deg; de Inventario ni N&deg; de Serie confiables. Se crearon como equipos separados pero <strong>no podr&aacute;n identificarse en futuras importaciones</strong>. Asigna identificadores manualmente.</p>
                                 </div>
                             </div>
@@ -291,7 +294,7 @@ $buildUrl = function ($p, $overrides = []) use ($filterParams) {
                                             <tr class="text-slate-700 dark:text-slate-300">
                                                 <td class="py-1.5 pr-4 font-mono"><?= $c['row'] ?></td>
                                                 <td class="py-1.5 pr-4"><?= htmlspecialchars($c['name']) ?></td>
-                                                <td class="py-1.5 pr-4 font-mono text-orange-700"><?= htmlspecialchars($c['inventory_id']) ?></td>
+                                                 <td class="py-1.5 pr-4 font-mono text-orange-700"><?= htmlspecialchars($c['location']) ?></td>
                                                 <td class="py-1.5 font-mono text-slate-400"><?= htmlspecialchars($c['serial'] ?: '—') ?></td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -349,11 +352,13 @@ $buildUrl = function ($p, $overrides = []) use ($filterParams) {
     <?php
     $headerActions = '';
     if (canModify()) {
-        $headerActions = '
+        $csrfToken = $_SESSION['csrf_token'] ?? '';
+        $headerActions = <<<HTML
             <div class="group relative">
                 <form method="POST" enctype="multipart/form-data" id="importForm">
-                    <input type="file" name="excel_file" id="excel_input" class="hidden" accept=".xlsx, .xls, .csv" onchange="document.getElementById(\'importForm\').submit()">
-                    <button type="button" onclick="document.getElementById(\'excel_input\').click()"
+                    <input type="hidden" name="csrf_token" value="$csrfToken">
+                    <input type="file" name="excel_file" id="excel_input" class="hidden" accept=".xlsx, .xls, .csv" onchange="document.getElementById('importForm').submit()">
+                    <button type="button" onclick="document.getElementById('excel_input').click()"
                         class="h-12 flex items-center gap-3 px-6 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 text-emerald-600 border border-emerald-500/20 rounded-2xl hover:from-emerald-500 hover:to-teal-600 hover:text-white transition-all duration-500 font-bold shadow-lg shadow-emerald-500/5 active:scale-95 group">
                         <span class="material-symbols-outlined text-xl group-hover:rotate-12 transition-transform duration-300">upload_file</span>
                         <span class="text-xs uppercase tracking-widest">Subir Excel / CSV</span>
@@ -370,7 +375,8 @@ $buildUrl = function ($p, $overrides = []) use ($filterParams) {
                 <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform relative z-10">add_circle</span>
                 <span class="text-xs uppercase tracking-widest relative z-10">Nuevo Activo</span>
-            </a>';
+            </a>
+HTML;
     }
 
     $preTitle = 'BioCMMS Engine';
@@ -634,8 +640,12 @@ $buildUrl = function ($p, $overrides = []) use ($filterParams) {
                                 <!-- Status & Criticality -->
                                 <td class="px-6 py-7 text-center">
                                     <?php
+                                    $hasActiveOtForBadge = in_array((int)$asset['id'], $activeOtsForBadge);
+
                                     $statusConf = match ($asset['status']) {
-                                        STATUS_OPERATIVE => ['label' => 'Operativo', 'class' => 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'],
+                                        STATUS_OPERATIVE => $hasActiveOtForBadge 
+                                            ? ['label' => 'Mantención (OT)', 'class' => 'bg-amber-500/10 text-amber-600 border-amber-500/20']
+                                            : ['label' => 'Operativo', 'class' => 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'],
                                         STATUS_MAINTENANCE => ['label' => 'Mantención', 'class' => 'bg-amber-500/10 text-amber-600 border-amber-500/20'],
                                         STATUS_NO_OPERATIVE => ['label' => 'Fuera de Servicio', 'class' => 'bg-red-500/10 text-red-600 border-red-500/20'],
                                         STATUS_OPERATIVE_WITH_OBS => ['label' => 'Observado', 'class' => 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20'],

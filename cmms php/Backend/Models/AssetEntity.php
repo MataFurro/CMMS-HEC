@@ -69,7 +69,17 @@ class AssetEntity
             serialNumber: $data['serial_number'] ?? null,
             brand: $data['brand'] ?? null,
             model: $data['model'] ?? null,
-            status: AssetStatus::tryFrom($data['status']) ?? AssetStatus::OPERATIVE,
+            status: (function($s) {
+                // Mapeo dinámico de estados heredados/DB a enum de negocio
+                return match (strtoupper($s ?? '')) {
+                    'MALO', 'NO_OPERATIVE' => AssetStatus::NO_OPERATIVE,
+                    'REGULAR', 'OPERATIVE_WITH_OBS' => AssetStatus::OPERATIVE_WITH_OBS,
+                    'BUENO', 'OPERATIVE' => AssetStatus::OPERATIVE,
+                    'MAINTENANCE' => AssetStatus::MAINTENANCE,
+                    'RETIRED' => AssetStatus::RETIRED,
+                    default => AssetStatus::tryFrom($s ?? '') ?? AssetStatus::OPERATIVE
+                };
+            })($data['status']),
             criticality: Criticality::tryFrom($data['criticality'] ?? '') ?? Criticality::LOW,
             acquisitionCost: (float) ($data['acquisition_cost'] ?? 0.0),
             fechaInstalacion: isset($data['fecha_instalacion']) ? new DateTime($data['fecha_instalacion']) : null,

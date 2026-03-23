@@ -32,6 +32,17 @@ class UserRepository
     }
 
     /**
+     * Buscar usuario por ID
+     */
+    public function findById(int $id): ?array
+    {
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+        $user = $stmt->fetch();
+        return $user ?: null;
+    }
+
+    /**
      * Crear un nuevo usuario
      */
     public function create(array $data): int
@@ -82,7 +93,7 @@ class UserRepository
      */
     public function getTechniciansByProductivity(): array
     {
-        $sql = "SELECT u.name, t.specialty, 
+        $sql = "SELECT u.id, u.name, t.specialty, 
                        (SELECT COUNT(*) FROM work_orders WHERE assigned_tech_id = u.id AND status = 'Terminada') as ot_terminadas,
                        -- MTTR: Promedio de horas de duración de OTs terminadas
                        COALESCE((SELECT ROUND(AVG(duration_hours), 1) FROM work_orders WHERE assigned_tech_id = u.id AND status = 'Terminada'), 0) as mttr,

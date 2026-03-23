@@ -93,3 +93,6 @@ define('PENALTY_MISSED_PM', 500);
 define('PENALTY_ADVERSE_EVENT', 2500);
 
 define('DEFAULT_HOSPITAL_NAME', 'Hospital General HEC');
+
+// --- Parámetros de Alerta (NotebookLM) ---
+define('HEC_MORA_DAYS', 30); // Umbral oficial para "Muro de Mora" (Overdue)

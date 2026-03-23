@@ -186,6 +186,9 @@ class AssetRepository
         if ($status !== 'ALL') {
             if ($status === 'OPERATIVE') {
                 $sql .= " AND status IN ('OPERATIVE', 'BUENO')";
+            } elseif ($status === 'MAINTENANCE') {
+                // Registro Dínámico: Incluir equipos con OTs activas (En Curso, Asignada, En Espera, etc.)
+                $sql .= " AND (status = 'MAINTENANCE' OR id IN (SELECT DISTINCT asset_id FROM work_orders WHERE LOWER(status) IN ('en curso', 'en proceso', 'abierta', 'pendiente', 'open', 'in_progress', 'asignada', 'on_hold', 'en espera')))";
             } elseif ($status === 'NO_OPERATIVE') {
                 $sql .= " AND status IN ('NO_OPERATIVE', 'MALO')";
             } elseif ($status === 'OPERATIVE_WITH_OBS') {
@@ -269,6 +272,9 @@ class AssetRepository
         if ($status !== 'ALL') {
             if ($status === 'OPERATIVE') {
                 $sql .= " AND status IN ('OPERATIVE', 'BUENO')";
+            } elseif ($status === 'MAINTENANCE') {
+                // Registro Dínámico: Incluir equipos con OTs activas
+                $sql .= " AND (status = 'MAINTENANCE' OR id IN (SELECT DISTINCT asset_id FROM work_orders WHERE LOWER(status) IN ('en curso', 'en proceso', 'abierta', 'pendiente', 'open', 'in_progress', 'asignada', 'on_hold', 'en espera')))";
             } elseif ($status === 'NO_OPERATIVE') {
                 $sql .= " AND status IN ('NO_OPERATIVE', 'MALO')";
             } elseif ($status === 'OPERATIVE_WITH_OBS') {
@@ -409,14 +415,14 @@ class AssetRepository
                 fecha_instalacion, purchased_year, acquisition_cost, 
                 total_useful_life, useful_life_pct, years_remaining, 
                 warranty_expiration, under_maintenance_plan, en_uso, 
-                image_url, observations, annual_maint_cost, subclase
+                image_url, observations, annual_maint_cost, frecuencia_mp_meses, subclase
             ) VALUES (
                 :inventory_id, :hec_id, :name, :serial_number, :brand, :model, :location, :sub_location, 
                 :vendor, :contract_id, :ownership, :criticality, :status, :riesgo_ge, :codigo_umdns, 
                 :fecha_instalacion, :purchased_year, :acquisition_cost, 
                 :total_useful_life, :useful_life_pct, :years_remaining, 
                 :warranty_expiration, :under_maintenance_plan, :en_uso, 
-                :image_url, :observations, :annual_maint_cost, :subclase
+                :image_url, :observations, :annual_maint_cost, :frecuencia_mp_meses, :subclase
             )";
 
             $stmt = $this->db->prepare($sql);
@@ -449,6 +455,7 @@ class AssetRepository
                 ':image_url' => $data['image_url'] ?? 'https://via.placeholder.com/300',
                 ':observations' => $data['observations'] ?? null,
                 ':annual_maint_cost' => $data['annual_maint_cost'] ?? 0.0,
+                ':frecuencia_mp_meses' => (int)($data['frecuencia_mp_meses'] ?? 6),
                 ':subclase' => $data['subclase'] ?? null
             ];
 

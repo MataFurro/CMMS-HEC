@@ -277,16 +277,7 @@ if (isset($_GET['from_request'])) {
                         <input name="requestor" value="<?= $_SESSION['user_name'] ?? '' ?>" readonly class="w-full bg-panel-dark border border-border-dark rounded-xl px-4 py-3 text-sm text-text-muted cursor-not-allowed" />
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-text-muted uppercase tracking-wider">Asignar a (Opcional)</label>
-                        <select name="assigned_tech_id" class="w-full bg-medical-dark/50 border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-text-main appearance-none">
-                            <option value="">-- Sin Asignar --</option>
-                            <?php
-                            require_once __DIR__ . '/../Backend/Providers/UserProvider.php';
-                            foreach (getActiveTechnicians() as $tech):
-                            ?>
-                                <option value="<?= $tech['id'] ?>"><?= htmlspecialchars($tech['name']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                        <!-- Espacio reservado para balance visual de grid -->
                     </div>
                 </div>
             </div>

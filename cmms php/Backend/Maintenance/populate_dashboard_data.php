@@ -12,8 +12,14 @@
  * USO: http://localhost/cmms%20php/populate_dashboard_data.php
  * ─────────────────────────────────────────────────────────────────
  */
-header('Content-Type: text/html; charset=utf-8');
-require_once __DIR__ . '/Backend/Core/DatabaseService.php';
+require_once __DIR__ . '/../../Backend/Providers/UserProvider.php';
+
+// SECURITY: Only Chief Engineer can perform data population
+if (!isChiefEngineer()) {
+    die("<h1>🛑 Acceso Denegado</h1><p>Solo el Ingeniero Jefe puede ejecutar procesos de poblamiento de datos.</p></body></html>");
+}
+
+require_once __DIR__ . '/../../Backend/Core/DatabaseService.php';
 
 use Backend\Core\DatabaseService;
 
@@ -101,6 +107,8 @@ $catalogoEquipos = [
     'ultrasonido'             => [22_000_000, 10, true,  'RELEVANT'],
     'arco en c'               => [85_000_000, 12, true,  'RELEVANT'],
     'rayos x'                 => [65_000_000, 15, true,  'RELEVANT'],
+    'imagenología'            => [120_000_000, 15, true, 'RELEVANT'],
+    'tomógrafo'               => [150_000_000, 15, true, 'RELEVANT'],
     'tensiómetro'             => [280_000,     7, true,  'RELEVANT'],
     'tensiometro'             => [280_000,     7, true,  'RELEVANT'],
     'termómetro'              => [180_000,     5, true,  'RELEVANT'],
@@ -117,6 +125,7 @@ $catalogoEquipos = [
 
     // ── NO MONITOREO · RELEVANTE ─────────────────────────────────
     'autoclave'               => [6_500_000,  15, false, 'RELEVANT'],
+    'tratamiento de agua'     => [12_000_000, 12, false, 'RELEVANT'],
     'esterilizador'           => [5_800_000,  12, false, 'RELEVANT'],
     'electrobisturí'          => [4_200_000,   8, false, 'RELEVANT'],
     'electrobisturi'          => [4_200_000,   8, false, 'RELEVANT'],

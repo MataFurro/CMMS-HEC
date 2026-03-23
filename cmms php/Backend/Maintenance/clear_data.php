@@ -5,8 +5,8 @@
  * Script de limpieza para eliminar todos los equipos (assets) y órdenes de trabajo (work_orders).
  */
 
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/Backend/Core/DatabaseService.php';
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../Backend/Core/DatabaseService.php';
 
 use Backend\Core\DatabaseService;
 

@@ -197,7 +197,7 @@ $kpiCards = [
         'label' => 'Cobertura PM',
         'value' => getPMComplianceRate() . '%',
         'trend' => 'Cumplimiento',
-        'color' => 'border-l-indigo-500',
+        'color' => 'border-l-medical-blue',
         'icon' => 'event_available',
         'sub' => 'Mora: $' . number_format($financialStats['mantenimiento_mora'], 0, ',', '.') . ' CLP'
     ],

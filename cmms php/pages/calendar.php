@@ -20,7 +20,7 @@ if ($view === 'month') {
 }
 
 $realOrders = getAgendaEvents($startDate, $endDate);
-$predictiveOrders = getPredictiveAgendaEvents($startDate, $endDate);
+$predictiveOrders = []; // Removed: getPredictiveAgendaEvents($startDate, $endDate);
 $allEvents = array_merge($realOrders, $predictiveOrders);
 
 $weekDays = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
@@ -102,10 +102,7 @@ foreach ($months as $idx => $m) {
                         <div class="size-3 rounded-full bg-medical-blue"></div>
                         <span class="text-[10px] font-black text-text-muted uppercase tracking-widest">Preventivos Programados</span>
                     </div>
-                    <div class="flex items-center gap-3 p-3 bg-panel-dark/40 rounded-xl border border-transparent">
-                        <div class="size-3 rounded-full bg-amber-500"></div>
-                        <span class="text-[10px] font-black text-text-muted uppercase tracking-widest">IA: Sugerencia Predictiva</span>
-                    </div>
+                    <!-- Sugerencia Predictiva Removed -->
                 </div>
                 <div class="mt-8 pt-8 border-t border-[var(--border-color)] space-y-4">
                     <div class="flex items-center justify-between px-1">
@@ -500,8 +497,7 @@ foreach ($months as $idx => $m) {
                             class="size-2 rounded-full bg-[var(--border-color)]"></span> Feriado</span>
                     <span class="flex items-center gap-2 text-[10px] font-black text-text-muted uppercase"><span
                             class="size-2 rounded-full bg-medical-blue"></span> Programado</span>
-                    <span class="flex items-center gap-2 text-[10px] font-black text-text-muted uppercase"><span
-                            class="size-2 rounded-full bg-amber-500"></span> Predictivo (IA)</span>
+                    <!-- Predictive (IA) Legend Removed -->
                 </div>
             </div>
         </div>

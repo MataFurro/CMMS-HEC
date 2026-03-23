@@ -43,7 +43,7 @@ class WorkOrderRepository
             }
         } catch (\Exception $e) {
             LoggerService::error("Error en WorkOrderRepository::findAll", ['error' => $e->getMessage()]);
-            return;
+            return yield from [];
         }
     }
 
@@ -61,8 +61,12 @@ class WorkOrderRepository
 
             $params = [];
             if (!empty($filters['status'])) {
-                $sql .= " AND wo.status = :status";
-                $params['status'] = $filters['status'];
+                if (strtolower($filters['status']) === 'en curso') {
+                    $sql .= " AND LOWER(wo.status) IN ('en curso', 'en proceso', 'abierta', 'pendiente', 'open', 'in_progress', 'asignada')";
+                } else {
+                    $sql .= " AND LOWER(wo.status) = LOWER(:status)";
+                    $params['status'] = $filters['status'];
+                }
             }
             if (!empty($filters['type'])) {
                 $sql .= " AND wo.type = :type";
@@ -82,7 +86,7 @@ class WorkOrderRepository
             }
         } catch (\Exception $e) {
             LoggerService::error("Error en WorkOrderRepository::findPaginated", ['error' => $e->getMessage()]);
-            return;
+            return yield from [];
         }
     }
 
@@ -95,9 +99,14 @@ class WorkOrderRepository
             $sql = "SELECT COUNT(*) FROM work_orders wo WHERE 1=1";
             $params = [];
             if (!empty($filters['status'])) {
-                $sql .= " AND wo.status = :status";
-                $params['status'] = $filters['status'];
+                if (strtolower($filters['status']) === 'en curso') {
+                    $sql .= " AND LOWER(wo.status) IN ('en curso', 'en proceso', 'abierta', 'pendiente', 'open', 'in_progress', 'asignada')";
+                } else {
+                    $sql .= " AND LOWER(wo.status) = LOWER(:status)";
+                    $params['status'] = $filters['status'];
+                }
             }
+
             if (!empty($filters['type'])) {
                 $sql .= " AND wo.type = :type";
                 $params['type'] = $filters['type'];
@@ -139,10 +148,10 @@ class WorkOrderRepository
     {
         $sql = "SELECT 
                     COUNT(*) as total,
-                    SUM(CASE WHEN LOWER(status) IN ('en curso') THEN 1 ELSE 0 END) as pending,
-                SUM(CASE WHEN LOWER(status) IN ('en espera') THEN 1 ELSE 0 END) as on_hold,
-                    SUM(CASE WHEN LOWER(status) IN ('closed', 'terminada', 'cerrada') THEN 1 ELSE 0 END) as completed,
-                    SUM(CASE WHEN (LOWER(priority) IN ('alta', 'crítica', 'high', 'critical')) AND LOWER(status) NOT IN ('closed', 'terminada', 'cerrada') THEN 1 ELSE 0 END) as critical_today
+                    SUM(CASE WHEN LOWER(status) IN ('en curso', 'abierta', 'asignada', 'pendiente', 'open', 'in_progress') THEN 1 ELSE 0 END) as pending,
+                    SUM(CASE WHEN LOWER(status) IN ('en espera', 'on_hold', 'waiting') THEN 1 ELSE 0 END) as on_hold,
+                    SUM(CASE WHEN LOWER(status) IN ('closed', 'terminada', 'cerrada', 'completed') THEN 1 ELSE 0 END) as completed,
+                    SUM(CASE WHEN (LOWER(priority) IN ('alta', 'crítica', 'high', 'critical')) AND LOWER(status) NOT IN ('closed', 'terminada', 'cerrada', 'completed') THEN 1 ELSE 0 END) as critical_today
                 FROM work_orders";
         return $this->db->query($sql)->fetch();
     }
@@ -165,7 +174,7 @@ class WorkOrderRepository
             }
         } catch (\Exception $e) {
             LoggerService::error("Error en WorkOrderRepository::findByTechnician", ['techId' => $techId, 'error' => $e->getMessage()]);
-            return;
+            return yield from [];
         }
     }
 
@@ -187,7 +196,7 @@ class WorkOrderRepository
             }
         } catch (\Exception $e) {
             LoggerService::error("Error en WorkOrderRepository::findAllAssigned", ['error' => $e->getMessage()]);
-            return;
+            return yield from [];
         }
     }
 
@@ -293,6 +302,22 @@ class WorkOrderRepository
         } catch (\Exception $e) {
             LoggerService::error("Error en WorkOrderRepository::partialUpdate", ['id' => $id, 'error' => $e->getMessage()]);
             return false;
+        }
+    }
+
+    /**
+     * Obtener IDs de activos que tienen OTs activas (En Curso, Abierta, etc.)
+     */
+    public function getActiveWorkOrderAssetIds(): array
+    {
+        $sql = "SELECT DISTINCT asset_id FROM work_orders 
+                WHERE LOWER(status) IN ('en curso', 'en proceso', 'abierta', 'pendiente', 'open', 'in_progress', 'asignada', 'on_hold', 'en espera')";
+        
+        try {
+            $stmt = $this->db->query($sql);
+            return $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        } catch (\Exception $e) {
+            return [];
         }
     }
 }
