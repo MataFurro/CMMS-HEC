@@ -54,7 +54,9 @@ class AssetEntity
         public ?string $firmwareVersion = null,
         public ?string $osVersion = null,
         public bool $isAem = false,
-        public ?string $nextMaintenanceDate = null
+        public ?string $nextMaintenanceDate = null,
+        public ?string $udi = null,
+        public ?string $gmdn = null
     ) {}
 
     /**
@@ -115,7 +117,9 @@ class AssetEntity
             firmwareVersion: $data['firmware_version'] ?? null,
             osVersion: $data['os_version'] ?? null,
             isAem: (bool)($data['is_aem'] ?? false),
-            nextMaintenanceDate: $data['next_maintenance_date'] ?? null
+            nextMaintenanceDate: $data['next_maintenance_date'] ?? null,
+            udi: $data['udi'] ?? null,
+            gmdn: $data['gmdn'] ?? null
         );
     }
 
@@ -167,7 +171,9 @@ class AssetEntity
             'firmware_version' => $this->firmwareVersion,
             'os_version' => $this->osVersion,
             'is_aem' => $this->isAem,
-            'next_maintenance_date' => $this->nextMaintenanceDate
+            'next_maintenance_date' => $this->nextMaintenanceDate,
+            'udi' => $this->udi,
+            'gmdn' => $this->gmdn
         ];
     }
 }

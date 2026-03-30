@@ -22,7 +22,12 @@ class DatabaseService
     public static function getInstance(): PDO
     {
         if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
-            throw new Exception("DATABASE_MOCK_MODE_ACTIVE: La base de datos está desconectada por auditoría.");
+            // En modo Mock, devolvemos una conexión SQLite en memoria para evitar excepciones
+            // y permitir que el sistema renderice el front sin servidor SQL.
+            if (self::$instance === null) {
+                self::$instance = new \PDO('sqlite::memory:');
+            }
+            return self::$instance;
         }
 
         if (self::$instance === null) {

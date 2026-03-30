@@ -198,16 +198,47 @@ require_once 'includes/audit_trail.php';
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Clase Riesgo</span>
-                        <span class="text-xs font-black text-text-main"><?= $asset['clase_riesgo'] ?? 'I' ?></span>
+                        <div class="flex flex-col items-end">
+                            <span class="text-xs font-black text-text-main"><?= $asset['clase_riesgo'] ?? 'I' ?></span>
+                            <span class="text-[8px] text-text-muted font-bold">ISP Clase I / EU MDR Clase I</span>
+                        </div>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Riesgo Biomédico</span>
-                        <span class="text-xs font-black text-text-main"><?= $asset['riesgo_biomedico'] ?? 'Medio' ?></span>
+                        <div class="flex flex-col items-end">
+                            <span class="text-xs font-black text-text-main"><?= $asset['riesgo_biomedico'] ?? 'Medio' ?></span>
+                            <span class="text-[8px] text-text-muted font-bold">Norma: ISP (D.825/10)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cumplimiento Regulatorio Global (UDI / GMDN) -->
+                <div class="space-y-4 pt-4 border-t border-[var(--border-color)] bg-medical-blue/5 -mx-6 px-6 pb-4">
+                    <h4 class="text-[10px] font-black uppercase tracking-widest text-medical-blue flex items-center justify-between">
+                        Cumplimiento Global
+                        <span class="text-[8px] bg-medical-blue text-white px-1.5 py-0.5 rounded">FDA / EU MDR</span>
+                    </h4>
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Cód. UDI-DI</span>
+                        <div class="flex flex-col items-end text-right">
+                            <span class="text-xs font-mono font-black text-medical-blue"><?= $asset['udi'] ?? '—' ?></span>
+                            <span class="text-[7px] text-text-muted leading-tight">GS1/HIBC Std | FDA Rule</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Nomenclatura GMDN</span>
+                        <div class="flex flex-col items-end text-right">
+                            <span class="text-xs font-black text-text-main"><?= $asset['gmdn'] ?? '—' ?></span>
+                            <span class="text-[7px] text-text-muted leading-tight">Agencia GMDN (Global)</span>
+                        </div>
                     </div>
                     <?php if (!empty($asset['codigo_umdns'])): ?>
                         <div class="flex justify-between items-center">
                             <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Código UMDNS</span>
-                            <span class="text-xs font-mono font-black text-medical-blue"><?= $asset['codigo_umdns'] ?></span>
+                            <div class="flex flex-col items-end">
+                                <span class="text-xs font-mono font-black text-text-main"><?= $asset['codigo_umdns'] ?></span>
+                                <span class="text-[7px] text-text-muted lowercase">legacy classification</span>
+                            </div>
                         </div>
                     <?php endif; ?>
                 </div>

@@ -10,7 +10,7 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// --- Migrador de Roles de Sesión (Previene bucles por datos antiguos) ---
+// --- Migrador de Roles de Sesión  ---
 if (isset($_SESSION['user_role'])) {
     $current_role = $_SESSION['user_role'];
     $role_map = [
@@ -32,7 +32,7 @@ if (isset($_SESSION['user_role'])) {
     }
 }
 
-// --- Soporte para Variables de Entorno (.env) ---
+// --- Soporte para Variables de Entorno  ---
 function loadEnv($path)
 {
     if (!file_exists($path))
@@ -55,8 +55,8 @@ define('DB_NAME', $_ENV['DB_NAME'] ?? 'biocmms');
 define('DB_USER', $_ENV['DB_USER'] ?? 'root');
 define('DB_PASS', $_ENV['DB_PASS'] ?? '');
 
-// Modo Demo - Activar para auditoría (Desconecta la DB)
-define('USE_MOCK_DATA', filter_var($_ENV['USE_MOCK_DATA'] ?? false, FILTER_VALIDATE_BOOLEAN));
+// MODO REAL FORZADO: Desactivar Mock Data para conectar a XAMPP directamente
+define('USE_MOCK_DATA', false); 
 
 // El sistema ahora utiliza repositorios MySQL. 
 // Las consultas de técnicos y usuarios se realizan vía UserProvider.php
