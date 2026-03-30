@@ -134,33 +134,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
     }
-
-    // 5. Adjuntar Archivo
-    if (isset($_FILES['attachment_file']) && canExecuteWorkOrder()) {
-        $category = $_POST['attachment_category'] ?? 'evidencia';
-        $caption = $_POST['attachment_caption'] ?? '';
-        if (uploadOtAttachment($id, $ot['asset_id'], $_FILES['attachment_file'], $category, $caption)) {
-            echo "<script>window.location.href = '?page=work_order_execution&id=$id&upload_success=1';</script>";
-            exit;
-        }
-    }
 }
 
-// Handle Attachment Upload
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['attachment_file']) && canExecuteWorkOrder()) {
-    $category = $_POST['attachment_category'] ?? 'evidencia';
-    $caption = $_POST['attachment_caption'] ?? '';
-    if (uploadOtAttachment($id, $ot['asset_id'], $_FILES['attachment_file'], $category, $caption)) {
-        echo "<script>
-    window.location.href = '?page=work_order_execution&id=$id&upload_success=1';
-</script>";
-        exit;
-    }
-}
-
-// El bloque de carga anterior se eliminó porque se movió al inicio del archivo.
-$isCompleted = ($ot['status'] ?? '') === 'Terminada';
-$savedChecklist = $ot['checklist_data'] ?? [];
+// --- ESTADO DE COMPLETITUD ---
+$statusValue = ($ot['status'] instanceof \Backend\Models\WorkOrderStatus) ? $ot['status']->value : (string)($ot['status'] ?? 'En Curso');
+$isCompleted = ($statusValue === 'Terminada' || $statusValue === 'Cancelada' || isset($_GET['completed']));
 
 // 2. Obtener datos del equipo (Asset)
 require_once __DIR__ . '/../Backend/Providers/AssetProvider.php';
@@ -974,3 +952,5 @@ $templateVersion = $template['version'] ?? 'V1';
         }))
     });
 </script>
+
+<?php require_once __DIR__ . '/../includes/sidebar.php'; ?>

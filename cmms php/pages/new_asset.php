@@ -248,6 +248,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
 
+        <!-- Global Regulatory & Traceability Section (New) -->
+        <div class="pt-8 border-t border-border-dark/30 space-y-6 relative z-10">
+            <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-medical-blue flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">verified_user</span>
+                Cumplimiento Regulatorio Global & Trazabilidad
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">UDI (Unique Device Identification)</label>
+                    <input name="udi" placeholder="Ej: (01)00884603095304(11)210101..."
+                        class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)] font-mono text-[10px]" />
+                    <p class="text-[9px] text-[var(--text-muted)] italic">Std: FDA UDI Rule | EU MDR 2017/745 (GS1, HIBCC)</p>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">GMDN (Global Nomenclature)</label>
+                    <input name="gmdn" placeholder="Ej: 35146"
+                        class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)]" />
+                    <p class="text-[9px] text-[var(--text-muted)] italic">Nomenclatura Global (IMDRF / GMDN Agency)</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Clase Riesgo (ISP/MDR)</label>
+                        <select name="clase_riesgo"
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)] appearance-none">
+                            <option value="I">Clase I</option>
+                            <option value="IIa">Clase IIa</option>
+                            <option value="IIb">Clase IIb</option>
+                            <option value="III">Clase III</option>
+                        </select>
+                        <p class="text-[9px] text-[var(--text-muted)] italic">Norma: ISP Chile (D.825) & EU MDR</p>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Riesgo Biomédico</label>
+                        <select name="riesgo_biomedico"
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)] appearance-none">
+                            <option value="Bajo">Bajo</option>
+                            <option value="Medio" selected>Medio</option>
+                            <option value="Alto">Alto</option>
+                            <option value="Muy Alto">Muy Alto</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="pt-8 border-t border-border-dark/50 flex justify-end gap-4">
             <a href="?page=inventory"
                 class="px-8 py-3 rounded-2xl text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-all text-sm font-bold uppercase tracking-wider text-center">

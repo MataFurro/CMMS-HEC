@@ -415,14 +415,16 @@ class AssetRepository
                 fecha_instalacion, purchased_year, acquisition_cost, 
                 total_useful_life, useful_life_pct, years_remaining, 
                 warranty_expiration, under_maintenance_plan, en_uso, 
-                image_url, observations, annual_maint_cost, frecuencia_mp_meses, subclase
+                image_url, observations, annual_maint_cost, frecuencia_mp_meses, subclase,
+                udi, gmdn, clase_riesgo, riesgo_biomedico
             ) VALUES (
                 :inventory_id, :hec_id, :name, :serial_number, :brand, :model, :location, :sub_location, 
                 :vendor, :contract_id, :ownership, :criticality, :status, :riesgo_ge, :codigo_umdns, 
                 :fecha_instalacion, :purchased_year, :acquisition_cost, 
                 :total_useful_life, :useful_life_pct, :years_remaining, 
                 :warranty_expiration, :under_maintenance_plan, :en_uso, 
-                :image_url, :observations, :annual_maint_cost, :frecuencia_mp_meses, :subclase
+                :image_url, :observations, :annual_maint_cost, :frecuencia_mp_meses, :subclase,
+                :udi, :gmdn, :clase_riesgo, :riesgo_biomedico
             )";
 
             $stmt = $this->db->prepare($sql);
@@ -456,7 +458,11 @@ class AssetRepository
                 ':observations' => $data['observations'] ?? null,
                 ':annual_maint_cost' => $data['annual_maint_cost'] ?? 0.0,
                 ':frecuencia_mp_meses' => (int)($data['frecuencia_mp_meses'] ?? 6),
-                ':subclase' => $data['subclase'] ?? null
+                ':subclase' => $data['subclase'] ?? null,
+                ':udi' => $data['udi'] ?? null,
+                ':gmdn' => $data['gmdn'] ?? null,
+                ':clase_riesgo' => $data['clase_riesgo'] ?? 'I',
+                ':riesgo_biomedico' => $data['riesgo_biomedico'] ?? 'Medio'
             ];
 
             if ($stmt->execute($params)) {
@@ -516,7 +522,9 @@ class AssetRepository
                 'firmware_version',
                 'os_version',
                 'is_aem',
-                'next_maintenance_date'
+                'next_maintenance_date',
+                'udi',
+                'gmdn'
             ];
             foreach ($allowedFields as $field) {
                 if (isset($data[$field])) {

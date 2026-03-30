@@ -288,10 +288,10 @@ $buildUrl = function ($p, $overrides = []) use ($filterParams) {
                         </td>
                         <td class="px-4 py-4 text-right">
                             <div class="flex items-center justify-end gap-3">
-                                <a href="?page=work_order_execution&id=<?= $ot['id'] ?>"
-                                    class="p-2 bg-panel-dark text-text-muted hover:text-text-main hover:border hover:border-medical-blue/30 rounded-lg transition-all border border-[var(--border-color)] shadow-sm"
-                                    title="Ver Detalles">
-                                    <span class="material-symbols-outlined text-lg">visibility</span>
+                                <a href="http://localhost:3000/api/v1/work-orders/<?= $ot['id'] ?>/pdf" target="_blank"
+                                    class="p-2.5 bg-medical-blue/10 text-medical-blue rounded-xl hover:bg-medical-blue hover:text-white transition-all border border-medical-blue/20 group/btn shadow-sm"
+                                    title="Descargar Reporte BioCMMS (Latex Engine)">
+                                    <span class="material-symbols-outlined text-xl group-hover/btn:scale-110 transition-transform">picture_as_pdf</span>
                                 </a>
                                 <?php if ($ot['status'] !== 'Terminada' && canExecuteWorkOrder()): ?>
                                     <a href="?page=work_order_execution&id=<?= $ot['id'] ?>&action=complete"

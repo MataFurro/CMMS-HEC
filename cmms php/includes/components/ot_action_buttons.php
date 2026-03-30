@@ -39,6 +39,28 @@
             <span>Cancelar OT</span>
         </button>
 
+        <!-- BLOQUE DE ÉXITO (MODO DUAL) -->
+        <div class="p-6 bg-emerald-500/10 border border-emerald-500/30 rounded-[2rem] space-y-4 animate-in zoom-in duration-500 mb-6">
+            <div class="flex items-center gap-4">
+                <div class="size-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <span class="material-symbols-outlined text-2xl">verified_user</span>
+                </div>
+                <div>
+                    <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Orden Finalizada</p>
+                    <p class="text-xs font-bold text-[var(--text-main)]">Reporte Listo</p>
+                </div>
+            </div>
+            
+            <p class="text-[10px] text-[var(--text-muted)] font-medium leading-relaxed">
+                El motor de BioCMMS ha procesado los datos. Puede descargar el informe técnico oficial generado por el **LaTeX Engine**.
+            </p>
+
+            <a href="http://localhost:3000/api/v1/work-orders/<?= $id ?>/pdf" target="_blank"
+                class="w-full py-4 bg-medical-blue text-white rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl shadow-medical-blue/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 border-none cursor-pointer">
+                <span class="material-symbols-outlined text-xl">picture_as_pdf</span>
+                Descargar Reporte Pro
+            </a>
+        </div>
     <?php elseif (!$isCompleted): ?>
         <!-- BOTÓN FINALIZAR -->
         <button type="submit" form="executionForm"
