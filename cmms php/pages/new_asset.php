@@ -18,6 +18,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die("<div class='p-8 text-center text-red-500 font-bold'>Token de seguridad inválido (CSRF). Por favor, vuelva atrás y recargue la página.</div>");
     }
 
+    // Manejar subida de imagen de equipo
+    if (isset($_FILES['imageUpload']) && $_FILES['imageUpload']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = __DIR__ . '/../uploads/assets/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+        $ext = pathinfo($_FILES['imageUpload']['name'], PATHINFO_EXTENSION);
+        $filename = uniqid('asset_') . '.' . $ext;
+        $targetPath = $uploadDir . $filename;
+        if (move_uploaded_file($_FILES['imageUpload']['tmp_name'], $targetPath)) {
+            $_POST['image_url'] = 'uploads/assets/' . $filename;
+        }
+    }
+
     $result = saveAsset($_POST);
 
     if ($result) {
@@ -46,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </a>
     </div>
 
-    <form method="POST" class="card-glass p-8 space-y-8 shadow-2xl relative overflow-hidden">
+    <form method="POST" enctype="multipart/form-data" class="card-glass p-8 space-y-8 shadow-2xl relative overflow-hidden">
         <?= csrfField() ?>
         <div class="absolute top-0 right-0 w-32 h-32 bg-medical-blue/5 blur-3xl rounded-full -mr-16 -mt-16"></div>
 
@@ -233,9 +247,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </select>
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">URL Imagen (Opcional)</label>
-                        <input name="image_url" placeholder="https://..."
-                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)]" />
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Cargar Imagen (Opcional)</label>
+                        <input type="file" name="imageUpload" accept="image/*"
+                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-2.5 text-sm outline-none transition-all text-[var(--text-main)] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-medical-blue/10 file:text-medical-blue hover:file:bg-medical-blue/20" />
                     </div>
                 </div>
 
@@ -244,54 +258,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Observaciones Generales</label>
                     <textarea name="observations" rows="2"
                         class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)] resize-none"></textarea>
-                </div>
-            </div>
-        </div>
-
-        <!-- Global Regulatory & Traceability Section (New) -->
-        <div class="pt-8 border-t border-border-dark/30 space-y-6 relative z-10">
-            <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-medical-blue flex items-center gap-2">
-                <span class="material-symbols-outlined text-sm">verified_user</span>
-                Cumplimiento Regulatorio Global & Trazabilidad
-            </h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="space-y-2">
-                    <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">UDI (Unique Device Identification)</label>
-                    <input name="udi" placeholder="Ej: (01)00884603095304(11)210101..."
-                        class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)] font-mono text-[10px]" />
-                    <p class="text-[9px] text-[var(--text-muted)] italic">Std: FDA UDI Rule | EU MDR 2017/745 (GS1, HIBCC)</p>
-                </div>
-
-                <div class="space-y-2">
-                    <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">GMDN (Global Nomenclature)</label>
-                    <input name="gmdn" placeholder="Ej: 35146"
-                        class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)]" />
-                    <p class="text-[9px] text-[var(--text-muted)] italic">Nomenclatura Global (IMDRF / GMDN Agency)</p>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-2">
-                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Clase Riesgo (ISP/MDR)</label>
-                        <select name="clase_riesgo"
-                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)] appearance-none">
-                            <option value="I">Clase I</option>
-                            <option value="IIa">Clase IIa</option>
-                            <option value="IIb">Clase IIb</option>
-                            <option value="III">Clase III</option>
-                        </select>
-                        <p class="text-[9px] text-[var(--text-muted)] italic">Norma: ISP Chile (D.825) & EU MDR</p>
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Riesgo Biomédico</label>
-                        <select name="riesgo_biomedico"
-                            class="w-full bg-medical-surface border border-border-dark rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-medical-blue/20 focus:border-medical-blue outline-none transition-all text-[var(--text-main)] appearance-none">
-                            <option value="Bajo">Bajo</option>
-                            <option value="Medio" selected>Medio</option>
-                            <option value="Alto">Alto</option>
-                            <option value="Muy Alto">Muy Alto</option>
-                        </select>
-                    </div>
                 </div>
             </div>
         </div>

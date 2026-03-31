@@ -218,6 +218,8 @@ function calcularMetricasGlobales($assets, $otCorrectivas)
     $mttrs = [];
     $disponibilidades = [];
     $totalDowntime = 0;
+    
+    $now = time();
 
     foreach ($assets as $asset) {
         $assetId = $asset['id'] ?? null;
@@ -225,7 +227,13 @@ function calcularMetricasGlobales($assets, $otCorrectivas)
 
         $otsActivo = $otsPorActivo[$assetId] ?? [];
 
-        $mtbf = calcularMTBF_Internal($assetId, $otsActivo);
+        // Calcular días en servicio
+        $instDate = !empty($asset['fecha_instalacion']) ? strtotime($asset['fecha_instalacion']) : strtotime('-1 year');
+        $daysInService = max(1, ($now - $instDate) / 86400);
+        $numFallos = count($otsActivo);
+
+        // MTBF dinámico basado en tiempo en servicio total y cantidad de fallos
+        $mtbf = $numFallos > 0 ? $daysInService / $numFallos : $daysInService;
         $mttr = calcularMTTR_Internal($assetId, $otsActivo);
 
         // Sumar downtime real

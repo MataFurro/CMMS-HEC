@@ -310,15 +310,15 @@ $mttrTrend = getMTTREvolutionData();
             ],
             [
                 'label' => 'Vencidos',
-                'value' => getExpiredOperativeCount(),
+                'value' => getExpiredOperativeCount($assets),
                 'subValue' => 'Exced.',
                 'icon' => 'history_toggle_off',
-                'colorClass' => getExpiredOperativeCount() > 0 ? 'amber-500' : 'slate-400',
+                'colorClass' => getExpiredOperativeCount($assets) > 0 ? 'amber-500' : 'slate-400',
                 'trend' => 'Audit'
             ],
             [
                 'label' => 'Adherencia',
-                'value' => getAdherenceRate() . '%',
+                'value' => getAdherenceRate($assets) . '%',
                 'subValue' => 'Mora',
                 'icon' => 'check_circle',
                 'colorClass' => 'indigo-500',

@@ -139,6 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // --- ESTADO DE COMPLETITUD ---
 $statusValue = ($ot['status'] instanceof \Backend\Models\WorkOrderStatus) ? $ot['status']->value : (string)($ot['status'] ?? 'En Curso');
 $isCompleted = ($statusValue === 'Terminada' || $statusValue === 'Cancelada' || isset($_GET['completed']));
+$savedChecklist = $ot['checklist_data'] ?? [];
 
 // 2. Obtener datos del equipo (Asset)
 require_once __DIR__ . '/../Backend/Providers/AssetProvider.php';
@@ -238,9 +239,21 @@ $templateVersion = $template['version'] ?? 'V1';
                     ✓ Borrador Guardado
                 </div>
             <?php endif; ?>
-            <div class="flex gap-4">
+            <div class="flex gap-3">
+                <?php if ($isCompleted): ?>
+                    <a href="Backend/Exports/generate_ot_pdf.php?id=<?= $id ?>" target="_blank"
+                        class="px-6 py-3 bg-medical-blue text-white rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center gap-2 shadow-lg shadow-medical-blue/20 hover:scale-[1.02] transition-all">
+                        <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
+                        Reporte PDF
+                    </a>
+                    <button type="button" onclick="window.print()"
+                        class="px-6 py-3 bg-medical-surface border border-[var(--border-color)] text-[var(--text-main)] rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center gap-2 hover:bg-medical-blue/10 transition-all print:hidden">
+                        <span class="material-symbols-outlined text-sm">print</span>
+                        Imprimir
+                    </button>
+                <?php endif; ?>
                 <a href="?page=asset&id=<?= $ot['asset_id'] ?? '' ?>"
-                    class="px-6 py-3 bg-medical-surface border border-[var(--border-color)] text-[var(--text-main)] rounded-2xl font-bold text-sm flex items-center gap-3 hover:bg-medical-blue/10 transition-all">
+                    class="px-6 py-3 bg-medical-surface border border-[var(--border-color)] text-[var(--text-main)] rounded-2xl font-bold text-sm flex items-center gap-3 hover:bg-medical-blue/10 transition-all print:hidden">
                     <span class="material-symbols-outlined text-xl">history</span>
                     Ficha del Activo
                 </a>
@@ -257,7 +270,7 @@ $templateVersion = $template['version'] ?? 'V1';
         <input type="hidden" name="action" :value="formAction">
 
         <!-- CONTENIDO PRINCIPAL -->
-        <div class="xl:col-span-9 2xl:col-span-10 xl:col-start-1 space-y-6" style="width: 100% !important; max-width: none !important;">
+        <div class="xl:col-span-8 2xl:col-span-9 space-y-6" style="width: 100% !important; max-width: none !important;">
             <!-- Info Banner (Plantilla + Estado) Movido aquí para mejor flujo -->
             <div class="flex flex-col sm:flex-row items-center gap-4 p-5 bg-medical-blue/5 border border-medical-blue/20 rounded-2xl mb-6">
                 <div class="p-3 bg-medical-blue/10 text-medical-blue rounded-2xl">
@@ -565,37 +578,36 @@ $templateVersion = $template['version'] ?? 'V1';
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-
-                    <!-- Tiempo de Trabajo -->
-                    <div class="space-y-3">
-                        <label class="block text-[11px] font-black text-[var(--text-main)] uppercase tracking-[0.15em]">Horas de Intervención</label>
-                        <div class="relative group">
-                            <input type="number" step="0.5" name="duration_hours" value="<?= $ot['duration_hours'] ?? 0 ?>"
-                                class="w-full bg-[var(--input-bg)] border-2 border-[var(--border-color)] group-hover:border-medical-blue/50 rounded-2xl px-5 py-4 text-sm focus:border-medical-blue outline-none transition-all font-bold text-[var(--text-main)]"
-                                <?= isReadOnly() ? 'disabled' : '' ?>>
-                            <span class="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-black text-medical-blue/60">HRS</span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Tiempo de Trabajo -->
+                        <div class="space-y-3">
+                            <label class="block text-[11px] font-black text-[var(--text-main)] uppercase tracking-[0.15em]">Horas de Intervención</label>
+                            <div class="relative group">
+                                <input type="number" step="0.5" name="duration_hours" value="<?= $ot['duration_hours'] ?? 0 ?>"
+                                    class="w-full bg-[var(--input-bg)] border-2 border-[var(--border-color)] group-hover:border-medical-blue/50 rounded-2xl px-5 py-4 text-sm focus:border-medical-blue outline-none transition-all font-bold text-[var(--text-main)]"
+                                    <?= isReadOnly() ? 'disabled' : '' ?>>
+                                <span class="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-black text-medical-blue/60">HRS</span>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Estado Final -->
-                    <div class="space-y-3">
-                        <label class="block text-[11px] font-black text-[var(--text-main)] uppercase tracking-[0.15em]">Estado Final del Activo</label>
-                        <div class="relative group">
-                            <select name="final_asset_status"
-                                class="w-full bg-[var(--input-bg)] border-2 border-[var(--border-color)] group-hover:border-medical-blue/50 rounded-2xl px-5 py-4 text-sm focus:border-medical-blue outline-none transition-all font-bold text-[var(--text-main)] appearance-none"
-                                <?= isReadOnly() ? 'disabled' : '' ?>>
-                                <option value="OPERATIVE" <?= ($ot['final_asset_status'] ?? '') === 'OPERATIVE' ? 'selected' : '' ?>>OPERATIVO</option>
-                                <option value="DEGRADED" <?= ($ot['final_asset_status'] ?? '') === 'DEGRADED' ? 'selected' : '' ?>>OPERATIVO CON RESTRICCIÓN</option>
-                                <option value="OUT_OF_SERVICE" <?= ($ot['final_asset_status'] ?? '') === 'OUT_OF_SERVICE' ? 'selected' : '' ?>>FUERA DE SERVICIO</option>
-                            </select>
-                            <span class="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--text-muted)]">expand_more</span>
+                        <!-- Estado Final -->
+                        <div class="space-y-3">
+                            <label class="block text-[11px] font-black text-[var(--text-main)] uppercase tracking-[0.15em]">Estado Final del Activo</label>
+                            <div class="relative group">
+                                <select name="final_asset_status"
+                                    class="w-full bg-[var(--input-bg)] border-2 border-[var(--border-color)] group-hover:border-medical-blue/50 rounded-2xl px-5 py-4 text-sm focus:border-medical-blue outline-none transition-all font-bold text-[var(--text-main)] appearance-none"
+                                    <?= isReadOnly() ? 'disabled' : '' ?>>
+                                    <option value="OPERATIVE" <?= ($ot['final_asset_status'] ?? '') === 'OPERATIVE' ? 'selected' : '' ?>>OPERATIVO</option>
+                                    <option value="DEGRADED" <?= ($ot['final_asset_status'] ?? '') === 'DEGRADED' ? 'selected' : '' ?>>OPERATIVO CON RESTRICCIÓN</option>
+                                    <option value="OUT_OF_SERVICE" <?= ($ot['final_asset_status'] ?? '') === 'OUT_OF_SERVICE' ? 'selected' : '' ?>>FUERA DE SERVICIO</option>
+                                </select>
+                                <span class="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--text-muted)]">expand_more</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Handover Section (Only if completing) -->
+                <!-- Handover Section (Only if completing) -->
             <div x-show="isCompleting" x-transition class="bg-emerald-500/5 p-6 rounded-3xl border border-emerald-500/20 space-y-4">
                 <div class="flex items-center gap-3 mb-2">
                     <span class="material-symbols-outlined text-emerald-500">handshake</span>
@@ -768,9 +780,9 @@ $templateVersion = $template['version'] ?? 'V1';
             <?php endif; endif; ?>
         </div>
 
-        <!-- SIDEBAR STICKY (Vuelve a su posición lateral derecha) -->
-        <div class="hidden xl:block xl:col-span-3 2xl:col-span-2">
-            <div class="xl:sticky xl:top-24 space-y-6">
+        <!-- SIDEBAR STICKY -->
+        <div class="xl:col-span-4 2xl:col-span-3">
+            <div class="xl:sticky xl:top-24 space-y-8">
                 <!-- ACCIONES PRINCIPALES (Movidas al lateral) -->
                 <div class="bg-medical-surface p-6 rounded-3xl border border-medical-blue/30 shadow-2xl relative overflow-hidden group">
                     <div class="absolute inset-0 bg-gradient-to-br from-medical-blue/5 to-transparent opacity-50"></div>
@@ -787,98 +799,113 @@ $templateVersion = $template['version'] ?? 'V1';
                 <div class="bg-medical-surface p-6 rounded-3xl border border-[var(--border-color)] shadow-xl overflow-hidden relative group">
                     <div class="absolute -right-4 -top-4 w-24 h-24 bg-medical-blue/5 rounded-full blur-2xl group-hover:bg-medical-blue/10 transition-all"></div>
 
-                    <h3 class="text-xs font-black text-[var(--text-muted)] uppercase tracking-[0.2em] mb-4">Estado de Avance</h3>
+                    <h3 class="text-[11px] font-black text-[var(--text-muted)] uppercase tracking-[0.2em] mb-6">
+                        <?= $isCompleted ? 'Resumen de Registro' : 'Estado de Avance' ?>
+                    </h3>
 
                     <!-- Mini Checklist Progress -->
-                    <div class="space-y-4">
+                    <div class="space-y-6">
                         <?php
-                        $totalItems = count($qualitativeChecks);
-                        $completedItemsCount = 0;
-                        if (isset($savedChecklist['qualitative'])) {
-                            foreach ($savedChecklist['qualitative'] as $k => $v) if (str_starts_with($k, 'q_')) $completedItemsCount++;
-                        }
-                        $percentage = $totalItems > 0 ? floor(($completedItemsCount / $totalItems) * 100) : 0;
+                        $totalItemsCount = count($qualitativeChecks) + count($savedCustomQuali);
+                        $percentage = $isCompleted ? 100 : ($totalItemsCount > 0 ? floor(($completedItemsCount / $totalItemsCount) * 100) : 0);
                         ?>
-                        <div class="flex items-end justify-between">
-                            <span class="text-3xl font-black text-[var(--text-main)] italic" x-text="Math.floor((checkedCount / totalItems) * 100) + '%'"></span>
-                            <span class="text-[10px] font-bold text-[var(--text-muted)]"><span x-text="checkedCount"></span> / <span x-text="totalItems"></span> Ítems</span>
-                        </div>
-                        <div class="h-2 w-full bg-[var(--input-bg)] rounded-full overflow-hidden">
-                            <div class="h-full bg-medical-blue transition-all duration-500" :style="'width: ' + ((checkedCount / totalItems) * 100) + '%'"></div>
-                        </div>
+                        <?php if ($isCompleted): ?>
+                            <div class="flex items-center gap-6 py-2">
+                                <div class="size-14 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/20 shadow-lg shadow-emerald-500/5">
+                                    <span class="material-symbols-outlined text-3xl font-variation-fill">verified</span>
+                                </div>
+                                <div>
+                                    <p class="text-3xl font-black text-[var(--text-main)] italic tracking-tighter">100%</p>
+                                    <p class="text-[10px] font-black text-emerald-500 uppercase tracking-[0.15em] leading-none">REGISTRO COMPLETO</p>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <div class="flex items-end justify-between">
+                                <span class="text-4xl font-black text-[var(--text-main)] italic" x-text="Math.floor((checkedCount / totalItems) * 100) + '%'"></span>
+                                <span class="text-xs font-bold text-[var(--text-muted)]"><span x-text="checkedCount"></span> / <span x-text="totalItems"></span> Ítems</span>
+                            </div>
+                            <div class="h-2.5 w-full bg-[var(--input-bg)] rounded-full overflow-hidden">
+                                <div class="h-full bg-medical-blue transition-all duration-500" :style="'width: ' + ((checkedCount / totalItems) * 100) + '%'"></div>
+                            </div>
+                        <?php endif; ?>
                     </div>
 
-                    <div class="mt-8 pt-6 border-t border-[var(--border-color)] space-y-4">
+                    <div class="mt-8 pt-6 border-t border-[var(--border-color)] space-y-5">
                         <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-bold text-[var(--text-muted)]">Tipo de OT</span>
-                            <span class="text-xs font-black text-medical-blue uppercase tracking-tight"><?= $ot['type'] ?></span>
+                            <span class="text-xs font-bold text-[var(--text-muted)]">Tipo de OT</span>
+                            <span class="text-sm font-black text-medical-blue uppercase tracking-tight"><?= $ot['type'] ?></span>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-bold text-[var(--text-muted)]">Prioridad</span>
-                            <span class="px-2 py-0.5 bg-red-500/10 text-red-500 text-[9px] font-black rounded uppercase">Alta</span>
+                            <span class="text-xs font-bold text-[var(--text-muted)]">Prioridad</span>
+                            <?php
+                            $prioCol = match($ot['priority'] ?? 'Media') {
+                                'Alta' => 'text-red-500 bg-red-500/10 border-red-500/20',
+                                'Media' => 'text-amber-500 bg-amber-500/10 border-amber-500/20',
+                                default => 'text-text-muted bg-slate-500/10 border-slate-500/20'
+                            };
+                            ?>
+                            <span class="px-3 py-1 <?= $prioCol ?> text-[10px] font-black rounded-lg uppercase border tracking-widest"><?= $ot['priority'] ?? 'Media' ?></span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Datos Técnicos del Activo (Solo Lectura) -->
-                <div class="bg-medical-surface p-6 rounded-3xl border border-[var(--border-color)] shadow-xl space-y-4">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-xs font-black text-[var(--text-muted)] uppercase tracking-[0.2em]">Ficha del Activo</h3>
-                        <span class="material-symbols-outlined text-sm text-medical-blue opacity-50">info</span>
+                <!-- Datos Técnicos del Activo (Report Mode - Ampliado) -->
+                <div class="bg-medical-surface p-10 rounded-3xl border border-[var(--border-color)] shadow-xl space-y-8 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-8 opacity-[0.04] pointer-events-none transition-transform group-hover:scale-110">
+                        <span class="material-symbols-outlined text-8xl text-medical-blue">medical_information</span>
                     </div>
 
-                    <div class="space-y-4">
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1">Nombre del Equipo</label>
-                            <div class="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl px-3 py-2 text-xs font-bold text-[var(--text-main)]">
-                                <?= htmlspecialchars($asset['name'] ?? 'N/A') ?>
+                    <div class="flex items-center justify-between mb-2 border-b border-[var(--border-color)]/50 pb-6">
+                        <h3 class="text-[11px] font-black text-[var(--text-muted)] uppercase tracking-[0.25em]">Ficha del Activo</h3>
+                        <span class="material-symbols-outlined text-xl text-medical-blue font-variation-fill">id_card</span>
+                    </div>
+
+                    <div class="space-y-8">
+                        <div class="space-y-2">
+                            <label class="text-[11px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1">Equipo / Modelo</label>
+                            <p class="text-lg font-black text-[var(--text-main)] italic px-1 leading-tight uppercase tracking-tight">
+                                <?= htmlspecialchars($asset['name'] ?? 'N/A') ?> 
+                                <span class="text-medical-blue not-italic mx-2 opacity-30 text-base">/</span> 
+                                <?= htmlspecialchars($asset['model'] ?? 'N/A') ?>
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-8">
+                            <div class="space-y-2">
+                                <label class="text-[11px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1">Marca</label>
+                                <p class="text-sm font-bold text-[var(--text-main)] px-1"><?= htmlspecialchars($asset['brand'] ?? 'N/A') ?></p>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[11px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1">ID Inventario</label>
+                                <p class="text-sm font-mono font-black text-medical-blue px-1 uppercase tracking-tighter"><?= $asset['inventory_id'] ?? 'N/A' ?></p>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="space-y-1">
-                                <label class="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1">Marca</label>
-                                <div class="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl px-3 py-2 text-xs font-bold text-[var(--text-main)]">
-                                    <?= htmlspecialchars($asset['brand'] ?? 'N/A') ?>
-                                </div>
+                        <div class="grid grid-cols-2 gap-8">
+                            <div class="space-y-2">
+                                <label class="text-[11px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1">N° Serie</label>
+                                <p class="text-sm font-bold text-[var(--text-main)] px-1 uppercase"><?= htmlspecialchars($asset['serial_number'] ?? 'N/A') ?></p>
                             </div>
-                            <div class="space-y-1">
-                                <label class="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1">Modelo</label>
-                                <div class="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl px-3 py-2 text-xs font-bold text-[var(--text-main)]">
-                                    <?= htmlspecialchars($asset['model'] ?? 'N/A') ?>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="space-y-1">
-                                <label class="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1">N° Serie</label>
-                                <div class="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl px-3 py-2 text-xs font-bold text-[var(--text-main)]">
-                                    <?= htmlspecialchars($asset['serial_number'] ?? 'N/A') ?>
-                                </div>
-                            </div>
-                            <div class="space-y-1">
-                                <label class="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1">ID Inventario</label>
-                                <div class="w-full bg-white/5 border border-[var(--border-color)] rounded-xl px-3 py-2 text-xs font-bold text-[var(--text-muted)] truncate select-none">
-                                    <?= $asset['inventory_id'] ?? 'N/A' ?>
-                                </div>
+                            <div class="space-y-2">
+                                <label class="text-[11px] font-black text-amber-600 uppercase tracking-widest px-1 italic">Horómetro</label>
+                                <p class="text-base font-black text-amber-600 px-1 italic">
+                                    <?= (int)($asset['hours_used'] ?? 0) ?> 
+                                    <span class="text-[10px] opacity-70 ml-1 font-black">HRS</span>
+                                </p>
                             </div>
                         </div>
 
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-black text-medical-blue uppercase tracking-widest px-1">Ubicación de Operación</label>
-                            <div class="w-full bg-medical-blue/5 border border-medical-blue/20 rounded-xl px-3 py-2 text-xs font-bold text-medical-blue">
-                                <?= htmlspecialchars($asset['location'] ?? 'Sin ubicación') ?>
-                            </div>
-                        </div>
-
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-black text-amber-600 uppercase tracking-widest px-1">Horómetro Actual</label>
-                            <div class="relative">
-                                <div class="w-full bg-amber-500/5 border border-amber-500/20 rounded-xl px-3 py-2 text-xs font-bold text-amber-600">
-                                    <?= (int)($asset['hours_used'] ?? 0) ?>
+                        <div class="pt-6 border-t border-[var(--border-color)]/50">
+                            <div class="flex items-center gap-5 bg-medical-blue/5 p-5 rounded-3xl border border-medical-blue/15 shadow-inner shadow-medical-blue/5">
+                                <div class="size-12 rounded-2xl bg-medical-blue/10 text-medical-blue flex items-center justify-center border border-medical-blue/20">
+                                    <span class="material-symbols-outlined text-2xl">location_on</span>
                                 </div>
-                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-amber-600/50">HRS</span>
+                                <div class="space-y-1.5">
+                                    <label class="text-[10px] font-black text-medical-blue/70 uppercase tracking-widest leading-none">Ubicación de Operación</label>
+                                    <p class="text-sm font-black text-medical-blue uppercase leading-tight tracking-wide">
+                                        <?= htmlspecialchars($asset['location'] ?? 'Sin ubicación') ?>
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>

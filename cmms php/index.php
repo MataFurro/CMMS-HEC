@@ -66,7 +66,7 @@ require_once 'config.php';
 if (!defined('APP_NAME')) define('APP_NAME', 'BioCMMS v4.5');
 
 // 1. Determine target page
-$allowed_pages = ['dashboard', 'inventory', 'calendar', 'work_orders', 'new_asset', 'login', 'asset', 'work_order_execution', 'work_order_opening', 'family_analysis', 'financial_analysis', 'messenger_requests', 'service_request', 'service_request_review', 'accreditation_dashboard', 'bulk_management', 'my_work_orders', 'retired_assets', 'report_print_pdf'];
+$allowed_pages = ['dashboard', 'inventory', 'calendar', 'work_orders', 'new_asset', 'login', 'asset', 'work_order_execution', 'work_order_opening', 'family_analysis', 'financial_analysis', 'messenger_requests', 'service_request', 'service_request_review', 'accreditation_dashboard', 'bulk_management', 'my_work_orders', 'retired_assets', 'report_print_pdf', 'view_ot'];
 
 header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
