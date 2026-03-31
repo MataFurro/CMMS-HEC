@@ -233,12 +233,38 @@ function getWorkOrderStats(): array
 /**
  * Obtener tasa de adherencia al plan de mantenimiento (%)
  */
-function getAdherenceRate(): int
+function getAdherenceRate(?array $assets = null): int
 {
-    $stats = getWorkOrderStats();
-    if ($stats['TOTAL'] === 0)
+    if ($assets === null) {
+        $stats = getWorkOrderStats();
+        if ($stats['TOTAL'] === 0)
+            return 100;
+        return (int)round(($stats['Terminada'] / $stats['TOTAL']) * 100);
+    }
+    
+    $assetIds = array_filter(array_column($assets, 'id'));
+    if (empty($assetIds)) return 100;
+    
+    try {
+        $db = \Backend\Core\DatabaseService::getInstance();
+        $placeholders = implode(',', array_fill(0, count($assetIds), '?'));
+        // Adherencia se basa en preventivas
+        $stmt = $db->prepare("SELECT status, COUNT(*) as cnt FROM work_orders WHERE type='Preventiva' AND asset_id IN ($placeholders) GROUP BY status");
+        $stmt->execute($assetIds);
+        $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $total = 0;
+        $terminada = 0;
+        foreach ($res as $row) {
+            $total += $row['cnt'];
+            if ($row['status'] === 'Terminada') $terminada += $row['cnt'];
+        }
+        
+        if ($total === 0) return 100;
+        return (int)round(($terminada / $total) * 100);
+    } catch (Exception $e) {
         return 100;
-    return round(($stats['Terminada'] / $stats['TOTAL']) * 100);
+    }
 }
 
 function getWorkloadSaturation(): int

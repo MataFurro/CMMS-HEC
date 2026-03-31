@@ -71,11 +71,14 @@ function getAgendaEvents(string $startDate, string $endDate): array
 {
     try {
         $db = DatabaseService::getInstance();
-        $sql = "SELECT w.id, w.asset_id, w.asset_name, w.type, w.status, w.priority, w.date, w.technician, a.location 
+        $sql = "SELECT w.id, w.asset_id, a.name as asset_name, w.type, w.status, w.priority, w.created_date as date, u.name as technician, a.location 
                 FROM work_orders w
                 LEFT JOIN assets a ON w.asset_id = a.id
-                WHERE w.date >= :start AND w.date <= :end
-                ORDER BY w.date ASC";
+                LEFT JOIN users u ON w.assigned_tech_id = u.id
+                WHERE w.type = 'Preventiva'
+                  AND w.created_date >= :start 
+                  AND w.created_date <= :end
+                ORDER BY w.created_date ASC";
 
         $stmt = $db->prepare($sql);
         $stmt->execute(['start' => $startDate, 'end' => $endDate]);

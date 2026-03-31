@@ -169,12 +169,27 @@ function getFinancialStats(?array $assets = null): array
     $obsolescencia = 0;
     $costoMantenimiento = 0;
 
+    $assetIds = [];
     foreach ($assets as $asset) {
         $totalVal += $asset['acquisition_cost'] ?? 0;
         $costoMantenimiento += $asset['annual_maint_cost'] ?? 0;
         if (($asset['useful_life_pct'] ?? 0) <= 0) { // Vida útil excedida (Obsolescente)
             $obsolescencia++;
         }
+        if (!empty($asset['id'])) {
+            $assetIds[] = $asset['id'];
+        }
+    }
+
+    if (!empty($assetIds)) {
+        try {
+            $db = \Backend\Core\DatabaseService::getInstance();
+            $placeholders = implode(',', array_fill(0, count($assetIds), '?'));
+            $stmtHours = $db->prepare("SELECT SUM(duration_hours) FROM work_orders WHERE status = 'Terminada' AND asset_id IN ($placeholders)");
+            $stmtHours->execute($assetIds);
+            $totalHours = (float)$stmtHours->fetchColumn();
+            $costoMantenimiento += ($totalHours * 25000); // 25000 CLP estimacion tarifa hh tecnico
+        } catch(Exception $e) {}
     }
 
     $totalReposicion = $totalVal * REPLACEMENT_COST_FACTOR;
@@ -333,9 +348,10 @@ function getExpiredOperativeCount(?array $assets = null): int
 {
     $assets = $assets ?: getAllAssets();
     return count(array_filter($assets, function ($a) {
-        $status = $a['status'] ?? '';
-        return ($a['useful_life_pct'] ?? 0) <= 0
-            && ($status === 'OPERATIVE' || $status === 'BUENO');
+        if (isset($a['years_remaining'])) {
+            return $a['years_remaining'] <= 0;
+        }
+        return ($a['useful_life_pct'] ?? 1) <= 0;
     }));
 }
 

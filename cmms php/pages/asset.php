@@ -165,83 +165,7 @@ require_once 'includes/audit_trail.php';
                     </div>
                 </div>
 
-                <!-- Campos Normativos Sidebar -->
-                <div class="space-y-4 pt-4 border-t border-[var(--border-color)]">
-                    <div class="flex justify-between items-center">
-                        <span class="text-[10px] font-black text-text-muted uppercase tracking-widest">Clasificación</span>
-                        <span class="px-2 py-1 rounded border text-[9px] font-black flex items-center gap-1.5 <?= $rgeClass ?>">
-                            <span><?= $rgeIcon ?></span>
-                            <span><?= $rge ?></span>
-                        </span>
-                    </div>
-                    <div class="flex justify-between items-center px-4 py-3 bg-medical-blue/5 rounded-2xl border border-medical-blue/10">
-                        <span class="text-[10px] font-black text-medical-blue uppercase tracking-widest flex items-center gap-2">
-                            <span class="material-symbols-outlined text-sm">timer</span>
-                            Uso Acumulado
-                        </span>
-                        <span class="text-sm text-text-main font-black"><?= number_format($asset['hours_used'] ?? 0) ?> h</span>
-                    </div>
-                </div>
-
-                <!-- Gestión Tecnológica (Score Fennigkoh) -->
-                <div class="space-y-4 pt-4 border-t border-[var(--border-color)]">
-                    <h4 class="text-[10px] font-black uppercase tracking-widest text-text-muted">Gestión Tecnológica</h4>
-                    <div class="flex justify-between items-center">
-                        <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Score GE</span>
-                        <span class="text-xs font-black text-[var(--medical-blue)]"><?= $metrics['ge_score'] ?? '—' ?></span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Frecuencia MP</span>
-                        <span class="text-[10px] font-black px-2 py-0.5 rounded bg-medical-blue/10 text-medical-blue border border-medical-blue/20">
-                            <?= $metrics['pm_frequency'] ?? 'No Definida' ?>
-                        </span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Clase Riesgo</span>
-                        <div class="flex flex-col items-end">
-                            <span class="text-xs font-black text-text-main"><?= $asset['clase_riesgo'] ?? 'I' ?></span>
-                            <span class="text-[8px] text-text-muted font-bold">ISP Clase I / EU MDR Clase I</span>
-                        </div>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Riesgo Biomédico</span>
-                        <div class="flex flex-col items-end">
-                            <span class="text-xs font-black text-text-main"><?= $asset['riesgo_biomedico'] ?? 'Medio' ?></span>
-                            <span class="text-[8px] text-text-muted font-bold">Norma: ISP (D.825/10)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Cumplimiento Regulatorio Global (UDI / GMDN) -->
-                <div class="space-y-4 pt-4 border-t border-[var(--border-color)] bg-medical-blue/5 -mx-6 px-6 pb-4">
-                    <h4 class="text-[10px] font-black uppercase tracking-widest text-medical-blue flex items-center justify-between">
-                        Cumplimiento Global
-                        <span class="text-[8px] bg-medical-blue text-white px-1.5 py-0.5 rounded">FDA / EU MDR</span>
-                    </h4>
-                    <div class="flex justify-between items-center">
-                        <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Cód. UDI-DI</span>
-                        <div class="flex flex-col items-end text-right">
-                            <span class="text-xs font-mono font-black text-medical-blue"><?= $asset['udi'] ?? '—' ?></span>
-                            <span class="text-[7px] text-text-muted leading-tight">GS1/HIBC Std | FDA Rule</span>
-                        </div>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Nomenclatura GMDN</span>
-                        <div class="flex flex-col items-end text-right">
-                            <span class="text-xs font-black text-text-main"><?= $asset['gmdn'] ?? '—' ?></span>
-                            <span class="text-[7px] text-text-muted leading-tight">Agencia GMDN (Global)</span>
-                        </div>
-                    </div>
-                    <?php if (!empty($asset['codigo_umdns'])): ?>
-                        <div class="flex justify-between items-center">
-                            <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Código UMDNS</span>
-                            <div class="flex flex-col items-end">
-                                <span class="text-xs font-mono font-black text-text-main"><?= $asset['codigo_umdns'] ?></span>
-                                <span class="text-[7px] text-text-muted lowercase">legacy classification</span>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                </div>
+                <!-- Final de Sidebar Info -->
             </div>
 
             <!-- Alertas de Tecnovigilancia -->
@@ -433,7 +357,7 @@ require_once 'includes/audit_trail.php';
                                         data-tipo="<?= htmlspecialchars($ot['type'] ?? '') ?>" data-estado="<?= htmlspecialchars($ot['status'] ?? '') ?>"
                                         data-fecha="<?= htmlspecialchars($ot['created_date'] ?? $ot['date'] ?? '') ?>">
                                         <td class="py-4 px-4">
-                                            <a href="?page=work_order_execution&id=<?= $ot['id'] ?>"
+                                            <a href="?page=<?= (($ot['status'] ?? '') === 'Terminada') ? 'view_ot' : 'work_order_execution' ?>&id=<?= $ot['id'] ?>"
                                                 class="text-medical-blue hover:text-medical-blue/80 font-bold text-sm">
                                                 <?= $ot['id'] ?>
                                             </a>
@@ -458,7 +382,7 @@ require_once 'includes/audit_trail.php';
                                         <td class="py-4 px-4 text-sm text-text-muted"><?= htmlspecialchars($ot['created_date'] ?? $ot['date'] ?? '—') ?></td>
                                         <td class="py-4 px-4 text-sm text-text-main"><?= htmlspecialchars($ot['tech_name'] ?? $ot['tech'] ?? '—') ?></td>
                                         <td class="py-4 px-4">
-                                            <a href="?page=work_order_execution&id=<?= $ot['id'] ?>"
+                                            <a href="?page=<?= (($ot['status'] ?? '') === 'Terminada') ? 'view_ot' : 'work_order_execution' ?>&id=<?= $ot['id'] ?>"
                                                 class="text-xs font-bold text-medical-blue hover:text-medical-blue/80 uppercase tracking-wider">
                                                 Ver →
                                             </a>

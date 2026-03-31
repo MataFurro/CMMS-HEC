@@ -15,6 +15,7 @@ use Exception;
 class DatabaseService
 {
     private static ?PDO $instance = null;
+    public static ?string $connectionError = null;
 
     /**
      * Obtener la instancia de conexión (Singleton)
@@ -49,10 +50,14 @@ class DatabaseService
 
                 self::$instance = new PDO($dsn, $user, $pass, $options);
             } catch (\PDOException $e) {
-                // Loguear error y lanzar excepción con detalle técnico
-                $detail = $e->getMessage();
-                error_log("DATABASE CONNECTION ERROR: " . $detail);
-                throw new Exception("Error de conexión a MySQL. Verifica que XAMPP/MySQL esté iniciado. Detalle: " . $detail);
+                // FALLBACK: Si falla MySQL, devolvemos una base de datos en memoria vacía
+                self::$connectionError = $e->getMessage();
+                error_log("DATABASE CONNECTION ERROR (Switching to Zero-State): " . self::$connectionError);
+                
+                // Retornamos un PDO de SQLite en memoria (estará vacío, por lo que las tablas no existirán)
+                return new PDO('sqlite::memory:', null, null, [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT // Silencioso para evitar warnings en UI
+                ]);
             }
         }
 

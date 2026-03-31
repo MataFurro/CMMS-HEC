@@ -8,6 +8,7 @@ set_exception_handler(function (Throwable $e) {
     $title   = $isDbError ? 'Base de Datos No Disponible' : 'Error del Sistema';
     $icon    = $isDbError ? 'storage' : 'bug_report';
     $detail  = htmlspecialchars($e->getMessage()) . "\nFile: " . htmlspecialchars($e->getFile()) . "\nLine: " . $e->getLine();
+    file_put_contents('cmms_error_log.txt', date('Y-m-d H:i:s') . "\n" . $e->getMessage() . "\nFile: " . $e->getFile() . "\nLine: " . $e->getLine() . "\n\n", FILE_APPEND);
     $instruction = $isDbError
         ? 'Por favor verifica el estado del servidor MySQL en el Panel de Control de XAMPP.'
         : 'Se ha detectado una anomalía técnica en el código de la aplicación.';
@@ -65,7 +66,7 @@ require_once 'config.php';
 if (!defined('APP_NAME')) define('APP_NAME', 'BioCMMS v4.5');
 
 // 1. Determine target page
-$allowed_pages = ['dashboard', 'inventory', 'calendar', 'work_orders', 'new_asset', 'login', 'asset', 'work_order_execution', 'work_order_opening', 'family_analysis', 'financial_analysis', 'messenger_requests', 'service_request', 'service_request_review', 'accreditation_dashboard', 'bulk_management', 'my_work_orders', 'retired_assets', 'report_print_pdf'];
+$allowed_pages = ['dashboard', 'inventory', 'calendar', 'work_orders', 'new_asset', 'login', 'asset', 'work_order_execution', 'work_order_opening', 'family_analysis', 'financial_analysis', 'messenger_requests', 'service_request', 'service_request_review', 'accreditation_dashboard', 'bulk_management', 'my_work_orders', 'retired_assets', 'report_print_pdf', 'view_ot'];
 
 header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
