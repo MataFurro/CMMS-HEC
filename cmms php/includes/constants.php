@@ -6,7 +6,7 @@
  */
 
 // --- Identidad Visual & Paleta Premium ---
-define('APP_NAME_HTML', 'BioCMMS v4.5');
+define('APP_NAME_HTML', 'BioCMMS v4.5 BUILD 2026');
 define('COLOR_MEDICAL_BLUE', '#0ea5e9'); // Más vibrante v4.2
 define('COLOR_EMERALD', '#10b981');
 define('COLOR_AMBER', '#f59e0b');

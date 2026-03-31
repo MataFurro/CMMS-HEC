@@ -11,7 +11,7 @@ $menuItems = getSidebarMenu($_SESSION['user_role'] ?? '');
             </div>
             <div class="hidden lg:block">
                 <h2 class="text-sm font-black tracking-tight text-text-main leading-none uppercase">BioCMMS</h2>
-                <p class="text-[10px] text-medical-blue font-black tracking-widest uppercase mt-1">v4.5</p>
+                <p class="text-[10px] text-medical-blue font-black tracking-widest uppercase mt-1">v4.5 BUILD 2026</p>
             </div>
         </div>
 

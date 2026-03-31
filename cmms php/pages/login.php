@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - <?= APP_NAME ?></title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="assets/vendor/tailwind.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -185,7 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
 
         <div class="mt-10 text-center">
-            <p class="text-text-main text-[11px] font-bold uppercase tracking-widest opacity-60">Versión 4.4 Build 2026</p>
+            <p class="text-text-main text-[11px] font-bold uppercase tracking-widest opacity-60">Versión 4.5 Build 2026</p>
         </div>
     </div>
 

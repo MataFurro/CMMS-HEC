@@ -42,7 +42,7 @@ if (!$template) {
 <head>
     <meta charset="UTF-8">
     <title>Reporte Técnico #<?= $id ?></title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="assets/vendor/tailwind.min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap">
     <style>
         body {

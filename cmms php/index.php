@@ -63,7 +63,7 @@ set_exception_handler(function (Throwable $e) {
 require_once 'Backend/Core/TemplateUtils.php';
 require_once 'Backend/Core/SecurityUtils.php';
 require_once 'config.php';
-if (!defined('APP_NAME')) define('APP_NAME', 'BioCMMS v4.5');
+if (!defined('APP_NAME')) define('APP_NAME', 'BioCMMS v4.5 BUILD 2026');
 
 // 1. Determine target page
 $allowed_pages = ['dashboard', 'inventory', 'calendar', 'work_orders', 'new_asset', 'login', 'asset', 'work_order_execution', 'work_order_opening', 'family_analysis', 'financial_analysis', 'messenger_requests', 'service_request', 'service_request_review', 'accreditation_dashboard', 'bulk_management', 'my_work_orders', 'retired_assets', 'report_print_pdf', 'view_ot'];
@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $providedToken = $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
     if (!hash_equals($_SESSION['csrf_token'] ?? '', $providedToken)) {
         http_response_code(403);
-        die("Error de Seguridad [CSRF]: Solicitud no autorizada en BioCMMS v4.5");
+        die("Error de Seguridad [CSRF]: Solicitud no autorizada en BioCMMS v4.5 BUILD 2026");
     }
 }
 
@@ -144,7 +144,7 @@ if ($page === 'login' || $page === 'service_request' || (in_array($page, ['bulk_
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BioCMMS v4.5 - Gestión Biomédica</title>
+    <title>BioCMMS v4.5 BUILD 2026 - Gestión Biomédica</title>
 
     <!-- External Dependencies -->
     <script src="assets/vendor/tailwind.min.js"></script>
