@@ -223,18 +223,3 @@ INSERT INTO technicians (user_id, specialty, active_ots, completed_ots, capacity
 (3, 'Técnico Biomédico',        3,  15, 45),
 (4, 'Técnico Especialista',     5,  10, 60);
 
--- Activos
-INSERT INTO assets (id, serial_number, name, brand, model, location, sub_location, vendor, ownership, criticality, status, riesgo_ge, codigo_umdns, fecha_instalacion, purchased_year, acquisition_cost, total_useful_life, useful_life_pct, years_remaining, warranty_expiration, under_maintenance_plan, en_uso, funcion_ge, riesgo_ge_score, mantenimiento_ge) VALUES
-('PB-840-00122', 'SN-992031-B',  'Ventilador Mecánico',        'Puritan Bennett', '840',             'UCI Adultos - Box 04', 'Cama 4',        'Draeger Medical',  'Propio',   'CRITICAL', 'OPERATIVE',          'Life Support', '17-429', '2020-05-10', 2020, 45000.00, 10, 75, 4, '2026-12-15', 1, 1, 10, 5, 4),
-('AL-500-00441', 'SN-882211-X',  'Bomba de Infusión',          'Alaris',          'GH Plus',         'Urgencias - Sala 01',  'Box 1',         'Becton Dickinson', 'Comodato', 'RELEVANT', 'MAINTENANCE',        'High Risk',    '13-215', '2021-02-15', 2021,  8500.00, 10, 85, 7, '2026-02-15', 1, 0,  8, 4, 3),
-('MM-X3-00922',  'SN-773344-Y',  'Monitor Multiparamétrico',   'Mindray',         'BeneVision X3',   'Pabellón 03',          'Mesa Anestesia','Mindray Chile',    'Propio',   'CRITICAL', 'OPERATIVE_WITH_OBS', 'High Risk',    '12-630', '2022-08-20', 2022, 12000.00, 10, 90, 8, '2025-08-20', 1, 1,  9, 4, 3),
-('DF-CU-00210',  'SN-554433-Z',  'Desfibrilador',              'Zoll',            'R Series',        'Piso 3 - Torre A',     'Carro de Paro', 'Medtronic',        'Propio',   'CRITICAL', 'NO_OPERATIVE',       'Life Support', '11-129', '2020-03-30', 2020, 15000.00, 10, 40, 4, '2025-03-30', 1, 0, 10, 5, 3),
-('ECG-2024-001', 'SN-ECG-9988',  'Electrocardiógrafo',         'Philips',         'PageWriter TC70', 'Cardiología',          'Consulta 2',    'Philips Medical',  'Propio',   'RELEVANT', 'OPERATIVE_WITH_OBS', NULL,           NULL,     NULL,         2023,  5500.00,  8, 60, 4, '2027-01-01', 1, 1,  5, 2, 3);
-
-
--- Órdenes de trabajo
-INSERT INTO work_orders (id, asset_id, type, status, assigned_tech_id, created_date, priority, checklist_template) VALUES
-('OT-2026-4584', 'MM-X3-00922',  'Calibracion', 'Pendiente',  3, '2026-02-11', 'Baja',  NULL),
-('OT-2026-4583', 'AL-500-00441', 'Correctiva',  'En Proceso', 4, '2026-02-10', 'Media', NULL),
-('OT-2025-3210', 'DF-CU-00210',  'Preventiva',  'Terminada',  3, '2025-11-20', 'Baja',  NULL),
-('OT-2024-1105', 'PB-840-00122', 'Preventiva',  'Terminada',  4, '2024-08-15', 'Alta',  'ventilador_mecanico');
