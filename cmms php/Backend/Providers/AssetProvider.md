@@ -18,7 +18,7 @@ use Backend\Repositories\AssetRepository;
  */
 function getAllAssets(): array
 {
-    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+    if (defined('FORCE_EMPTY_STATE') && FORCE_EMPTY_STATE === true) {
         return [];
     }
     $repo = new AssetRepository();
@@ -44,7 +44,7 @@ function getAssetById(string $id): ?array
  */
 function searchAssets(string $search = '', string $statusFilter = 'ALL'): array
 {
-    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+    if (defined('FORCE_EMPTY_STATE') && FORCE_EMPTY_STATE === true) {
         return [];
     }
     $repo = new AssetRepository();
@@ -144,7 +144,7 @@ function getFinancialStats(): array
  */
 function countAssetsByStatus(): array
 {
-    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+    if (defined('FORCE_EMPTY_STATE') && FORCE_EMPTY_STATE === true) {
         return [
             'total' => 0,
             'operative' => 0,
@@ -197,7 +197,7 @@ function getCapitalRiskCount(): int
  */
 function getAllLocations(): array
 {
-    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+    if (defined('FORCE_EMPTY_STATE') && FORCE_EMPTY_STATE === true) {
         return [];
     }
     $repo = new AssetRepository();
@@ -245,7 +245,7 @@ function getAssetPerformanceMetrics(string $asset_id): array
  */
 function saveAsset(array $data): bool
 {
-    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+    if (defined('FORCE_EMPTY_STATE') && FORCE_EMPTY_STATE === true) {
         return true;
     }
     $repo = new AssetRepository();
@@ -256,7 +256,7 @@ function saveAsset(array $data): bool
  */
 function updateAssetInfo(string $id, array $data): bool
 {
-    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+    if (defined('FORCE_EMPTY_STATE') && FORCE_EMPTY_STATE === true) {
         return true;
     }
     $repo = new AssetRepository();
@@ -268,7 +268,7 @@ function updateAssetInfo(string $id, array $data): bool
  */
 function deleteAsset(string $id): bool
 {
-    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+    if (defined('FORCE_EMPTY_STATE') && FORCE_EMPTY_STATE === true) {
         return true;
     }
     $repo = new AssetRepository();

@@ -18,7 +18,8 @@ use Generator;
 require_once __DIR__ . '/../Providers/AuditProvider.php';
 class WorkOrderRepository
 {
-    private PDO $db;
+    /** @var PDO|\Backend\Core\SafePDO */
+    private $db;
 
     public function __construct()
     {
@@ -38,6 +39,8 @@ class WorkOrderRepository
                     LEFT JOIN users u ON wo.assigned_tech_id = u.id
                     ORDER BY wo.created_at DESC";
             $stmt = $this->db->query($sql);
+            if (!$stmt) return yield from [];
+            
             while ($row = $stmt->fetch()) {
                 yield WorkOrderEntity::fromArray($row);
             }
@@ -146,14 +149,23 @@ class WorkOrderRepository
      */
     public function getStatusStats(): array
     {
-        $sql = "SELECT 
-                    COUNT(*) as total,
-                    SUM(CASE WHEN LOWER(status) IN ('en curso', 'abierta', 'asignada', 'pendiente', 'open', 'in_progress') THEN 1 ELSE 0 END) as pending,
-                    SUM(CASE WHEN LOWER(status) IN ('en espera', 'on_hold', 'waiting') THEN 1 ELSE 0 END) as on_hold,
-                    SUM(CASE WHEN LOWER(status) IN ('closed', 'terminada', 'cerrada', 'completed') THEN 1 ELSE 0 END) as completed,
-                    SUM(CASE WHEN (LOWER(priority) IN ('alta', 'crítica', 'high', 'critical')) AND LOWER(status) NOT IN ('closed', 'terminada', 'cerrada', 'completed') THEN 1 ELSE 0 END) as critical_today
-                FROM work_orders";
-        return $this->db->query($sql)->fetch();
+        try {
+            $sql = "SELECT 
+                        COUNT(*) as total,
+                        SUM(CASE WHEN LOWER(status) IN ('en curso', 'abierta', 'asignada', 'pendiente', 'open', 'in_progress') THEN 1 ELSE 0 END) as pending,
+                        SUM(CASE WHEN LOWER(status) IN ('en espera', 'on_hold', 'waiting') THEN 1 ELSE 0 END) as on_hold,
+                        SUM(CASE WHEN LOWER(status) IN ('closed', 'terminada', 'cerrada', 'completed') THEN 1 ELSE 0 END) as completed,
+                        SUM(CASE WHEN (LOWER(priority) IN ('alta', 'crítica', 'high', 'critical')) AND LOWER(status) NOT IN ('closed', 'terminada', 'cerrada', 'completed') THEN 1 ELSE 0 END) as critical_today
+                    FROM work_orders";
+            $stmt = $this->db->query($sql);
+            if (!$stmt) {
+                return ['total' => 0, 'pending' => 0, 'on_hold' => 0, 'completed' => 0, 'critical_today' => 0];
+            }
+            $row = $stmt->fetch();
+            return is_array($row) ? $row : ['total' => 0, 'pending' => 0, 'on_hold' => 0, 'completed' => 0, 'critical_today' => 0];
+        } catch (\Exception $e) {
+            return ['total' => 0, 'pending' => 0, 'on_hold' => 0, 'completed' => 0, 'critical_today' => 0];
+        }
     }
 
     /**

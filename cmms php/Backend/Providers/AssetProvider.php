@@ -30,7 +30,7 @@ use Backend\Services\CatalogService;
  */
 function getAllAssets(): array
 {
-    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+    if (defined('FORCE_EMPTY_STATE') && FORCE_EMPTY_STATE === true) {
         return [];
     }
     $repo = new AssetRepository();
@@ -56,7 +56,7 @@ function getAssetById($id): ?array
  */
 function searchAssets(string $search = '', string $statusFilter = 'ALL', int $limit = 0, int $offset = 0, array $filters = []): array
 {
-    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+    if (defined('FORCE_EMPTY_STATE') && FORCE_EMPTY_STATE === true) {
         return [];
     }
     $repo = new AssetRepository();
@@ -72,7 +72,7 @@ function searchAssets(string $search = '', string $statusFilter = 'ALL', int $li
  */
 function countAssets(string $search = '', string $statusFilter = 'ALL', array $filters = []): int
 {
-    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+    if (defined('FORCE_EMPTY_STATE') && FORCE_EMPTY_STATE === true) {
         return 0;
     }
     $repo = new AssetRepository();
@@ -147,7 +147,7 @@ function getAssetOptions(): array
  */
 function getFinancialStats(?array $assets = null): array
 {
-    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+    if (defined('FORCE_EMPTY_STATE') && FORCE_EMPTY_STATE === true) {
         return [
             'valor_inventario' => 0,
             'valor_reposicion' => 0,
@@ -270,7 +270,7 @@ function getActiveWorkOrderAssetIds(): array
  */
 function countAssetsByStatus(?array $assets = null): array
 {
-    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+    if (defined('FORCE_EMPTY_STATE') && FORCE_EMPTY_STATE === true) {
         return [
             'total' => 0,
             'operative' => 0,
@@ -374,7 +374,7 @@ function getCapitalRiskCount(?array $assets = null): int
  */
 function getAllLocations(): array
 {
-    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+    if (defined('FORCE_EMPTY_STATE') && FORCE_EMPTY_STATE === true) {
         return [];
     }
     $repo = new AssetRepository();

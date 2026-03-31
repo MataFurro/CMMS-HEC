@@ -16,19 +16,24 @@ use Backend\Core\DatabaseService;
  */
 function getRecentEvents(int $limit = 10): array
 {
-    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+    try {
+        if (defined('FORCE_EMPTY_STATE') && FORCE_EMPTY_STATE === true) {
+            return [];
+        }
+        $db = DatabaseService::getInstance();
+        $sql = "SELECT a.action as title, u.name as subtitle, a.timestamp as time, a.target_type 
+                FROM audit_trail a
+                JOIN users u ON a.user_id = u.id
+                ORDER BY a.timestamp DESC
+                LIMIT :limit";
+
+        $stmt = $db->prepare($sql);
+        if (!$stmt) return [];
+        $stmt->execute(['limit' => $limit]);
+        $results = $stmt->fetchAll();
+    } catch (\Exception $e) {
         return [];
     }
-    $db = DatabaseService::getInstance();
-    $sql = "SELECT a.action as title, u.name as subtitle, a.timestamp as time, a.target_type 
-            FROM audit_trail a
-            JOIN users u ON a.user_id = u.id
-            ORDER BY a.timestamp DESC
-            LIMIT :limit";
-
-    $stmt = $db->prepare($sql);
-    $stmt->execute(['limit' => $limit]);
-    $results = $stmt->fetchAll();
 
     return array_map(function ($row) {
         $icon = match ($row['target_type']) {
@@ -53,16 +58,21 @@ function getRecentEvents(int $limit = 10): array
  */
 function getEventsByAssetId(string $assetId): array
 {
-    $db = DatabaseService::getInstance();
-    $sql = "SELECT a.action as title, u.name as subtitle, a.timestamp as time 
-            FROM audit_trail a
-            JOIN users u ON a.user_id = u.id
-            WHERE a.asset_id = :asset_id
-            ORDER BY a.timestamp DESC";
+    try {
+        $db = DatabaseService::getInstance();
+        $sql = "SELECT a.action as title, u.name as subtitle, a.timestamp as time 
+                FROM audit_trail a
+                JOIN users u ON a.user_id = u.id
+                WHERE a.asset_id = :asset_id
+                ORDER BY a.timestamp DESC";
 
-    $stmt = $db->prepare($sql);
-    $stmt->execute(['asset_id' => $assetId]);
-    return $stmt->fetchAll();
+        $stmt = $db->prepare($sql);
+        if (!$stmt) return [];
+        $stmt->execute(['asset_id' => $assetId]);
+        return $stmt->fetchAll();
+    } catch (\Exception $e) {
+        return [];
+    }
 }
 /**
  * Obtener eventos para la agenda (OTs reales y sugerencias)
@@ -81,6 +91,7 @@ function getAgendaEvents(string $startDate, string $endDate): array
                 ORDER BY w.created_date ASC";
 
         $stmt = $db->prepare($sql);
+        if (!$stmt) return [];
         $stmt->execute(['start' => $startDate, 'end' => $endDate]);
         $orders = $stmt->fetchAll();
 

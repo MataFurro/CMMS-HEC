@@ -56,7 +56,8 @@ define('DB_USER', $_ENV['DB_USER'] ?? 'root');
 define('DB_PASS', $_ENV['DB_PASS'] ?? '');
 
 // MODO REAL FORZADO: Desactivar Mock Data para conectar a XAMPP directamente
-define('USE_MOCK_DATA', false); 
+// Cambiar a true solo para testear estados "sin datos" en las tablas (UI testing)
+define('FORCE_EMPTY_STATE', false); 
 
 // El sistema ahora utiliza repositorios MySQL. 
 // Las consultas de técnicos y usuarios se realizan vía UserProvider.php
