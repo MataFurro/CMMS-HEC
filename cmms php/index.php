@@ -8,6 +8,7 @@ set_exception_handler(function (Throwable $e) {
     $title   = $isDbError ? 'Base de Datos No Disponible' : 'Error del Sistema';
     $icon    = $isDbError ? 'storage' : 'bug_report';
     $detail  = htmlspecialchars($e->getMessage()) . "\nFile: " . htmlspecialchars($e->getFile()) . "\nLine: " . $e->getLine();
+    file_put_contents('cmms_error_log.txt', date('Y-m-d H:i:s') . "\n" . $e->getMessage() . "\nFile: " . $e->getFile() . "\nLine: " . $e->getLine() . "\n\n", FILE_APPEND);
     $instruction = $isDbError
         ? 'Por favor verifica el estado del servidor MySQL en el Panel de Control de XAMPP.'
         : 'Se ha detectado una anomalía técnica en el código de la aplicación.';
