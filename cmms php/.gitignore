@@ -1,16 +1,30 @@
-# Logs
-storage/logs/*.log
-cmms php/storage/logs/*.log
+# --- BioCMMS v4.5 GitIgnore ---
+
+# Logs & Temporales
 *.log
+storage/logs/*.log
+cmms_error_log.txt
+cmms_audit_raw.csv
+storage/reliability_cache.json
+php_server.log
+php_server_8088.log
+robocopy_sync.log
 
-# Sensitive data
+# Datos Sensibles y Locales
 .env
-config.php (if it contains real secrets, though user asked not to)
+!.env.example
 
-# OS Files
+# Datos Reales (Seguridad)
+*.sql
+!Backend/Database/schema.sql
+biocmms_full_export.sql
+
+# Carpetas de OS e IDE
+.vscode/
+.idea/
 Thumbs.db
 Desktop.ini
 
-# Vendor
+# Vendor / Librerías (Si se usa composer en el futuro)
 vendor/
 node_modules/
