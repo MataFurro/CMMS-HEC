@@ -25,7 +25,7 @@ require_once __DIR__ . '/../Models/WorkOrderEntity.php';
  */
 function getAllWorkOrders(): array
 {
-    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+    if (defined('FORCE_EMPTY_STATE') && FORCE_EMPTY_STATE === true) {
         return [];
     }
     $repo = new WorkOrderRepository();
@@ -209,7 +209,7 @@ function countWorkOrdersByType(): array
  */
 function getWorkOrderStats(): array
 {
-    if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
+    if (defined('FORCE_EMPTY_STATE') && FORCE_EMPTY_STATE === true) {
         return [
             'TOTAL' => 0,
             'En Curso' => 0,

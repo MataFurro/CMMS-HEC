@@ -6,9 +6,10 @@ use PDO;
 
 class CategoryRepository
 {
+    /** @var PDO|\Backend\Core\SafePDO */
     private $db;
 
-    public function __construct(PDO $db)
+    public function __construct($db)
     {
         $this->db = $db;
     }

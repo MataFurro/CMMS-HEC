@@ -21,7 +21,8 @@ use Generator;
  */
 class AssetRepository
 {
-    private PDO $db;
+    /** @var PDO|\Backend\Core\SafePDO */
+    private $db;
 
     public function __construct()
     {
@@ -36,13 +37,15 @@ class AssetRepository
     {
         try {
             $stmt = $this->db->query("SELECT * FROM assets WHERE en_uso = 1 ORDER BY created_at DESC");
+            if (!$stmt) return yield from [];
+            
             LoggerService::info("Consulta exitosa: Lista total de activos generada.");
             while ($row = $stmt->fetch()) {
                 yield AssetEntity::fromArray($row);
             }
         } catch (\Exception $e) {
             LoggerService::error("Error en AssetRepository::findAll", ['error' => $e->getMessage()]);
-            throw new \Backend\Core\Exceptions\DatabaseException("Error al consultar lista de activos.");
+            return yield from [];
         }
     }
 
@@ -329,16 +332,25 @@ class AssetRepository
      */
     public function getStatusCounts(): array
     {
-        $sql = "SELECT 
-                    COUNT(*) as total,
-                    SUM(CASE WHEN status IN ('OPERATIVE', 'BUENO') THEN 1 ELSE 0 END) as operative,
-                    SUM(CASE WHEN status = 'MAINTENANCE' THEN 1 ELSE 0 END) as maintenance,
-                    SUM(CASE WHEN status IN ('NO_OPERATIVE', 'MALO') THEN 1 ELSE 0 END) as no_operative,
-                    SUM(CASE WHEN status IN ('OPERATIVE_WITH_OBS', 'REGULAR') THEN 1 ELSE 0 END) as with_obs
-                FROM assets
-                WHERE en_uso = 1";
+        try {
+            $sql = "SELECT 
+                        COUNT(*) as total,
+                        SUM(CASE WHEN status IN ('OPERATIVE', 'BUENO') THEN 1 ELSE 0 END) as operative,
+                        SUM(CASE WHEN status = 'MAINTENANCE' THEN 1 ELSE 0 END) as maintenance,
+                        SUM(CASE WHEN status IN ('NO_OPERATIVE', 'MALO') THEN 1 ELSE 0 END) as no_operative,
+                        SUM(CASE WHEN status IN ('OPERATIVE_WITH_OBS', 'REGULAR') THEN 1 ELSE 0 END) as with_obs
+                    FROM assets
+                    WHERE en_uso = 1";
 
-        return $this->db->query($sql)->fetch();
+            $stmt = $this->db->query($sql);
+            if (!$stmt) {
+                return ['total' => 0, 'operative' => 0, 'maintenance' => 0, 'no_operative' => 0, 'with_obs' => 0];
+            }
+            $row = $stmt->fetch();
+            return is_array($row) ? $row : ['total' => 0, 'operative' => 0, 'maintenance' => 0, 'no_operative' => 0, 'with_obs' => 0];
+        } catch (\Exception $e) {
+            return ['total' => 0, 'operative' => 0, 'maintenance' => 0, 'no_operative' => 0, 'with_obs' => 0];
+        }
     }
 
     /**
@@ -372,8 +384,13 @@ class AssetRepository
      */
     public function getUniqueLocations(): array
     {
-        $stmt = $this->db->query("SELECT DISTINCT location FROM assets WHERE location IS NOT NULL AND location != '' ORDER BY location ASC");
-        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        try {
+            $stmt = $this->db->query("SELECT DISTINCT location FROM assets WHERE location IS NOT NULL AND location != '' ORDER BY location ASC");
+            if (!$stmt) return [];
+            return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 
     /**

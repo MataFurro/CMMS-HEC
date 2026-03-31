@@ -17,23 +17,10 @@ class DatabaseService
     private static ?PDO $instance = null;
     public static ?string $connectionError = null;
 
-    /**
-     * Obtener la instancia de conexión (Singleton)
-     */
-    public static function getInstance(): PDO
+    public static function getInstance(): PDO|\Backend\Core\SafePDO
     {
-        if (defined('USE_MOCK_DATA') && USE_MOCK_DATA === true) {
-            // En modo Mock, devolvemos una conexión SQLite en memoria para evitar excepciones
-            // y permitir que el sistema renderice el front sin servidor SQL.
-            if (self::$instance === null) {
-                self::$instance = new \PDO('sqlite::memory:');
-            }
-            return self::$instance;
-        }
-
         if (self::$instance === null) {
             try {
-                // Configuración de conexión flexible
                 $host = defined('DB_HOST') ? DB_HOST : '127.0.0.1';
                 $db = defined('DB_NAME') ? DB_NAME : 'biocmms';
                 $user = defined('DB_USER') ? DB_USER : 'root';
@@ -50,24 +37,61 @@ class DatabaseService
 
                 self::$instance = new PDO($dsn, $user, $pass, $options);
             } catch (\PDOException $e) {
-                // FALLBACK: Si falla MySQL, devolvemos una base de datos en memoria vacía
                 self::$connectionError = $e->getMessage();
-                error_log("DATABASE CONNECTION ERROR (Switching to Zero-State): " . self::$connectionError);
-                
-                // Retornamos un PDO de SQLite en memoria (estará vacío, por lo que las tablas no existirán)
-                return new PDO('sqlite::memory:', null, null, [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT // Silencioso para evitar warnings en UI
+                error_log("DATABASE CONNECTION ERROR: " . self::$connectionError);
+
+                // En caso de fallo, devolvemos un SafePDO que envuelve un SQLite en memoria
+                $fallbackPDO = new PDO('sqlite::memory:', null, null, [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT
                 ]);
+                return new SafePDO($fallbackPDO);
             }
         }
 
         return self::$instance;
     }
 
-    /**
-     * Evitar clonación del Singleton
-     */
     private function __clone() {}
     public function __wakeup() {}
     private function __construct() {}
+}
+
+/**
+ * Clase defensiva para evitar el error "Call to a member function execute() on bool"
+ * cuando las tablas no existen en el fallback de SQLite.
+ */
+class SafePDO
+{
+    private PDO $pdo;
+
+    public function __construct(PDO $pdo) {
+        $this->pdo = $pdo;
+    }
+
+    public function prepare($sql, $options = []) {
+        $stmt = $this->pdo->prepare($sql, $options);
+        return $stmt === false ? new NullStatement() : $stmt;
+    }
+
+    public function query($sql, $mode = null, $arg3 = null, $arg4 = null) {
+        $stmt = $this->pdo->query($sql, $mode, $arg3, $arg4);
+        return $stmt === false ? new NullStatement() : $stmt;
+    }
+
+    public function __call($name, $arguments) {
+        return call_user_func_array([$this->pdo, $name], $arguments);
+    }
+}
+
+/**
+ * Representa una sentencia que no hace nada pero evita crasheos.
+ */
+class NullStatement
+{
+    public function execute($params = null) { return false; }
+    public function fetch($mode = null, $cursor = null, $offset = null) { return false; }
+    public function fetchAll($mode = null, $arg2 = null, $arg3 = null) { return []; }
+    public function fetchColumn($column = 0) { return null; }
+    public function rowCount() { return 0; }
+    public function __call($name, $arguments) { return null; }
 }
