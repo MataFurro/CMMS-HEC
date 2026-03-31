@@ -95,10 +95,6 @@ foreach ($months as $idx => $m) {
                     Leyenda de Estados</h3>
                 <div class="space-y-4">
                     <div class="flex items-center gap-3 p-3 bg-panel-dark/40 rounded-xl border border-transparent">
-                        <div class="size-3 rounded-full bg-danger"></div>
-                        <span class="text-[10px] font-black text-text-muted uppercase tracking-widest">Correctivos Críticos</span>
-                    </div>
-                    <div class="flex items-center gap-3 p-3 bg-panel-dark/40 rounded-xl border border-transparent">
                         <div class="size-3 rounded-full bg-medical-blue"></div>
                         <span class="text-[10px] font-black text-text-muted uppercase tracking-widest">Preventivos Programados</span>
                     </div>

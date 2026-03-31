@@ -426,15 +426,7 @@ $mttrTrend = getMTTREvolutionData();
             </div>
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
                 <div class="md:col-span-8 h-[350px] flex items-center justify-center">
-                    <?php if ($hasCorrectives): ?>
-                        <canvas id="reliabilityCurveChart"></canvas>
-                    <?php else: ?>
-                        <div class="text-center space-y-4">
-                            <span class="material-symbols-outlined text-6xl text-slate-300 dark:text-slate-700">query_stats</span>
-                            <p class="text-xs text-[var(--text-muted)] font-bold uppercase tracking-widest">Sin datos históricos de fallas para modelar curva</p>
-                            <p class="text-[10px] text-[var(--text-muted)] max-w-xs mx-auto italic">Se requieren Órdenes de Trabajo correctivas finalizadas para generar el pronóstico Weibull.</p>
-                        </div>
-                    <?php endif; ?>
+                    <canvas id="reliabilityCurveChart"></canvas>
                 </div>
                 <div class="md:col-span-4 space-y-6">
                     <div class="card-glass <?= $hasCorrectives ? 'bg-amber-500/5 border-amber-500/10' : 'opacity-50 grayscale' ?> p-6 border">
@@ -968,81 +960,79 @@ $mttrTrend = getMTTREvolutionData();
         try {
             const ctx0 = document.getElementById('reliabilityCurveChart');
             if (ctx0) {
-                <?php if ($hasCorrectives): ?>
-                    new Chart(ctx0, {
-                        type: 'line',
-                        data: {
-                            labels: <?= json_encode($labelsCurva) ?>,
-                            datasets: [{
-                                label: 'Probabilidad de Falla F(t) (%)',
-                                data: <?= json_encode($puntosCurva) ?>,
-                                borderColor: '#f59e0b',
-                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                                fill: true,
-                                tension: 0.4,
-                                borderWidth: 3,
-                                pointRadius: 4,
-                                pointBackgroundColor: '#f59e0b',
-                                pointBorderColor: '#fff',
-                                pointBorderWidth: 2
-                            }]
-                        },
-                        options: Object.assign({}, commonOptions, {
-                            scales: {
-                                x: {
-                                    grid: {
-                                        color: gridColor
-                                    },
-                                    ticks: {
-                                        color: mutedText,
-                                        font: {
-                                            weight: 'bold',
-                                            size: 10
-                                        }
-                                    },
-                                    title: {
-                                        display: true,
-                                        text: 'Tiempo Transcurrido (Días)',
-                                        color: mutedText,
-                                        font: {
-                                            size: 10
-                                        }
+                new Chart(ctx0, {
+                    type: 'line',
+                    data: {
+                        labels: <?= json_encode($labelsCurva) ?>,
+                        datasets: [{
+                            label: 'Probabilidad de Falla F(t) (%)',
+                            data: <?= json_encode($puntosCurva) ?>,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#f59e0b',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2
+                        }]
+                    },
+                    options: Object.assign({}, commonOptions, {
+                        scales: {
+                            x: {
+                                grid: {
+                                    color: gridColor
+                                },
+                                ticks: {
+                                    color: mutedText,
+                                    font: {
+                                        weight: 'bold',
+                                        size: 10
                                     }
                                 },
-                                y: {
-                                    min: 0,
-                                    max: 100,
-                                    grid: {
-                                        color: gridColor
-                                    },
-                                    ticks: {
-                                        color: mutedText,
-                                        callback: function(value) {
-                                            return value + '%'
-                                        }
-                                    },
-                                    title: {
-                                        display: true,
-                                        text: 'Probabilidad de Ocurrencia',
-                                        color: mutedText,
-                                        font: {
-                                            size: 10
-                                        }
+                                title: {
+                                    display: true,
+                                    text: 'Tiempo Transcurrido (Días)',
+                                    color: mutedText,
+                                    font: {
+                                        size: 10
                                     }
                                 }
                             },
-                            plugins: {
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            return 'Riesgo de Falla: ' + context.parsed.y + '%';
-                                        }
+                            y: {
+                                min: 0,
+                                max: 100,
+                                grid: {
+                                    color: gridColor
+                                },
+                                ticks: {
+                                    color: mutedText,
+                                    callback: function(value) {
+                                        return value + '%'
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Probabilidad de Ocurrencia',
+                                    color: mutedText,
+                                    font: {
+                                        size: 10
                                     }
                                 }
                             }
-                        })
-                    });
-                <?php endif; ?>
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Riesgo de Falla: ' + context.parsed.y + '%';
+                                    }
+                                }
+                            }
+                        }
+                    })
+                });
             }
         } catch (e) {
             console.warn("Error en reliabilityCurveChart:", e);
